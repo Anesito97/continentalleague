@@ -4,7 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestor de Liga de Fútbol</title>
+    <title>Continental League</title>
+    <link rel="icon" type="image/png" href="{{ asset('logo.png') }}">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* ------------------------------------------------ */
@@ -130,7 +131,7 @@
     <div id="loader-overlay">
         <div class="spinner"></div>
     </div>
-    
+
     <div id="app-container" class="flex flex-col">
 
         {{-- 1. HEADER (Navbar) --}}
@@ -169,9 +170,9 @@
         </main>
 
         {{-- FOOTER --}}
-        <footer class="bg-gray-800 mt-8 py-4 text-center text-gray-500 text-sm">
+        {{-- <footer class="bg-gray-800 mt-8 py-4 text-center text-gray-500 text-sm">
             Diseño Frontend con Tailwind CSS | Backend Laravel
-        </footer>
+        </footer> --}}
     </div>
 
     {{-- 3. CUSTOM MESSAGE/ALERT MODAL --}}
