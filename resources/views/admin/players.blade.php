@@ -61,7 +61,7 @@
 
     {{-- Listado de Jugadores --}}
     <div class="card p-4 hover:transform-none">
-        <h4 class="text-xl font-semibold mb-3">Jugadores Registrados (DB)</h4>
+        <h4 class="text-xl font-semibold mb-3">Últimos 10 Jugadores Registrados</h4>
         <ul id="players-list" class="space-y-2 text-sm text-gray-300">
             @forelse($players as $player)
                 {{-- Contenido principal de la lista --}}

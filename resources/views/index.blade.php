@@ -140,32 +140,35 @@
         {{-- 2. MAIN CONTENT AREA --}}
         <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
 
-            {{-- VISTA PÚBLICA: CLASIFICACIÓN (HOME) --}}
-            <section id="home-view" data-view="home"
-                class="view-panel space-y-8 @if ($activeView !== 'home') hidden @endif">
-                @include('partials.standings', ['teams' => $teams, 'recentMatches' => $recentMatches])
-            </section>
+            {{-- ⬇️ 1. Si hay contenido externo (como la vista de jugadores), muéstralo aquí ⬇️ --}}
+            @hasSection('content')
+                @yield('content')
+            @else
+                {{-- ⬇️ 2. Si no hay contenido externo, muestra el sistema de paneles normal ⬇️ --}}
+                <section id="home-view" data-view="home"
+                    class="view-panel space-y-8 @if ($activeView !== 'home') hidden @endif">
+                    @include('partials.standings', ['teams' => $teams, 'recentMatches' => $recentMatches])
+                </section>
 
-            {{-- VISTA PÚBLICA: ESTADÍSTICAS (STATS) --}}
-            <section id="stats-view" data-view="stats"
-                class="view-panel @if ($activeView !== 'stats') hidden @endif space-y-8">
-                @include('partials.stats', [
-                    'topScorers' => $topScorers,
-                    'topAssists' => $topAssists,
-                    'topKeepers' => $topKeepers,
-                ])
-            </section>
+                <section id="stats-view" data-view="stats"
+                    class="view-panel @if ($activeView !== 'stats') hidden @endif space-y-8">
+                    @include('partials.stats', [
+                        'topScorers' => $topScorers,
+                        'topAssists' => $topAssists,
+                        'topKeepers' => $topKeepers,
+                    ])
+                </section>
 
-            {{-- VISTA DE ADMINISTRACIÓN (ADMIN) --}}
-            <section id="admin-view" data-view="admin"
-                class="view-panel @if ($activeView !== 'admin') hidden @endif">
-                @include('admin.panel', [
-                    'teams' => $teams,
-                    'players' => $players,
-                    'pendingMatches' => $pendingMatches,
-                    'activeAdminContent' => session('activeAdminContent', 'teams'), // Carga el contenido activo
-                ])
-            </section>
+                <section id="admin-view" data-view="admin"
+                    class="view-panel @if ($activeView !== 'admin') hidden @endif">
+                    @include('admin.panel', [
+                        'teams' => $teams,
+                        'players' => $players,
+                        'pendingMatches' => $pendingMatches,
+                        'activeAdminContent' => session('activeAdminContent', 'teams'),
+                    ])
+                </section>
+            @endif
 
         </main>
 

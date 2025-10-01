@@ -12,7 +12,10 @@ class DashboardController extends Controller
     private function loadAllData()
     {
         $teams = Equipo::orderByDesc('puntos')->orderByDesc('goles_a_favor')->get();
-        $players = Jugador::with('equipo')->get();
+        $players = Jugador::with('equipo')
+                           ->orderBy('id', 'desc') 
+                           ->take(10)
+                           ->get();
 
         $pendingMatches = Partido::with(['localTeam', 'visitorTeam'])
             ->where('estado', 'pendiente')
@@ -20,11 +23,11 @@ class DashboardController extends Controller
             ->get();
 
         $recentMatches = Partido::with([
-                'localTeam',
-                'visitorTeam',
-                'eventos.jugador',
-                'eventos.equipo'
-            ])
+            'localTeam',
+            'visitorTeam',
+            'eventos.jugador',
+            'eventos.equipo'
+        ])
             ->orderBy('fecha_hora', 'desc')
             ->limit(10)
             ->get();
@@ -105,5 +108,23 @@ class DashboardController extends Controller
         // Asegúrate de cargar las relaciones necesarias para el formulario de partido
         $partido->load(['localTeam', 'visitorTeam']);
         return view('edit', $data);
+    }
+
+    public function showTeamPlayers(Equipo $equipo)
+    {
+        // Asegúrate de cargar la relación 'jugadores' y ordenarlos por número de camiseta
+        $equipo->load([
+            'jugadores' => function ($query) {
+                $query->orderBy('numero', 'asc');
+            }
+        ]);
+
+        $data = $this->loadAllData(); // Carga todos los datos generales (teams, pending matches, etc.)
+        $data['equipoActual'] = $equipo;
+        $data['players'] = $equipo->jugadores; // Sobrescribimos 'players' con solo los de este equipo
+        $data['activeView'] = 'admin';
+        $data['activeAdminContent'] = 'teams'; // Mantenemos la navegación activa en 'teams'
+
+        return view('admin.team_players', $data);
     }
 }

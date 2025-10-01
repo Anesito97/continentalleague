@@ -49,5 +49,7 @@ Route::middleware(\App\Http\Middleware\AdminCheck::class)
         Route::delete('players/{jugador}', [PlayerController::class, 'destroy'])->name('players.destroy');
         Route::delete('matches/{partido}', [MatchController::class, 'destroy'])->name('matches.destroy');
 
+        Route::get('teams/{equipo}/players', [DashboardController::class, 'showTeamPlayers'])->name('teams.players');
+
         // RUTAS PENDIENTES (Ej: teams/delete/{id}, players/edit/{id}, etc.)
     });

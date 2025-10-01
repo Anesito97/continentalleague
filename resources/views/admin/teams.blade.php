@@ -23,13 +23,16 @@
         <h4 class="text-xl font-semibold mb-3">Equipos Registrados (DB)</h4>
         <ul id="teams-list" class="space-y-2 text-sm text-gray-300">
             @forelse($teams as $team)
-                {{-- Contenido principal de la lista --}}
                 <li class="p-2 bg-gray-700 rounded-md flex justify-between items-center">
                     <span>{{ $team->nombre }} (Ptos: {{ $team->puntos }})</span>
 
-                    {{-- ACCIONES DE EDITAR/ELIMINAR --}}
                     <div class="flex space-x-2">
-                        {{-- ⬇️ CORRECCIÓN: Usar enlace <a> para la ruta de edición ⬇️ --}}
+                        {{-- ⬇️ NUEVO BOTÓN: Ver Jugadores ⬇️ --}}
+                        <a href="{{ route('teams.players', $team->id) }}"
+                            class="bg-gray-600 hover:bg-gray-800 text-white px-2 py-1 rounded-md text-xs">Ver
+                            Jugadores</a>
+
+                        {{-- Botón Editar --}}
                         <a href="{{ route('teams.edit', $team->id) }}"
                             class="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded-md text-xs">Editar</a>
 
