@@ -6,19 +6,41 @@
     <title>Editar {{ ucfirst($type) }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Estilos base de Tailwind, etc. */
-        .card {
-            background-color: #1f2937;
-            border-radius: 0.75rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            padding: 1.5rem;
-        }
-        input[type="text"], input[type="number"], input[type="file"], input[type="date"], input[type="time"], select {
-            background-color: #374151; /* Color de fondo para inputs */
-            border-color: #4b5563; /* Color de borde */
-        }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        
+        :root { --color-primary: #10b981; --color-dark-bg: #111827; --color-card-bg: #1f2937; }
+
         body {
             font-family: 'Inter', sans-serif;
+            background-color: var(--color-dark-bg);
+            color: #e5e7eb;
+        }
+        
+        /* Estilos Profesionales */
+        .card {
+            background-color: var(--color-card-bg);
+            border-radius: 0.75rem;
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.5); 
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            padding: 1.5rem;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 15px 20px rgba(0, 0, 0, 0.7);
+        }
+
+        /* Inputs Consistentes */
+        input[type="text"], input[type="number"], input[type="file"], input[type="date"], input[type="time"], select {
+            background-color: #374151;
+            border-color: #4b5563;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--color-primary) !important;
+            box-shadow: 0 0 0 1px var(--color-primary); /* Efecto de enfoque sutil */
         }
     </style>
 </head>
@@ -29,18 +51,8 @@
                 Editar {{ ucfirst($type) }}: {{ $item->nombre ?? 'ID ' . $item->id }}
             </h2>
 
-            @include('partials.alerts') {{-- Asumiendo que tienes un archivo alerts.blade.php para mensajes de sesión --}}
+            @include('partials.alerts')
 
-            {{-- 
-                FORMULARIO DE ACTUALIZACIÓN (PUT)
-                
-                CORRECCIÓN CLAVE: Se usa una expresión ternaria para asegurar que 'match'
-                se pluralice correctamente como 'matches' y no 'matchs' al llamar a la ruta.
-                
-                Ruta para actualizar: 
-                - Si es 'match': route('matches.update', ...)
-                - Si es 'team' o 'player': route('teams.update', ...) o route('players.update', ...)
-            --}}
             <form method="POST" 
                   action="{{ route($type === 'match' ? 'matches.update' : $type . 's.update', $item->id) }}" 
                   enctype="multipart/form-data">
@@ -62,18 +74,10 @@
 
                 {{-- FORMULARIO DE JUGADOR --}}
                 @elseif($type === 'player')
-                    {{-- 
-                        ASUME que este es el contenido del include, ya que necesitamos los campos.
-                        Si tienes un archivo real, asegúrate de que exista en 'admin/forms/player_edit.blade.php' 
-                    --}}
                     @include('admin.forms.player_edit', ['player' => $item, 'teams' => $teams])
 
                 {{-- FORMULARIO DE PARTIDO --}}
                 @elseif($type === 'match')
-                    {{-- 
-                        ASUME que este es el contenido del include, ya que necesitamos los campos.
-                        Si tienes un archivo real, asegúrate de que exista en 'admin/forms/match_edit.blade.php' 
-                    --}}
                     @include('admin.forms.match_edit', ['match' => $item, 'teams' => $teams])
                 @endif
 
@@ -83,11 +87,6 @@
                 </div>
             </form>
 
-            {{-- 
-                FORMULARIO DE ELIMINACIÓN (DELETE)
-                
-                CORRECCIÓN CLAVE: También se aplica la expresión ternaria aquí para la ruta destroy.
-            --}}
             <form method="POST" 
                   action="{{ route($type === 'match' ? 'matches.destroy' : $type . 's.destroy', $item->id) }}" 
                   onsubmit="return confirm('¿CONFIRMAS ELIMINAR {{ ucfirst($type) }} ({{ $item->nombre ?? $item->id }})?');" 

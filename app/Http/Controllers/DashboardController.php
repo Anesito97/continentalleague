@@ -19,7 +19,12 @@ class DashboardController extends Controller
             ->orderBy('fecha_hora', 'asc')
             ->get();
 
-        $recentMatches = Partido::with(['localTeam', 'visitorTeam'])
+        $recentMatches = Partido::with([
+                'localTeam',
+                'visitorTeam',
+                'eventos.jugador',
+                'eventos.equipo'
+            ])
             ->orderBy('fecha_hora', 'desc')
             ->limit(10)
             ->get();
