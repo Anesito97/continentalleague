@@ -7,80 +7,130 @@
     <title>Gestor de Liga de Fútbol</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* ... (CSS Styles omitidos por brevedad) ... */
+        /* ------------------------------------------------ */
+        /* RESET Y ESTILOS BASE (Manejo de scroll y altura) */
+        /* ------------------------------------------------ */
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
 
+        /* Reseteo para evitar márgenes predeterminados */
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* ------------------------------------------------ */
+        /* ESTÉTICA GENERAL */
+        /* ------------------------------------------------ */
         :root {
             --color-primary: #10b981;
-            /* Mantener Esmeralda/Verde vibrante */
             --color-secondary: #3b82f6;
-            /* Mantener Azul */
             --color-dark-bg: #111827;
-            /* Fondo más oscuro y profundo (Gray 900 -> Gray 950 simulado) */
             --color-card-bg: #1f2937;
-            /* Gris oscuro para las tarjetas */
         }
 
         body {
             font-family: 'Inter', sans-serif;
             background-color: var(--color-dark-bg);
-            /* Usar variable para fondo */
             color: #e5e7eb;
-            /* Texto base más brillante (Gray 200) */
             -webkit-font-smoothing: antialiased;
             -moz-osx-moz-smoothing: grayscale;
         }
 
-        /* Estilos mejorados para la interfaz (Tarjetas y Sombras más profundas) */
+        /* Estilos de Tarjeta (Mantener) */
         .card {
             background-color: var(--color-card-bg);
             border-radius: 0.75rem;
-            /* Sombra interior para dar efecto 3D sutil (opcional) */
             box-shadow: 0 10px 15px rgba(0, 0, 0, 0.5);
-            /* Sombra más oscura y grande */
             border: 1px solid rgba(255, 255, 255, 0.05);
-            /* Borde sutil para definir el espacio */
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
         .card:hover {
             transform: translateY(-4px);
-            /* Efecto de elevación más notable */
             box-shadow: 0 15px 20px rgba(0, 0, 0, 0.7);
         }
 
-        .admin-nav-item:hover {
-            background-color: #374151;
-            transition: background-color 0.2s;
+        /* ... (Otros estilos de formularios, etc., se asume que están correctos) ... */
+
+
+        /* ------------------------------------------------ */
+        /* LÓGICA DEL LOADER (CRÍTICA PARA EL SCROLL) */
+        /* ------------------------------------------------ */
+
+        /* FIX DEFINITIVO: Fija el body durante la carga para evitar el scroll */
+        body.loading {
+            overflow: hidden;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
         }
 
-        /* Ajustar las entradas de formulario para que coincidan con el fondo */
-        input[type="text"],
-        input[type="password"],
-        input[type="number"],
-        input[type="date"],
-        input[type="time"],
-        select {
-            background-color: #374151;
-            border-color: #4b5563;
-            transition: border-color 0.3s;
+        /* Restaura el flujo normal al terminar la carga */
+        body:not(.loading) {
+            position: static;
+            overflow-y: auto;
         }
 
-        input:focus,
-        select:focus {
-            border-color: var(--color-primary) !important;
-            /* Resaltar con el color primario al enfocar */
-            ring-color: var(--color-primary);
+        /* Ocultar el contenido principal con transición */
+        body.loading #app-container {
+            opacity: 0;
+            visibility: hidden;
         }
 
-        #app-container {
-            min-height: 100vh;
+        body:not(.loading) #app-container {
+            opacity: 1;
+            visibility: visible;
+            transition: opacity 0.5s ease-in;
+        }
+
+        /* Loader Overlay (Mantener) */
+        #loader-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--color-dark-bg);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.5s ease-out;
+        }
+
+        /* Estilos del spinner (Mantener) */
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.2);
+            border-top: 4px solid var(--color-primary);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
         }
     </style>
 </head>
 
 <body class="bg-gray-900 text-gray-100">
-
+    {{-- ⬇️ 2. OVERLAY DEL LOADER ⬇️ --}}
+    <div id="loader-overlay">
+        <div class="spinner"></div>
+    </div>
+    
     <div id="app-container" class="flex flex-col">
 
         {{-- 1. HEADER (Navbar) --}}
@@ -167,6 +217,23 @@
     </div>
 
 
+
+    {{-- 3. SCRIPT DE CIERRE DEL LOADER --}}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Espera un pequeño retraso (ej. 300ms) para que el spinner sea visible, luego lo oculta.
+            setTimeout(function() {
+                document.body.classList.remove('loading');
+                document.getElementById('loader-overlay').style.opacity = '0';
+
+                // Opcional: Eliminar el overlay del DOM después de la transición
+                setTimeout(function() {
+                    const overlay = document.getElementById('loader-overlay');
+                    if (overlay) overlay.style.display = 'none';
+                }, 500);
+            }, 300); // Retraso de 300ms antes de empezar a ocultar
+        });
+    </script>
     {{-- SCRIPT ESENCIAL PARA SESIÓN Y ALERTAS --}}
     <script>
         // =======================================================
