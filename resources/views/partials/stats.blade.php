@@ -1,101 +1,144 @@
-<h2 class="text-4xl font-bold text-white mb-6 border-b border-green-700 pb-2">Estadísticas de Jugadores</h2>
-
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+{{-- Determine the active tab from the URL, default to 'scorers' --}}
+@php
+    // We assume the stats view URL accepts a 'stat' parameter, e.g., /?view=stats&stat=scorers
+    $activeStat = request()->query('stat', 'scorers');
     
-    {{-- GOLEADORES --}}
-    <div class="card p-6">
-        <h3 class="text-xl font-semibold mb-4 text-red-400 flex items-center">
-            {{-- Puedes añadir un icono SVG aquí si quieres --}}
-            Goleadores
-        </h3>
-        <ol id="top-scorers" class="list-none space-y-3">
-            @forelse($topScorers as $i => $player)
-                <li class="flex justify-between items-center text-gray-300 border-b border-gray-700 pb-3 last:border-b-0">
-                    
-                    {{-- Player Info (Photo, Rank, Name, Team) --}}
-                    <div class="flex items-center space-x-3">
-                        <span class="font-bold w-4 text-center {{ $i === 0 ? 'text-yellow-400' : '' }}">{{ $i + 1 }}.</span>
-                        
-                        {{-- ⬇️ Imagen del Jugador ⬇️ --}}
-                        <img src="{{ $player->foto_url ?? 'https://placehold.co/50x50/1f2937/FFFFFF?text=JUG' }}"
-                            onerror="this.src='https://placehold.co/50x50/1f2937/FFFFFF?text=JUG'"
-                            class="w-10 h-10 rounded-full object-cover">
-                        
-                        <div class="flex flex-col text-sm">
-                            <span class="font-semibold text-white">{{ $player->nombre }}</span>
-                            <span class="text-xs text-gray-400">{{ $player->equipo->nombre ?? 'N/A' }}</span>
-                        </div>
-                    </div>
+    // Select the correct data based on the active tab
+    $currentTop3 = collect([]);
+    $currentList = collect([]);
+    $statName = '';
+    $statColor = '';
+    
+    if ($activeStat === 'scorers') {
+        $currentTop3 = $topScorers->take(3);
+        $currentList = $topScorers->skip(3)->take(7);
+        $statName = 'Goles';
+        $statColor = 'text-red-400';
+    } elseif ($activeStat === 'assists') {
+        $currentTop3 = $topAssists->take(3);
+        $currentList = $topAssists->skip(3)->take(7);
+        $statName = 'Asistencias';
+        $statColor = 'text-yellow-400';
+    } elseif ($activeStat === 'keepers') {
+        $currentTop3 = $topKeepers->take(3);
+        $currentList = $topKeepers->skip(3)->take(7);
+        $statName = 'Paradas';
+        $statColor = 'text-blue-440';
+    }
+@endphp
 
-                    {{-- Stats --}}
-                    <div class="text-right">
-                        <span class="text-red-400 font-bold text-xl">{{ $player->goles }}</span>
-                        <span class="text-xs text-gray-500 block">Goles</span>
-                    </div>
-                </li>
-            @empty
-                <li class="text-gray-500">Aún no hay goles registrados.</li>
-            @endforelse
-        </ol>
-    </div>
 
-    {{-- ASISTENTES --}}
-    <div class="card p-6">
-        <h3 class="text-xl font-semibold mb-4 text-yellow-400 flex items-center">Asistentes</h3>
-        <ol id="top-assists" class="list-none space-y-3">
-            @forelse($topAssists as $i => $player)
-                <li class="flex justify-between items-center text-gray-300 border-b border-gray-700 pb-3 last:border-b-0">
-                    <div class="flex items-center space-x-3">
-                        <span class="font-bold w-4 text-center {{ $i === 0 ? 'text-yellow-400' : '' }}">{{ $i + 1 }}.</span>
-                        
-                        <img src="{{ $player->foto_url ?? 'https://placehold.co/50x50/1f2937/FFFFFF?text=JUG' }}"
-                            onerror="this.src='https://placehold.co/50x50/1f2937/FFFFFF?text=JUG'"
-                            class="w-10 h-10 rounded-full object-cover">
-                        
-                        <div class="flex flex-col text-sm">
-                            <span class="font-semibold text-white">{{ $player->nombre }}</span>
-                            <span class="text-xs text-gray-400">{{ $player->equipo->nombre ?? 'N/A' }}</span>
-                        </div>
-                    </div>
-                    
-                    <div class="text-right">
-                        <span class="text-yellow-400 font-bold text-xl">{{ $player->asistencias }}</span>
-                        <span class="text-xs text-gray-500 block">Asist.</span>
-                    </div>
-                </li>
-            @empty
-                <li class="text-gray-500">Aún no hay asistencias registradas.</li>
-            @endforelse
-        </ol>
-    </div>
+<h2 class="text-3xl font-bold text-white mb-4">Líderes de la Liga</h2>
 
-    {{-- MEJORES PORTEROS --}}
-    <div class="card p-6">
-        <h3 class="text-xl font-semibold mb-4 text-blue-400 flex items-center">Mejores Porteros</h3>
-        <ol id="top-keepers" class="list-none space-y-3">
-            @forelse($topKeepers as $i => $player)
-                <li class="flex justify-between items-center text-gray-300 border-b border-gray-700 pb-3 last:border-b-0">
-                    <div class="flex items-center space-x-3">
-                        <span class="font-bold w-4 text-center {{ $i === 0 ? 'text-yellow-400' : '' }}">{{ $i + 1 }}.</span>
-                        
-                        <img src="{{ $player->foto_url ?? 'https://placehold.co/50x50/1f2937/FFFFFF?text=JUG' }}"
-                            onerror="this.src='https://placehold.co/50x50/1f2937/FFFFFF?text=JUG'"
-                            class="w-10 h-10 rounded-full object-cover">
-                        
-                        <div class="flex flex-col text-sm">
-                            <span class="font-semibold text-white">{{ $player->nombre }}</span>
-                            <span class="text-xs text-gray-400">{{ $player->equipo->nombre ?? 'N/A' }}</span>
-                        </div>
-                    </div>
+{{-- ---------------------------------------------------- --}}
+{{-- 1. TABS: Toggle between Scorers, Assists, and Keepers --}}
+{{-- ---------------------------------------------------- --}}
+<div class="flex space-x-4 mb-8 border-b border-gray-700">
+    <a href="{{ route('home', ['view' => 'stats', 'stat' => 'scorers']) }}"
+       class="py-2 px-4 font-semibold transition duration-200 {{ $activeStat === 'scorers' ? 'text-red-400 border-b-2 border-red-400' : 'text-gray-400 hover:text-white' }}">
+        Top Goleadores
+    </a>
+    <a href="{{ route('home', ['view' => 'stats', 'stat' => 'assists']) }}"
+       class="py-2 px-4 font-semibold transition duration-200 {{ $activeStat === 'assists' ? 'text-yellow-400 border-b-2 border-yellow-400' : 'text-gray-400 hover:text-white' }}">
+        Top Asistentes
+    </a>
+    <a href="{{ route('home', ['view' => 'stats', 'stat' => 'keepers']) }}"
+       class="py-2 px-4 font-semibold transition duration-200 {{ $activeStat === 'keepers' ? 'text-blue-400 border-b-2 border-blue-400' : 'text-gray-400 hover:text-white' }}">
+        Top Porteros
+    </a>
+</div>
+
+
+{{-- ---------------------------------------------------- --}}
+{{-- 2. TOP 3 CARDS (The visual highlight) --}}
+{{-- ---------------------------------------------------- --}}
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    @forelse($currentTop3 as $i => $player)
+        @php
+            $rank = $loop->iteration;
+            
+            $statValue = ($activeStat === 'scorers') ? $player->goles : (($activeStat === 'assists') ? $player->asistencias : $player->paradas);
+            $cardColor = $rank === 1 ? 'border-primary' : ($rank === 2 ? 'border-secondary' : 'border-gray-500');
+            $posColor = $rank === 1 ? 'text-primary' : ($rank === 2 ? 'text-secondary' : 'text-gray-400');
+            $backgroundColor = $rank === 1 ? 'bg-primary/20' : ($rank === 2 ? 'bg-secondary/20' : 'bg-gray-700/50');
+        @endphp
+        
+        <div class="card p-3 sm:p-4 flex justify-between items-center border-b-4 {{ $cardColor }} shadow-xl {{ $backgroundColor }}">
+            
+            {{-- SECCIÓN IZQUIERDA: Rank, Info y FOTO --}}
+            <div class="flex items-center space-x-3">
+                
+                {{-- Rank Destacado --}}
+                <div class="text-3xl font-extrabold px-3 py-1 rounded-lg {{ $posColor }} flex-shrink-0">
+                    {{ $rank }}
+                </div>
+                
+                {{-- ⬇️ IMAGEN Y TEXTO ⬇️ --}}
+                <div class="flex items-center space-x-2">
+                    <img src="{{ $player->foto_url ?? 'https://placehold.co/50x50/1f2937/FFFFFF?text=JUG' }}"
+                        onerror="this.src='https://placehold.co/50x50/1f2937/FFFFFF?text=JUG'"
+                        class="w-10 h-10 rounded-full object-cover flex-shrink-0">
                     
-                    <div class="text-right">
-                        <span class="text-blue-400 font-bold text-xl">{{ $player->paradas }}</span>
-                        <span class="text-xs text-gray-500 block">Paradas</span>
+                    <div class="flex flex-col">
+                        <p class="text-lg font-bold text-white leading-tight">{{ $player->nombre }}</p>
+                        <p class="text-xs text-gray-400">{{ $player->equipo->nombre ?? 'N/A' }}</p>
                     </div>
-                </li>
-            @empty
-                <li class="text-gray-500">Aún no hay porteros con paradas registradas.</li>
-            @endforelse
-        </ol>
+                </div>
+            </div>
+
+            {{-- SECCIÓN DERECHA: Stat Value --}}
+            <div class="text-right flex items-center space-x-2">
+                {{-- Stat Count --}}
+                <div class="p-2 sm:p-3 rounded-lg bg-black/30 flex-shrink-0">
+                    <span class="text-3xl font-extrabold {{ $statColor }} block leading-none">{{ $statValue }}</span>
+                </div>
+            </div>
+        </div>
+    @empty
+        <p class="text-white/70 md:col-span-3">No hay suficientes datos para mostrar el Top 3.</p>
+    @endforelse
+</div>
+
+
+{{-- ---------------------------------------------------- --}}
+{{-- 3. DETAILED LIST (Rank 4-10) --}}
+{{-- ---------------------------------------------------- --}}
+@if($currentList->isNotEmpty())
+<div class="bg-card-bg rounded-lg overflow-hidden shadow-xl">
+    <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-white/5 text-sm">
+            <thead>
+                <tr class="text-left text-xs font-semibold uppercase tracking-wider text-gray-400 bg-gray-800">
+                    <th class="py-3 px-4 w-1/12">Rank</th>
+                    <th class="py-3 px-4 w-5/12">Jugador</th>
+                    <th class="py-3 px-4 text-center hidden sm:table-cell">PJ</th> 
+                    <th class="py-3 px-4 text-right">{{ $statName }}</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-white/5">
+                @foreach($currentList as $i => $player)
+                    @php
+                        $rank = $loop->iteration + 3; 
+                        $statValue = ($activeStat === 'scorers') ? $player->goles : (($activeStat === 'assists') ? $player->asistencias : $player->paradas);
+                        $matchesPlayed = $player->equipo->partidos_jugados ?? 0;
+                    @endphp
+                    <tr class="hover:bg-white/5 transition duration-150">
+                        <td class="py-3 px-4 text-center font-bold text-white/70">{{ $rank }}</td>
+                        <td class="py-3 px-4 font-medium flex items-center gap-3">
+                            <img src="{{ $player->foto_url ?? 'https://placehold.co/50x50/1f2937/FFFFFF?text=JUG' }}"
+                                onerror="this.src='https://placehold.co/50x50/1f2937/FFFFFF?text=JUG'"
+                                class="w-8 h-8 rounded-full object-cover flex-shrink-0">
+                            <div class="flex flex-col">
+                                <span class="text-white">{{ $player->nombre }}</span>
+                                <span class="text-xs text-gray-500">{{ $player->equipo->nombre ?? 'N/A' }}</span>
+                            </div>
+                        </td>
+                        <td class="py-3 px-4 text-center hidden sm:table-cell text-white/70">{{ $matchesPlayed }}</td> 
+                        <td class="py-3 px-4 text-right font-bold {{ $statColor }}">{{ $statValue }}</td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
     </div>
 </div>
+@endif

@@ -1,14 +1,69 @@
-<h2 class="text-4xl font-bold text-white mb-6 border-b border-green-700 pb-2">Tabla de Posiciones</h2>
+{{-- Este contenido se renderiza cuando $activeView es 'home' --}}
 
+@php
+    $totalMatches = $teams->sum('partidos_jugados') / 2;
+    $totalGoals = $teams->sum('goles_a_favor');
+    $totalTeams = $teams->count();
+    $nextMatch = $pendingMatches->first();
+    // Obtener los primeros 3 equipos para el detalle
+    $topTeams = $teams->take(3);
+    $avgGoals = $totalMatches > 0 ? number_format($totalGoals / $totalMatches, 2) : 0;
+    $topImpactPlayer = $players->sortByDesc(fn($p) => $p->goles + $p->asistencias)->first();
+@endphp
+
+<h2 class="text-3xl font-bold mb-6">Resumen de la Liga</h2>
+
+@if ($nextMatch)
+    {{-- ---------------------------------------------------- --}}
+    {{-- 1. TARJETA DE DUELO DESTACADA (COMPACTA Y VISUAL) --}}
+    {{-- ---------------------------------------------------- --}}
+
+    <h3 class="text-2xl font-bold mb-4 mt-8">Próximo Gran Duelo</h3>
+
+    <div class="flex justify-center">
+        {{-- Contenedor principal centrado, máximo 3XL de ancho --}}
+        <div class="card max-w-3xl w-full p-4 sm:p-6 shadow-2xl transition duration-500 hover:translate-y-0">
+            <div class="flex flex-col md:flex-row items-center justify-between text-center space-y-4 md:space-y-0">
+
+                {{-- EQUIPO LOCAL --}}
+                <div class="flex flex-col items-center w-full md:w-5/12">
+                    <img src="{{ $nextMatch->localTeam->escudo_url ?? 'https://placehold.co/100x100/1f2937/FFFFFF?text=LOCAL' }}"
+                        alt="Logo Local" class="w-20 h-20 rounded-full object-cover border-4 border-primary/50 mb-2" />
+                    <span class="text-xl font-extrabold text-white">{{ $nextMatch->localTeam->nombre }}</span>
+                    <span class="text-sm text-gray-400">Local</span>
+                </div>
+
+                {{-- CENTRO: VS, Fecha y Hora --}}
+                <div class="w-full md:w-2/12">
+                    <div class="bg-gray-700/70 border border-white/10 rounded-xl p-2 md:p-3 mx-auto shadow-lg">
+                        <span class="text-2xl font-black text-red-500 block mb-1">VS</span>
+                        <span class="text-xs font-semibold text-white block">
+                            {{ \Carbon\Carbon::parse($nextMatch->fecha_hora)->locale('es')->isoFormat('D MMM') }}
+                        </span>
+                        <span
+                            class="text-xs text-gray-400">{{ \Carbon\Carbon::parse($nextMatch->fecha_hora)->format('H:i') }}</span>
+                    </div>
+                </div>
+
+                {{-- EQUIPO VISITANTE --}}
+                <div class="flex flex-col items-center w-full md:w-5/12">
+                    <img src="{{ $nextMatch->visitorTeam->escudo_url ?? 'https://placehold.co/100x100/1f2937/FFFFFF?text=VISIT' }}"
+                        alt="Logo Visitante"
+                        class="w-20 h-20 rounded-full object-cover border-4 border-secondary/50 mb-2" />
+                    <span class="text-xl font-extrabold text-white">{{ $nextMatch->visitorTeam->nombre }}</span>
+                    <span class="text-sm text-gray-400">Visitante</span>
+                </div>
+
+            </div>
+        </div>
+    </div>
+@endif
 
 {{-- ---------------------------------------------------- --}}
-{{-- 2. TABLA DE CLASIFICACIÓN --}}
+{{-- 2. TABLA DE CLASIFICACIÓN RÁPIDA (Adaptada) --}}
 {{-- ---------------------------------------------------- --}}
-<div class="card p-6">
-    <h3 class="text-2xl font-bold mb-4 text-white">Clasificación de Liga</h3>
-    <p class="text-xs text-gray-500 mb-3 sm:hidden">Desliza horizontalmente la tabla para ver todos los datos (GF, GC).
-    </p>
-
+<h3 class="text-2xl font-bold mb-4">Clasificación</h3>
+<div class="bg-card-bg rounded-lg shadow-xl overflow-hidden mb-8">
     <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-gray-700">
             <thead>
@@ -23,6 +78,7 @@
                     <th class="py-3 px-2 text-center">GF</th>
                     <th class="py-3 px-2 text-center">GC</th>
                     <th class="py-3 px-2 text-center">Dif</th>
+                    <th class="py-3 px-2 text-center">Forma</th>
                 </tr>
             </thead>
             <tbody id="standings-body" class="divide-y divide-gray-800 text-sm">
@@ -59,6 +115,15 @@
                             class="py-3 px-2 text-center font-bold {{ $goalDiff > 0 ? 'text-green-500' : ($goalDiff < 0 ? 'text-red-500' : 'text-gray-400') }}">
                             {{ $goalDiff > 0 ? '+' : '' }}{{ $goalDiff }}
                         </td>
+                        <td class="py-3 px-2 text-center">
+                            <div class="flex space-x-0.5 justify-center">
+                                @foreach (str_split($team->form_guide ?? '-----') as $result)
+                                    <span class="w-2.5 h-2.5 rounded-sm"
+                                        style="background-color: {{ $result === 'G' ? '#10b981' : ($result === 'E' ? '#f59e0b' : ($result === 'P' ? '#ef4444' : '#374151')) }};">
+                                    </span>
+                                @endforeach
+                            </div>
+                        </td>
                     </tr>
                 @empty
                     <tr class="hover:bg-gray-700 transition">
@@ -71,127 +136,120 @@
 </div>
 
 {{-- ---------------------------------------------------- --}}
-{{-- 1. PANEL DE PARTIDOS (Próximos y Recientes) --}}
+{{-- 1. CARDS DE ESTADÍSTICAS GENERALES --}}
 {{-- ---------------------------------------------------- --}}
-<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+<div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
 
-    {{-- PRÓXIMOS PARTIDOS (PENDIENTES) --}}
-    <div class="card p-4">
-        {{-- ⬇️ CORRECCIÓN: Título con botón "Ver todos" ⬇️ --}}
-        <h3 class="flex justify-between items-center text-xl font-semibold mb-3 text-green-400">
-            <span>Próximos Partidos</span>
-            <button
-                class="bg-gray-600 hover:bg-green-600 text-white px-3 py-1 rounded-full text-xs font-semibold transition">
-                Ver todos
-            </button>
-        </h3>
-        <div class="space-y-3">
-            @forelse($recentMatches->where('estado', 'pendiente')->take(5) as $match)
-                @php
-                    $dateTime = \Carbon\Carbon::parse($match->fecha_hora);
-                    $isLive = $dateTime->isPast() && $dateTime->diffInHours(now()) < 2; // Simulación: Si empezó hace < 2h
-                @endphp
-                <div
-                    class="p-3 border-l-4 rounded-md flex justify-between items-center text-sm 
-                            {{ $isLive ? 'border-red-500 bg-gray-600' : 'border-green-500 bg-gray-700' }}">
-
-                    <div class="flex flex-col">
-                        <span class="font-bold text-white">
-                            {{ $match->localTeam->nombre }} <span class="font-normal text-gray-400">vs</span>
-                            {{ $match->visitorTeam->nombre }}
-                        </span>
-                        @if ($isLive)
-                            <span class="text-xs text-red-400 font-bold">¡EN CURSO!</span>
-                        @endif
-                    </div>
-
-                    <span class="text-xs text-gray-400 text-right">
-                        {{ $dateTime->locale('es')->isoFormat('ddd, D MMM') }}<br>
-                        <span class="font-semibold">{{ $dateTime->format('H:i') }}</span>
-                    </span>
-                </div>
-            @empty
-                <p class="text-sm text-gray-400">No hay partidos pendientes.</p>
-            @endforelse
-        </div>
+    {{-- Equipos Participantes --}}
+    <div class="bg-card-bg rounded-lg p-6 flex flex-col items-center justify-center text-center shadow-lg">
+        <span class="material-symbols-outlined text-secondary text-5xl mb-2">group</span>
+        <p class="text-white/70 text-sm">Equipos</p>
+        <p class="text-3xl font-bold">{{ $totalTeams }}</p>
     </div>
 
-    {{-- ÚLTIMOS PARTIDOS (FINALIZADOS) --}}
-    <div class="card p-4">
-        {{-- ⬇️ CORRECCIÓN: Título con botón "Ver todos" ⬇️ --}}
-        <h3 class="flex justify-between items-center text-xl font-semibold mb-3 text-blue-400">
-            <span>Últimos Resultados</span>
-            <button
-                class="bg-gray-600 hover:bg-blue-600 text-white px-3 py-1 rounded-full text-xs font-semibold transition">
-                Ver todos
-            </button>
-        </h3>
-        <div class="space-y-4">
-            @forelse($recentMatches->where('estado', 'finalizado')->take(5) as $match)
-                <div class="p-3 border-l-4 border-blue-500 bg-gray-700 rounded-md text-sm">
-
-                    {{-- ⬇️ CORRECCIÓN: Usamos un contenedor Flexbox para el encabezado ⬇️ --}}
-                    <div class="flex justify-between items-center mb-2">
-
-                        {{-- 1. Nombre Equipo Local --}}
-                        <span class="font-bold text-white text-left overflow-hidden whitespace-nowrap pr-1">
-                            {{ $match->localTeam->nombre }}
-                        </span>
-
-                        {{-- 2. Resultado Central (Fijado al Centro) --}}
-                        <span
-                            class="text-base font-bold flex-shrink-0 mx-2 
-                                     {{ $match->goles_local === $match->goles_visitante ? 'text-yellow-400' : 'text-blue-400' }}">
-                            {{ $match->goles_local }} - {{ $match->goles_visitante }}
-                        </span>
-
-                        {{-- 3. Nombre Equipo Visitante --}}
-                        <span class="font-bold text-white text-right overflow-hidden whitespace-nowrap pl-1">
-                            {{ $match->visitorTeam->nombre }}
-                        </span>
-                    </div>
-
-                    {{-- CUERPO: DETALLE DE EVENTOS (Side-by-Side) --}}
-                    <div class="flex text-xs text-gray-400">
-
-                        {{-- Columna Local (Prácticamente sin cambios) --}}
-                        <div class="w-1/2 pr-2 space-y-1 border-r border-gray-600">
-                            @php
-                                $localEvents = $match->eventos
-                                    ->where('equipo_id', $match->equipo_local_id)
-                                    ->sortBy('minuto');
-                            @endphp
-
-                            @forelse($localEvents as $event)
-                                @include('partials.event_item', ['event' => $event, 'align' => 'right'])
-                            @empty
-                                <div class="text-gray-500 text-right pr-2">Sin eventos</div>
-                            @endforelse
-                        </div>
-
-                        {{-- Columna Visitante (Prácticamente sin cambios) --}}
-                        <div class="w-1/2 pl-2 space-y-1">
-                            @php
-                                $visitorEvents = $match->eventos
-                                    ->where('equipo_id', $match->equipo_visitante_id)
-                                    ->sortBy('minuto');
-                            @endphp
-
-                            @forelse($visitorEvents as $event)
-                                @include('partials.event_item', ['event' => $event, 'align' => 'left'])
-                            @empty
-                                <div class="text-gray-500 text-left pl-2">Sin eventos</div>
-                            @endforelse
-                        </div>
-                    </div>
-
-                    @if ($match->eventos->isEmpty())
-                        <div class="pt-2 text-center text-gray-500">No se registraron eventos detallados.</div>
-                    @endif
-                </div>
-            @empty
-                <p class="text-sm text-gray-400">No hay resultados recientes.</p>
-            @endforelse
-        </div>
+    {{-- Partidos Jugados --}}
+    <div class="bg-card-bg rounded-lg p-6 flex flex-col items-center justify-center text-center shadow-lg">
+        <span class="material-symbols-outlined text-primary text-5xl mb-2">sports_soccer</span>
+        <p class="text-white/70 text-sm">Partidos Jugados</p>
+        <p class="text-3xl font-bold">{{ round($totalMatches) }}</p>
     </div>
+
+    {{-- Goles Totales --}}
+    <div class="bg-card-bg rounded-lg p-6 flex flex-col items-center justify-center text-center shadow-lg">
+        <span class="material-symbols-outlined text-red-500 text-5xl mb-2">flare</span>
+        <p class="text-white/70 text-sm">Goles Totales</p>
+        <p class="text-3xl font-bold">{{ $totalGoals }}</p>
+    </div>
+
+    {{-- Goles por partido --}}
+    <div class="bg-card-bg rounded-lg p-6 flex flex-col items-center justify-center text-center shadow-lg">
+        <span class="material-symbols-outlined text-yellow-500 text-5xl mb-2">trending_up</span>
+        <p class="text-white/70 text-sm">Goles Promedio<br>por Partido</p>
+        <p class="text-3xl font-bold">{{ $avgGoals ?? 0 }}</p>
+    </div>
+
+    <div class="bg-card-bg rounded-lg p-6 flex flex-col items-center justify-center text-center shadow-lg">
+        <span class="material-symbols-outlined text-purple-400 text-5xl mb-2">star_rate</span>
+        <p class="text-white/70 text-sm">Jugador Más Influyente</p>
+        @if ($topImpactPlayer)
+            <p class="text-xl font-bold">{{ $topImpactPlayer->nombre }}</p>
+            <p class="text-white/70 text-sm">{{ $topImpactPlayer->goles + $topImpactPlayer->asistencias }} Puntos de
+                Impacto</p>
+        @else
+            <p class="text-xl font-bold text-white/50">N/A</p>
+        @endif
+    </div>
+
+    <div class="bg-card-bg rounded-lg p-6 flex flex-col items-center justify-center text-center shadow-lg">
+        <span class="material-symbols-outlined text-blue-400 text-5xl mb-2">handshake</span>
+        <p class="text-white/70 text-sm">Equipo Más Limpio</p>
+        @php
+            // Esto asume que discipline_points fue calculado en el controlador
+            $cleanestTeam = $teams->sortBy('discipline_points')->first();
+        @endphp
+        @if ($cleanestTeam)
+            <p class="text-xl font-bold">{{ $cleanestTeam->nombre }}</p>
+            <p class="text-white/50 text-xs">{{ $cleanestTeam->discipline_points }} Pts. Disciplina</p>
+        @endif
+    </div>
+
+    <div class="bg-card-bg rounded-lg p-6 flex flex-col items-center justify-center text-center shadow-lg">
+        <span class="material-symbols-outlined text-primary text-5xl mb-2">shield</span>
+        <p class="text-white/70 text-sm">Muro Defensivo</p>
+        @if ($bestDefenseTeam)
+            <p class="text-xl font-bold">{{ $bestDefenseTeam->nombre }}</p>
+            <p class="text-white/70 text-xs">{{ $bestDefenseTeam->goles_en_contra }} Goles Recibidos</p>
+        @else
+            <p class="text-xl font-bold text-white/50">N/A</p>
+        @endif
+    </div>
+
+    <div class="bg-card-bg rounded-lg p-6 flex flex-col items-center justify-center text-center shadow-lg">
+        <span class="material-symbols-outlined text-red-500 text-5xl mb-2">rocket_launch</span>
+        <p class="text-white/70 text-sm">Ataque Más Potente</p>
+        @if ($mostOffensiveTeam)
+            <p class="text-xl font-bold">{{ $mostOffensiveTeam->nombre }}</p>
+            <p class="text-white/70 text-xs">{{ $mostOffensiveTeam->goles_a_favor }} Goles a Favor</p>
+        @else
+            <p class="text-xl font-bold text-white/50">N/A</p>
+        @endif
+    </div>
+</div>
+
+{{-- ---------------------------------------------------- --}}
+{{-- 3. DETALLE POR EQUIPO (TOP 4) --}}
+{{-- ---------------------------------------------------- --}}
+<h3 class="text-2xl font-bold mb-4">Equipos Destacados</h3>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    @forelse($topTeams as $team)
+        <div class="bg-card-bg rounded-lg p-6 flex flex-col items-start shadow-xl border border-primary/20">
+            <div class="flex items-center gap-3 mb-4">
+                <img src="{{ $team->escudo_url ?? 'https://placehold.co/50x50/1f2937/FFFFFF?text=L' }}"
+                    onerror="this.src='https://placehold.co/50x50/1f2937/FFFFFF?text=L'"
+                    class="w-10 h-10 rounded-full object-cover border-2 border-primary/50">
+
+                <h4 class="text-xl font-bold">{{ $team->nombre }}</h4>
+            </div>
+            <div class="grid grid-cols-2 gap-4 w-full">
+                <div>
+                    <p class="text-white/70 text-sm">Puntos</p>
+                    <p class="text-xl font-bold text-primary">{{ $team->puntos }}</p>
+                </div>
+                <div>
+                    <p class="text-white/70 text-sm">Partidos Jugados</p>
+                    <p class="text-xl font-bold">{{ $team->partidos_jugados }}</p>
+                </div>
+                <div>
+                    <p class="text-white/70 text-sm">Victorias</p>
+                    <p class="text-xl font-bold text-green-500">{{ $team->ganados }}</p>
+                </div>
+                <div>
+                    <p class="text-white/70 text-sm">Derrotas</p>
+                    <p class="text-xl font-bold text-red-500">{{ $team->perdidos }}</p>
+                </div>
+            </div>
+        </div>
+    @empty
+        <p class="text-white/50 p-6">Aún no hay suficientes equipos para mostrar un detalle destacado.</p>
+    @endforelse
 </div>

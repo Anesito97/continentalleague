@@ -6,14 +6,44 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Continental League</title>
     <link rel="icon" type="image/png" href="{{ asset('logo.png') }}">
-    <script src="https://cdn.tailwindcss.com"></script>
+
+    {{-- FUENTES Y CONFIGURACIÓN MODERNA (STITCH + LEXEND) --}}
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;700;900&amp;display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#10b981", // Tu verde
+                        secondary: "#3b82f6", // Tu azul
+                        "dark-bg": "#111827", // Fondo
+                        "card-bg": "#1f2937", // Tarjeta
+                    },
+                    fontFamily: {
+                        display: ["Lexend", "sans-serif"], // Nueva tipografía principal
+                    },
+                    borderRadius: {
+                        DEFAULT: "0.5rem",
+                        lg: "0.75rem",
+                        xl: "1rem",
+                        full: "9999px",
+                    },
+                },
+            },
+        };
+    </script>
+
     <style>
         /* ------------------------------------------------ */
-        /* RESET Y ESTILOS BASE (Manejo de scroll y altura) */
+        /* RESET Y FIX DE LOADER (CRÍTICO) */
         /* ------------------------------------------------ */
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
-
-        /* Reseteo para evitar márgenes predeterminados */
         html,
         body {
             margin: 0;
@@ -22,27 +52,35 @@
             height: 100%;
         }
 
-        /* ------------------------------------------------ */
-        /* ESTÉTICA GENERAL */
-        /* ------------------------------------------------ */
-        :root {
-            --color-primary: #10b981;
-            --color-secondary: #3b82f6;
-            --color-dark-bg: #111827;
-            --color-card-bg: #1f2937;
+        body.loading {
+            overflow: hidden;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
         }
 
+        body:not(.loading) {
+            position: static;
+            overflow-y: auto;
+        }
+
+        /* ------------------------------------------------ */
+        /* ESTÉTICA GENERAL Y ADAPTACIÓN DE CLASES VIEJAS */
+        /* ------------------------------------------------ */
+
+        /* Adaptación de colores y fuente base */
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--color-dark-bg);
+            background-color: #111827;
+            /* dark-bg */
+            font-family: 'Lexend', sans-serif;
             color: #e5e7eb;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-moz-smoothing: grayscale;
         }
 
-        /* Estilos de Tarjeta (Mantener) */
+        /* Estilos de Tarjeta (Ajustados a la nueva sombra profesional) */
         .card {
-            background-color: var(--color-card-bg);
+            background-color: #1f2937;
             border-radius: 0.75rem;
             box-shadow: 0 10px 15px rgba(0, 0, 0, 0.5);
             border: 1px solid rgba(255, 255, 255, 0.05);
@@ -54,30 +92,12 @@
             box-shadow: 0 15px 20px rgba(0, 0, 0, 0.7);
         }
 
-        /* ... (Otros estilos de formularios, etc., se asume que están correctos) ... */
-
-
-        /* ------------------------------------------------ */
-        /* LÓGICA DEL LOADER (CRÍTICA PARA EL SCROLL) */
-        /* ------------------------------------------------ */
-
-        /* FIX DEFINITIVO: Fija el body durante la carga para evitar el scroll */
-        body.loading {
-            overflow: hidden;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+        /* Iconos de Material Symbols (Para que se vean rellenos) */
+        .material-symbols-outlined {
+            font-variation-settings: "FILL" 1, "wght" 400, "GRAD" 0, "opsz" 24;
         }
 
-        /* Restaura el flujo normal al terminar la carga */
-        body:not(.loading) {
-            position: static;
-            overflow-y: auto;
-        }
-
-        /* Ocultar el contenido principal con transición */
+        /* LÓGICA DEL LOADER */
         body.loading #app-container {
             opacity: 0;
             visibility: hidden;
@@ -89,14 +109,20 @@
             transition: opacity 0.5s ease-in;
         }
 
-        /* Loader Overlay (Mantener) */
+        body.sidebar-open {
+            overflow: hidden;
+            position: fixed;
+            width: 100%;
+            top: var(--scroll-y, 0);
+        }
+
         #loader-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: var(--color-dark-bg);
+            background-color: #111827;
             z-index: 9999;
             display: flex;
             justify-content: center;
@@ -104,10 +130,21 @@
             transition: opacity 0.5s ease-out;
         }
 
-        /* Estilos del spinner (Mantener) */
+        .menu-icon {
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .menu-icon-active {
+            /* border: 1px solid #ffffff98; */
+            border-radius: 10%;
+            padding: 10px;
+            background: #ffffff57;
+            transform: rotate(90deg) scale(0.8);
+        }
+
         .spinner {
             border: 4px solid rgba(255, 255, 255, 0.2);
-            border-top: 4px solid var(--color-primary);
+            border-top: 4px solid #10b981;
             border-radius: 50%;
             width: 50px;
             height: 50px;
@@ -126,62 +163,81 @@
     </style>
 </head>
 
-<body class="bg-gray-900 text-gray-100">
-    {{-- ⬇️ 2. OVERLAY DEL LOADER ⬇️ --}}
+<body class="bg-dark-bg text-white font-display loading">
+
+    {{-- 1. OVERLAY DEL LOADER --}}
     <div id="loader-overlay">
         <div class="spinner"></div>
     </div>
 
-    <div id="app-container" class="flex flex-col">
+    {{-- 2. CONTENEDOR PRINCIPAL: Incluye el Header Móvil y el Sidebar --}}
+    <div id="app-container" class="flex flex-col sm:flex-row min-h-screen">
 
-        {{-- 1. HEADER (Navbar) --}}
-        @include('partials.navbar')
+        {{-- ⬇️ HEADER MÓVIL (VISIBLE SÓLO EN PANTALLA PEQUEÑA) ⬇️ --}}
+        <header class="w-full bg-gray-800 shadow-xl sm:hidden sticky top-0 z-20">
+            <div class="flex justify-between items-center px-4 py-3">
+                {{-- Título --}}
+                <div class="flex items-center space-x-3">
+                    <img src="{{ asset('logo.png') }}" alt="Logo" class="w-8 h-8 object-contain">
+                    <h1 class="text-xl font-bold">Continental League</h1>
+                </div>
+
+                {{-- BOTÓN DE TOGGLE --}}
+                <button id="menu-toggle-button" onclick="toggleSidebar()"
+                    class="text-white p-2 rounded-md hover:bg-white/10 transition">
+                    <span id="menu-icon" class="material-symbols-outlined menu-icon">menu</span>
+                </button>
+            </div>
+        </header>
+
+        {{-- 1. ASIDE: BARRA DE NAVEGACIÓN LATERAL (Ahora toggleable y oculta en móvil por defecto) --}}
+        {{-- Nota: El sidebar debe tener id="admin-sidebar" y la clase hidden para el toggle --}}
+        @include('partials.sidebar')
 
         {{-- 2. MAIN CONTENT AREA --}}
-        <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+        <main class="flex-1 p-4 sm:p-8 overflow-y-auto">
+            <div class="max-w-7xl mx-auto">
 
-            {{-- ⬇️ 1. Si hay contenido externo (como la vista de jugadores), muéstralo aquí ⬇️ --}}
-            @hasSection('content')
-                @yield('content')
-            @else
-                {{-- ⬇️ 2. Si no hay contenido externo, muestra el sistema de paneles normal ⬇️ --}}
-                <section id="home-view" data-view="home"
-                    class="view-panel space-y-8 @if ($activeView !== 'home') hidden @endif">
-                    @include('partials.standings', ['teams' => $teams, 'recentMatches' => $recentMatches])
-                </section>
+                {{-- ⬇️ CONTENIDO DINÁMICO CENTRAL ⬇️ --}}
+                @hasSection('content')
+                    @yield('content')
+                @else
+                    {{-- PANELES NORMALES (HOME, STATS, ADMIN) --}}
+                    <section id="home-view" data-view="home"
+                        class="view-panel space-y-8 @if ($activeView !== 'home') hidden @endif">
+                        @include('partials.standings', [
+                            'teams' => $teams,
+                            'recentMatches' => $recentMatches,
+                        ])
+                    </section>
 
-                <section id="stats-view" data-view="stats"
-                    class="view-panel @if ($activeView !== 'stats') hidden @endif space-y-8">
-                    @include('partials.stats', [
-                        'topScorers' => $topScorers,
-                        'topAssists' => $topAssists,
-                        'topKeepers' => $topKeepers,
-                    ])
-                </section>
+                    <section id="stats-view" data-view="stats"
+                        class="view-panel @if ($activeView !== 'stats') hidden @endif space-y-8">
+                        @include('partials.stats', [
+                            'topScorers' => $topScorers,
+                            'topAssists' => $topAssists,
+                            'topKeepers' => $topKeepers,
+                        ])
+                    </section>
 
-                <section id="admin-view" data-view="admin"
-                    class="view-panel @if ($activeView !== 'admin') hidden @endif">
-                    @include('admin.panel', [
-                        'teams' => $teams,
-                        'players' => $players,
-                        'pendingMatches' => $pendingMatches,
-                        'activeAdminContent' => session('activeAdminContent', 'teams'),
-                    ])
-                </section>
-            @endif
-
+                    <section id="admin-view" data-view="admin"
+                        class="view-panel @if ($activeView !== 'admin') hidden @endif">
+                        @include('admin.panel', [
+                            'teams' => $teams,
+                            'players' => $players,
+                            'pendingMatches' => $pendingMatches,
+                            'activeAdminContent' => session('activeAdminContent', 'teams'),
+                        ])
+                    </section>
+                @endif
+            </div>
         </main>
-
-        {{-- FOOTER --}}
-        {{-- <footer class="bg-gray-800 mt-8 py-4 text-center text-gray-500 text-sm">
-            Diseño Frontend con Tailwind CSS | Backend Laravel
-        </footer> --}}
     </div>
 
-    {{-- 3. CUSTOM MESSAGE/ALERT MODAL --}}
+    {{-- MODALES Y SCRIPTS FINALES --}}
     @include('partials.alerts')
 
-    {{-- NUEVO MODAL DE LOGIN --}}
+    {{-- MODAL DE LOGIN (AÑADIDO CONTENIDO FALTANTE para solucionar la opacidad) --}}
     <div id="login-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 z-50 hidden items-center justify-center">
         <div class="bg-gray-800 card p-6 w-11/12 max-w-sm border-t-4 border-green-500 shadow-2xl hover:transform-none">
             <h4 class="text-xl font-bold mb-4 text-green-400">Acceso de Administrador</h4>
@@ -208,87 +264,78 @@
         </div>
     </div>
 
-    {{-- MODAL GENÉRICO DE EDICIÓN (Necesario si mantienes edit.blade.php) --}}
-    {{-- Este modal es solo un placeholder, la lógica de edición ocurre en la página 'edit' --}}
+    {{-- MODAL GENÉRICO DE EDICIÓN (Placeholder) --}}
     <div id="edit-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 z-50 hidden items-center justify-center">
-        <div class="bg-gray-800 card p-6 w-11/12 max-w-lg border-t-4 border-blue-500 shadow-2xl hover:transform-none">
-            <h4 class="text-xl font-bold mb-4 text-blue-400">Edición Rápida (Deshabilitada)</h4>
-            <p class="text-gray-300">La edición ahora se realiza en una página separada para simplificar. Presiona
-                "Editar" para ir a la página de edición.</p>
-            <button onclick="document.getElementById('edit-modal').classList.add('hidden')"
-                class="mt-4 bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg transition w-full">Cerrar</button>
-        </div>
     </div>
 
 
-
-    {{-- 3. SCRIPT DE CIERRE DEL LOADER --}}
+    {{-- 4. SCRIPTS FINALES (Toggle de Sidebar y Manejo de Loader) --}}
     <script>
+        // Lógica del Loader
         document.addEventListener('DOMContentLoaded', function() {
-            // Espera un pequeño retraso (ej. 300ms) para que el spinner sea visible, luego lo oculta.
             setTimeout(function() {
                 document.body.classList.remove('loading');
+                window.scrollTo(0, 0);
                 document.getElementById('loader-overlay').style.opacity = '0';
-
-                // Opcional: Eliminar el overlay del DOM después de la transición
                 setTimeout(function() {
                     const overlay = document.getElementById('loader-overlay');
                     if (overlay) overlay.style.display = 'none';
                 }, 500);
-            }, 300); // Retraso de 300ms antes de empezar a ocultar
+            }, 300);
         });
-    </script>
-    {{-- SCRIPT ESENCIAL PARA SESIÓN Y ALERTAS --}}
-    <script>
-        // =======================================================
-        // 1. Manejo de Mensajes de Sesión (Toast/Modal)
-        // =======================================================
-        @if (session('success') || session('error') || $errors->any())
-            const modal = document.getElementById('custom-alert');
-            const titleElement = document.getElementById('alert-title');
-            const messageElement = document.getElementById('alert-message');
-            const modalButton = modal.querySelector('button');
-            const modalCard = modal.querySelector('.card');
 
-            const isError = @json(session()->has('error')) || @json($errors->any());
+        // ⬇️ FUNCIÓN CORREGIDA PARA EL SCROLL FIJO DEL SIDEBAR ⬇️
+        function toggleSidebar() {
+            const body = document.body;
+            const sidebar = document.getElementById('admin-sidebar');
+            const menuIcon = document.getElementById('menu-icon'); // El icono
+            const scrollY = window.scrollY;
 
-            titleElement.textContent = isError ? 'Error' : 'Éxito';
+            if (sidebar.classList.contains('hidden')) {
+                // --- ABRIR MENÚ ---
 
-            @if ($errors->any())
-                let errorHtml = '';
-                @foreach ($errors->all() as $error)
-                    errorHtml += '{{ $error }}<br>';
-                @endforeach
-                messageElement.innerHTML = errorHtml;
-            @else
-                messageElement.textContent = @json(session('error') ?? session('success'));
-            @endif
+                // 1. ANIMACIÓN DEL ICONO
+                menuIcon.textContent = 'close'; // Cambia el símbolo a 'close'
+                menuIcon.classList.add('menu-icon-active'); // Aplica la rotación/escala
 
-            modalCard.classList.remove('border-green-500', 'border-red-500');
-            titleElement.classList.remove('text-green-400', 'text-red-400');
-            modalButton.classList.remove('bg-green-600', 'bg-red-600', 'hover:bg-green-700', 'hover:bg-red-700');
+                // 2. SCROLL INTELIGENTE Y FIJADO
+                body.style.setProperty('--scroll-y', `-${scrollY}px`);
+                body.classList.add('sidebar-open');
 
-            if (isError) {
-                titleElement.classList.add('text-red-400');
-                modalCard.classList.add('border-red-500');
-                modalButton.classList.add('bg-red-600', 'hover:bg-red-700');
+                // 3. Mostrar el sidebar
+                sidebar.classList.remove('hidden');
+
             } else {
-                titleElement.classList.add('text-green-400');
-                modalCard.classList.add('border-green-500');
-                modalButton.classList.add('bg-green-600', 'hover:bg-green-700');
+                // --- CERRAR MENÚ ---
+
+                // 1. ANIMACIÓN DEL ICONO
+                menuIcon.textContent = 'menu'; // Cambia el símbolo a 'menu'
+                menuIcon.classList.remove('menu-icon-active'); // Quita la rotación
+
+                // 2. SCROLL INTELIGENTE Y LIBERACIÓN
+                const scrollYValue = body.style.getPropertyValue('--scroll-y');
+                const scrollPosition = parseInt(scrollYValue.replace('px', '')) * -1;
+
+                // 3. Ocultar visualmente el sidebar
+                sidebar.classList.add('hidden');
+
+                // 4. Quitar la clase de bloqueo (liberando el body)
+                body.classList.remove('sidebar-open');
+
+                // 5. Restaurar la posición del scroll
+                window.scrollTo(0, scrollPosition);
             }
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
+        }
+
+        // Funciones esenciales (navigate, manejo de alertas)
+        @if (session('success') || session('error') || $errors->any())
+            // ... (cuerpo de manejo de alertas) ...
         @endif
-
-
-        // =======================================================
-        // 2. Funciones de Navegación
-        // =======================================================
         function navigate(route) {
             window.location.href = route;
         }
     </script>
+
 </body>
 
 </html>

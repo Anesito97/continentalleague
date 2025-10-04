@@ -13,9 +13,9 @@ class DashboardController extends Controller
     {
         $teams = Equipo::orderByDesc('puntos')->orderByDesc('goles_a_favor')->get();
         $players = Jugador::with('equipo')
-                           ->orderBy('id', 'desc') 
-                           ->take(10)
-                           ->get();
+            ->orderBy('id', 'desc')
+            ->take(10)
+            ->get();
 
         $pendingMatches = Partido::with(['localTeam', 'visitorTeam'])
             ->where('estado', 'pendiente')
@@ -32,13 +32,56 @@ class DashboardController extends Controller
             ->limit(10)
             ->get();
 
+        $teams = $teams->map(function ($team) {
+            // Obtener los últimos 5 partidos finalizados donde el equipo fue local O visitante
+            $lastMatches = Partido::where('estado', 'finalizado')
+                ->where(function ($query) use ($team) {
+                    $query->where('equipo_local_id', $team->id)
+                        ->orWhere('equipo_visitante_id', $team->id);
+                })
+                ->orderBy('fecha_hora', 'desc')
+                ->take(5)
+                ->get();
+
+            $formGuide = '';
+
+            foreach ($lastMatches as $match) {
+                $result = 'P'; // Derrota por defecto
+
+                // Si es el equipo local
+                if ($match->equipo_local_id === $team->id) {
+                    if ($match->goles_local > $match->goles_visitante) {
+                        $result = 'G'; // Ganado
+                    } elseif ($match->goles_local === $match->goles_visitante) {
+                        $result = 'E'; // Empate
+                    }
+                    // Si es el equipo visitante
+                } elseif ($match->equipo_visitante_id === $team->id) {
+                    if ($match->goles_visitante > $match->goles_local) {
+                        $result = 'G'; // Ganado
+                    } elseif ($match->goles_visitante === $match->goles_local) {
+                        $result = 'E'; // Empate
+                    }
+                }
+
+                $formGuide .= $result;
+            }
+
+            // Rellenar con '-' si hay menos de 5 partidos
+            $team->form_guide = str_pad($formGuide, 5, '-', STR_PAD_RIGHT);
+
+            return $team;
+        });
+
         // ⬇️ CALCULAR TOPS AQUI PARA QUE ESTÉN DISPONIBLES EN TODAS PARTES ⬇️
         $topScorers = $players->sortByDesc('goles')->take(5);
         $topAssists = $players->sortByDesc('asistencias')->take(5);
         $topKeepers = $players->filter(fn($p) => strtolower($p->posicion) === 'portero')->sortByDesc('paradas')->take(5);
 
+        $bestDefenseTeam = $teams->sortBy('goles_en_contra')->first();
+        $mostOffensiveTeam = $teams->sortByDesc('goles_a_favor')->first();
 
-        return compact('teams', 'players', 'pendingMatches', 'recentMatches', 'topScorers', 'topAssists', 'topKeepers');
+        return compact('teams', 'players', 'pendingMatches', 'recentMatches', 'topScorers', 'topAssists', 'topKeepers', 'bestDefenseTeam', 'mostOffensiveTeam');
     }
 
     // 1. VISTA PÚBLICA (HOME/STANDINGS/STATS)
@@ -126,5 +169,36 @@ class DashboardController extends Controller
         $data['activeAdminContent'] = 'teams'; // Mantenemos la navegación activa en 'teams'
 
         return view('admin.team_players', $data);
+    }
+
+    public function showCalendar(Request $request) // ⬅️ Aceptar Request
+    {
+        // 1. Determinar el filtro activo
+        $filter = $request->query('status', 'pending'); // 'pending' es el valor por defecto
+
+        // 2. Cargar todos los partidos y luego filtrar o cargar la colección directamente
+        $query = Partido::with(['localTeam', 'visitorTeam'])
+            ->orderBy('fecha_hora', 'asc');
+
+        if ($filter === 'pending') {
+            $query->where('estado', 'pendiente');
+        } elseif ($filter === 'finished') {
+            $query->where('estado', 'finalizado')->orderBy('fecha_hora', 'desc'); // Recientes primero
+        }
+        // Si $filter es 'all' o cualquier otro valor, se cargan todos.
+
+        $allMatches = $query->get();
+
+        // 3. Agrupar los partidos por fecha
+        $matchesByDate = $allMatches->groupBy(function ($match) {
+            return \Carbon\Carbon::parse($match->fecha_hora)->format('Y-m-d');
+        });
+
+        $data = $this->loadAllData();
+        $data['matchesByDate'] = $matchesByDate;
+        $data['activeView'] = 'calendar';
+        $data['activeFilter'] = $filter; // ⬅️ Pasar el filtro activo a la vista
+
+        return view('calendar', $data);
     }
 }

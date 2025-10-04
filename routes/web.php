@@ -10,6 +10,8 @@ use App\Http\Controllers\MatchController;
 // Esta ruta carga la vista principal, incluyendo clasificación y estadísticas.
 Route::get('/', [DashboardController::class, 'index'])->name('home');
 
+Route::get('calendar', [DashboardController::class, 'showCalendar'])->name('matches.calendar');
+
 // --- AUTENTICACIÓN ---
 Route::post('login', [AuthController::class, 'login'])->name('login');
 Route::get('logout', [AuthController::class, 'logout'])->name('logout');
