@@ -1,30 +1,27 @@
 {{-- Determine the active tab from the URL, default to 'scorers' --}}
 @php
-    // We assume the stats view URL accepts a 'stat' parameter, e.g., /?view=stats&stat=scorers
     $activeStat = request()->query('stat', 'scorers');
     
-    // Select the correct data based on the active tab
-    $currentTop3 = collect([]);
-    $currentList = collect([]);
-    $statName = '';
-    $statColor = '';
-    
+    // ⬇️ CORRECCIÓN: Aplicar límites directamente a las colecciones ordenadas ⬇️
     if ($activeStat === 'scorers') {
-        $currentTop3 = $topScorers->take(3);
-        $currentList = $topScorers->skip(3)->take(7);
+        $fullRanking = $topScorers;
         $statName = 'Goles';
         $statColor = 'text-red-400';
     } elseif ($activeStat === 'assists') {
-        $currentTop3 = $topAssists->take(3);
-        $currentList = $topAssists->skip(3)->take(7);
+        $fullRanking = $topAssists;
         $statName = 'Asistencias';
         $statColor = 'text-yellow-400';
     } elseif ($activeStat === 'keepers') {
-        $currentTop3 = $topKeepers->take(3);
-        $currentList = $topKeepers->skip(3)->take(7);
+        $fullRanking = $topKeepers;
         $statName = 'Paradas';
-        $statColor = 'text-blue-440';
+        $statColor = 'text-blue-400';
+    } else {
+        $fullRanking = collect([]);
     }
+    
+    // Aplicamos los límites de la vista al ranking completo
+    $currentTop3 = $fullRanking->take(3);
+    $currentList = $fullRanking->skip(3); 
 @endphp
 
 
@@ -101,7 +98,7 @@
 
 
 {{-- ---------------------------------------------------- --}}
-{{-- 3. DETAILED LIST (Rank 4-10) --}}
+{{-- 3. DETAILED LIST (Rank 4 en adelante) --}}
 {{-- ---------------------------------------------------- --}}
 @if($currentList->isNotEmpty())
 <div class="bg-card-bg rounded-lg overflow-hidden shadow-xl">
@@ -116,9 +113,10 @@
                 </tr>
             </thead>
             <tbody class="divide-y divide-white/5">
-                @foreach($currentList as $i => $player)
+                @foreach($currentList as $player)
                     @php
-                        $rank = $loop->iteration + 3; 
+                        // FIX: Calcular el rank basado en la posición en la colección, sumando el 3 que ya saltamos
+                        $rank = $loop->index + 4; 
                         $statValue = ($activeStat === 'scorers') ? $player->goles : (($activeStat === 'assists') ? $player->asistencias : $player->paradas);
                         $matchesPlayed = $player->equipo->partidos_jugados ?? 0;
                     @endphp

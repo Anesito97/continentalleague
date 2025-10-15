@@ -9,13 +9,13 @@ use Illuminate\Http\Request;
 class DashboardController extends Controller
 {
     // Función central que carga TODOS los datos necesarios
-    private function loadAllData()
+private function loadAllData()
     {
+        // FIX CRÍTICO: Cargar TODOS los jugadores para rankings globales.
+        $players = Jugador::with('equipo')->get();
+        
+        // Carga de equipos y cálculo de la guía de forma (se mantiene)
         $teams = Equipo::orderByDesc('puntos')->orderByDesc('goles_a_favor')->get();
-        $players = Jugador::with('equipo')
-            ->orderBy('id', 'desc')
-            ->take(10)
-            ->get();
 
         $pendingMatches = Partido::with(['localTeam', 'visitorTeam'])
             ->where('estado', 'pendiente')
@@ -33,7 +33,13 @@ class DashboardController extends Controller
             ->get();
 
         $teams = $teams->map(function ($team) {
-            // Obtener los últimos 5 partidos finalizados donde el equipo fue local O visitante
+            // ... (Lógica de cálculo de form_guide y discipline_points)
+            
+            // Calculamos disciplina (requiere la relación jugadores previamente cargada)
+            $disciplinePoints = ($team->jugadores->sum('amarillas') * 1) + ($team->jugadores->sum('rojas') * 3);
+            $team->discipline_points = $disciplinePoints;
+            
+            // Lógica de forma
             $lastMatches = Partido::where('estado', 'finalizado')
                 ->where(function ($query) use ($team) {
                     $query->where('equipo_local_id', $team->id)
@@ -42,46 +48,52 @@ class DashboardController extends Controller
                 ->orderBy('fecha_hora', 'desc')
                 ->take(5)
                 ->get();
-
             $formGuide = '';
-
             foreach ($lastMatches as $match) {
-                $result = 'P'; // Derrota por defecto
-
-                // Si es el equipo local
+                $result = 'P';
                 if ($match->equipo_local_id === $team->id) {
-                    if ($match->goles_local > $match->goles_visitante) {
-                        $result = 'G'; // Ganado
-                    } elseif ($match->goles_local === $match->goles_visitante) {
-                        $result = 'E'; // Empate
-                    }
-                    // Si es el equipo visitante
+                    if ($match->goles_local > $match->goles_visitante) { $result = 'G'; } 
+                    elseif ($match->goles_local === $match->goles_visitante) { $result = 'E'; }
                 } elseif ($match->equipo_visitante_id === $team->id) {
-                    if ($match->goles_visitante > $match->goles_local) {
-                        $result = 'G'; // Ganado
-                    } elseif ($match->goles_visitante === $match->goles_local) {
-                        $result = 'E'; // Empate
-                    }
+                    if ($match->goles_visitante > $match->goles_local) { $result = 'G'; } 
+                    elseif ($match->goles_visitante === $match->goles_local) { $result = 'E'; }
                 }
-
                 $formGuide .= $result;
             }
-
-            // Rellenar con '-' si hay menos de 5 partidos
             $team->form_guide = str_pad($formGuide, 5, '-', STR_PAD_RIGHT);
 
             return $team;
         });
 
-        // ⬇️ CALCULAR TOPS AQUI PARA QUE ESTÉN DISPONIBLES EN TODAS PARTES ⬇️
-        $topScorers = $players->sortByDesc('goles')->take(5);
-        $topAssists = $players->sortByDesc('asistencias')->take(5);
-        $topKeepers = $players->filter(fn($p) => strtolower($p->posicion) === 'portero')->sortByDesc('paradas')->take(5);
+        // ⬇️ CALCULAR TOPS: Ordenar globalmente y filtrar por criterio (>= 1) ⬇️
+        
+        // Goleadores: Orden descendente por Goles (solo si tienen > 0)
+        $topScorers = $players->filter(fn($p) => $p->goles > 0)->sortByDesc('goles');
 
+        // Asistentes: Orden descendente por Asistencias (solo si tienen > 0)
+        $topAssists = $players->filter(fn($p) => $p->asistencias > 0)->sortByDesc('asistencias');
+
+        // Porteros: Orden descendente por Paradas (solo si son porteros y tienen > 0)
+        $topKeepers = $players->filter(fn($p) => strtolower($p->posicion) === 'portero' && $p->paradas > 0)->sortByDesc('paradas');
+        
+        // MÉTICAS DE DASHBOARD (Aseguramos que operen con colecciones completas)
+        $topImpactPlayer = $players->sortByDesc(fn($p) => $p->goles + $p->asistencias)->first();
         $bestDefenseTeam = $teams->sortBy('goles_en_contra')->first();
         $mostOffensiveTeam = $teams->sortByDesc('goles_a_favor')->first();
+        $cleanestTeam = $teams->sortBy('discipline_points')->first();
+        
+        // Calcular variables generales
+        $totalMatches = $teams->sum('partidos_jugados') / 2;
+        $totalGoals = $teams->sum('goles_a_favor');
+        $avgGoals = ($totalMatches > 0) ? number_format($totalGoals / $totalMatches, 2) : 0;
+        
 
-        return compact('teams', 'players', 'pendingMatches', 'recentMatches', 'topScorers', 'topAssists', 'topKeepers', 'bestDefenseTeam', 'mostOffensiveTeam');
+        return compact(
+            'teams', 'players', 'pendingMatches', 'recentMatches', 
+            'topScorers', 'topAssists', 'topKeepers', 
+            'topImpactPlayer', 'bestDefenseTeam', 'mostOffensiveTeam', 'cleanestTeam',
+            'totalMatches', 'totalGoals', 'avgGoals'
+        );
     }
 
     // 1. VISTA PÚBLICA (HOME/STANDINGS/STATS)
