@@ -23,7 +23,6 @@ WORKDIR /app
 COPY . /app
 
 # Crea el archivo .env a partir del .env.example.
-# ESTO ES CRUCIAL para que los comandos artisan puedan ejecutarse sin el error "No such file".
 RUN cp .env.example .env
 
 # 3. OPTIMIZACIÓN DE LARAVEL
@@ -31,13 +30,18 @@ RUN cp .env.example .env
 RUN composer install --optimize-autoloader --no-dev
 
 # Genera la clave de aplicación y optimiza la app para producción.
-# Estos comandos son SEGUROS ya que no dependen de la conexión a la Base de Datos.
-# Se ha ELIMINADO 'cache:clear' para evitar el error de conexión a DB/SQLite.
+# Estos comandos son seguros.
 RUN php artisan key:generate
 RUN php artisan config:cache
 RUN php artisan route:cache
 
-# 4. PERMISOS Y ARRANQUE
+# 4. CONFIGURACIÓN DEL SERVIDOR WEB (NGINX)
+# Copia el archivo de configuración personalizado de Nginx
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+# Asegúrate de que PHP-FPM corra en el socket correcto para Nginx
+RUN sed -i 's/listen = 127.0.0.1:9000/listen = \/var\/run\/php\/php-fpm.sock/' /etc/php8/php-fpm.d/www.conf
+
+# 5. PERMISOS Y ARRANQUE
 # Establece los permisos correctos para Laravel
 RUN chown -R www-data:www-data /app/storage /app/bootstrap/cache \
     && chmod -R 775 /app/storage /app/bootstrap/cache
