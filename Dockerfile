@@ -1,4 +1,3 @@
-# Usa la imagen oficial de PHP con Alpine (es ligera)
 FROM php:8.3-fpm-alpine
 
 # Instala dependencias del sistema operativo y extensiones de PHP comunes para Laravel
@@ -19,10 +18,6 @@ WORKDIR /app
 
 # Copia los archivos del proyecto (excepto lo ignorado en .dockerignore)
 COPY . /app
-
-# 🚨 LÍNEA DE CORRECCIÓN AÑADIDA 🚨
-# Crea el archivo .env a partir del .env.example para que los comandos artisan puedan usarlos.
-RUN cp .env.example .env
 
 # Instala las dependencias de Laravel
 RUN composer install --optimize-autoloader --no-dev
