@@ -43,7 +43,7 @@ RUN sed -i 's/listen = 127.0.0.1:9000/listen = \/var\/run\/php\/php-fpm.sock/' /
 
 # 5. PERMISOS Y ARRANQUE
 # Establece los permisos correctos para Laravel
-RUN chown -R www-data:www-data /app/storage /app/bootstrap/cache \
+RUN chown -R www-data:www-data /app \
     && chmod -R 775 /app/storage /app/bootstrap/cache
 
 # Comando para iniciar Nginx y PHP-FPM (el servidor web)
