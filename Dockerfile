@@ -39,7 +39,7 @@ RUN php artisan route:cache
 # Copia el archivo de configuración personalizado de Nginx
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 # Asegúrate de que PHP-FPM corra en el socket correcto para Nginx
-RUN sed -i 's/listen = 127.0.0.1:9000/listen = \/var\/run\/php\/php-fpm.sock/' /etc/php8/php-fpm.d/www.conf
+RUN sed -i 's/listen = 127.0.0.1:9000/listen = \/var\/run\/php\/php-fpm.sock/' /usr/local/etc/php-fpm.d/www.conf
 
 # 5. PERMISOS Y ARRANQUE
 # Establece los permisos correctos para Laravel
