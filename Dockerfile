@@ -20,6 +20,10 @@ WORKDIR /app
 # Copia los archivos del proyecto (excepto lo ignorado en .dockerignore)
 COPY . /app
 
+# 🚨 LÍNEA DE CORRECCIÓN AÑADIDA 🚨
+# Crea el archivo .env a partir del .env.example para que los comandos artisan puedan usarlos.
+RUN cp .env.example .env
+
 # Instala las dependencias de Laravel
 RUN composer install --optimize-autoloader --no-dev
 
