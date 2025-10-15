@@ -36,8 +36,10 @@ RUN php artisan config:cache
 RUN php artisan route:cache
 
 # 4. CONFIGURACIÓN DEL SERVIDOR WEB (NGINX)
-# Copia el archivo de configuración personalizado de Nginx
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+# 🚨 CAMBIO CRÍTICO: Copiamos la configuración de Laravel como el archivo principal.
+# Es necesario para que Nginx no cargue configuraciones erróneas que no permiten el bloque 'server'.
+RUN rm /etc/nginx/conf.d/default.conf 
+COPY nginx.conf /etc/nginx/http.d/default.conf
 # Asegúrate de que PHP-FPM corra en el socket correcto para Nginx
 RUN sed -i 's/listen = 127.0.0.1:9000/listen = \/var\/run\/php\/php-fpm.sock/' /usr/local/etc/php-fpm.d/www.conf
 
