@@ -23,7 +23,6 @@ COPY . /app
 RUN composer install --optimize-autoloader --no-dev
 
 # Genera la clave de aplicación y limpia cachés
-RUN php artisan key:generate
 RUN php artisan config:clear
 RUN php artisan cache:clear
 
