@@ -20,6 +20,9 @@ Route::get('news', [PublicController::class, 'indexNews'])->name('news.index');
 // Detalle de una noticia
 Route::get('news/{noticia:id}', [PublicController::class, 'showNews'])->name('news.show');
 
+// REglas
+Route::get('rules', [DashboardController::class, 'showRules'])->name('rules.index');
+
 // --- AUTENTICACIÓN ---
 Route::post('login', [AuthController::class, 'login'])->name('login');
 Route::get('logout', [AuthController::class, 'logout'])->name('logout');

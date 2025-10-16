@@ -286,4 +286,13 @@ class DashboardController extends Controller
 
         return view('calendar', $data);
     }
+
+    public function showRules()
+    {
+        // Carga solo los datos necesarios para el layout (si no se cargan globalmente)
+        $data = $this->loadAllData();
+        $data['activeView'] = 'rules'; // Nueva vista activa
+
+        return view('rules', $data); // Usaremos una nueva vista 'rules.blade.php'
+    }
 }

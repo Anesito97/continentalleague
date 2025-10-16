@@ -45,6 +45,14 @@
                 <span class="font-medium">Noticias</span>
             </a>
 
+            {{-- REGLAS DE LA LIGA (NUEVO) --}}
+            <a href="{{ route('rules.index') }}"
+                class="flex items-center gap-3 px-4 py-3 rounded-lg text-white/70 hover:bg-white/5 
+                       @if (isset($activeView) && $activeView === 'rules') bg-primary/20 text-primary @endif">
+                <span class="material-symbols-outlined">gavel</span>
+                <span class="font-medium">Reglas de la Liga</span>
+            </a>
+
             <br><br>
             {{-- Panel de Administración --}}
             @if (session('is_admin'))
