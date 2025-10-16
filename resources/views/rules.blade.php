@@ -30,6 +30,7 @@
                 <h3 class="text-2xl font-bold text-red-400 border-b border-gray-700 pb-1">2. Sanciones Disciplinarias y Reporte de Datos</h3>
                 <ul class="list-disc list-inside space-y-3 text-gray-300 ml-4">
                     <li>**Tarjeta Roja:** Jugador con tarjeta roja, se pierde el próximo encuentro. No se puede pactar entre equipos que el jugador juegue, si ambos equipos pactan para que juegue automáticamente esa jornada ambos equipos quedan con 0 puntos.</li>
+                    <li>**Tarjeta Amarila:** De cada 3 amarillas un partido de sanción para el jugador.</li>
                     <li>Un jugador que lleve 2 o más rojas dependiendo de como fueron las rojas se verá si sigue en el torneo o no. No se ve la necesidad de hacer una falta contra tu compañero que se puede hasta lesionar cuando esto es para divertirse, no se juega por dinero. (No importa si es falta táctica o no. Ojo con las rojas).</li>
                     <li>**Reporte de Datos:** Cada capitán tiene que entregar a los encargados los goles, asistencias y tarjetas que hubieron en el partido lo antes posible y con exactitud. Esto incluye el orden correcto y tiempo aproximado en que se dieron los hechos. (Pueden pedirle a el árbitro o designar a alguien responsable que se encargué de esto).</li>
                 </ul>
@@ -43,6 +44,7 @@
                     <li>**No Adelantar Jornadas:** No se va a saltar de jornada hasta que cada equipo allá jugado la misma. El ir adelantado partidos no va a existir. Cuando todos los equipos jueguen la jornada correspondiente entonces se pasa para la siguiente, sin importar la demora de un partido.</li>
                     <li>**Límite de 21 Días:** Tampoco podemos esperar un mes por un encuentro. El equipo que se demore más de 21 días aproximadamente 3 semana en cuadrar su partido, automáticamente pierde el equipo que nunca pudo cuadrar o de no ponerse de acuerdo ninguno de los 2 equipos y pasar este tiempo ambos se van con 0 puntos esa jornada. Por lo general la mayor responsabilidad recae sobre el visitante.</li>
                     <li>**Localía y Ayuda Monetaria:** Recordar que es un partido de visitante y otro de local en un mes. En el terreno que decidan jugar los equipos es su responsabilidad, al igual que los acuerdos de ayuda monetaria. No existe ni se exigirá ninguna ley al respecto.</li>
+                    <li>**Equipación:** De coincidor los colores de los uniformes de los equipos, el visitante está obligado a cambiar su uniforme.</li>
                 </ul>
             </div>
             
