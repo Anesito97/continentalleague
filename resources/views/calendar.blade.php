@@ -4,8 +4,7 @@
     @php
         $activeJornada ??= 1;
         $allJornadas ??= collect([1]);
-    @endphp
- class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">                    
+    @endphp                 
 <h2 class="text-3xl font-bold text-white mb-6 border-b border-primary pb-2 flex items-center">
             <span class="material-symbols-outlined mr-3 text-3xl text-primary">calendar_month</span>
             Calendario de Partidos por Jornada
