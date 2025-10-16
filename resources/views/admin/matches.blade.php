@@ -5,6 +5,11 @@
         <h4 class="text-2xl font-semibold mb-4 text-green-400">Programar Partido</h4>
         <form method="POST" action="{{ route('matches.store') }}">
             @csrf
+            <div class="mb-4">
+                <label for="match-jornada" class="block text-sm font-medium text-gray-400">Jornada Nº</label>
+                <input type="number" name="jornada" id="match-jornada" required min="1" value="{{ old('jornada', 1) }}"
+                    class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white">
+            </div>
             <div class="grid grid-cols-2 gap-4 mb-4">
                 <div>
                     <label for="match-local" class="block text-sm font-medium text-gray-400">Equipo Local</label>

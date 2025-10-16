@@ -17,6 +17,7 @@ class MatchController extends Controller
         $request->validate([
             'localId' => 'required|exists:equipos,id|different:visitorId',
             'visitorId' => 'required|exists:equipos,id',
+            'jornada' => 'required|integer|min:1',
             'date' => 'required|date', // ⬅️ Usamos date
             'time' => 'required|date_format:H:i', // ⬅️ Usamos time
         ]);
@@ -27,6 +28,7 @@ class MatchController extends Controller
         Partido::create([
             'equipo_local_id' => $request->localId,
             'equipo_visitante_id' => $request->visitorId,
+            'jornada' => $request->jornada,
             'fecha_hora' => $dateTime, // ⬅️ Usamos la combinación
             'estado' => 'pendiente',
         ]);
@@ -156,6 +158,7 @@ class MatchController extends Controller
         $request->validate([
             'localId' => 'required|exists:equipos,id|different:visitorId',
             'visitorId' => 'required|exists:equipos,id',
+            'jornada' => 'required|integer|min:1',
             'date' => 'required|date',
             'time' => 'required|date_format:H:i',
         ]);
@@ -165,6 +168,7 @@ class MatchController extends Controller
         $partido->update([
             'equipo_local_id' => $request->localId,
             'equipo_visitante_id' => $request->visitorId,
+            'jornada' => $request->jornada,
             'fecha_hora' => $dateTime,
         ]);
 

@@ -35,10 +35,16 @@
                     <span class="text-sm text-gray-400">Local</span>
                 </div>
 
-                {{-- CENTRO: VS, Fecha y Hora --}}
+                {{-- CENTRO: VS, Fecha y Hora y JORNADA --}}
                 <div class="w-full md:w-2/12">
                     <div class="bg-gray-700/70 border border-white/10 rounded-xl p-2 md:p-3 mx-auto shadow-lg">
                         <span class="text-2xl font-black text-red-500 block mb-1">VS</span>
+                        
+                        {{-- ⬇️ JORNADA AÑADIDA ⬇️ --}}
+                        @if ($nextMatch->jornada)
+                            <span class="text-sm font-bold text-primary block mb-1">Jornada {{ $nextMatch->jornada }}</span>
+                        @endif
+                        
                         <span class="text-xs font-semibold text-white block">
                             {{ \Carbon\Carbon::parse($nextMatch->fecha_hora)->locale('es')->isoFormat('D MMM') }}
                         </span>

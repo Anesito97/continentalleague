@@ -21,6 +21,9 @@ class DashboardController extends Controller
         // Carga de equipos y cálculo de la guía de forma (se mantiene)
         $teams = Equipo::orderByDesc('puntos')->orderByDesc('goles_a_favor')->get();
 
+        // Obtener la jornada activa (la más baja con partidos pendientes)
+        $activeJornada = Partido::where('estado', 'pendiente')->min('jornada');
+
         $pendingMatches = Partido::with(['localTeam', 'visitorTeam'])
             ->where('estado', 'pendiente')
             ->orderBy('fecha_hora', 'asc')
@@ -114,7 +117,8 @@ class DashboardController extends Controller
             'totalMatches',
             'totalGoals',
             'avgGoals',
-            'newsItems'
+            'newsItems',
+            'activeJornada',
         );
     }
 
@@ -256,33 +260,55 @@ class DashboardController extends Controller
         return view('admin.team_players', $data);
     }
 
-    public function showCalendar(Request $request) // ⬅️ Aceptar Request
+    public function showCalendar(Request $request)
     {
         // 1. Determinar el filtro activo
-        $filter = $request->query('status', 'pending'); // 'pending' es el valor por defecto
+        $filter = $request->query('status', 'pending');
 
-        // 2. Cargar todos los partidos y luego filtrar o cargar la colección directamente
-        $query = Partido::with(['localTeam', 'visitorTeam'])
+        // ⬇️ Obtener el número de jornada activa si se pasa en la URL, o la jornada más baja pendiente ⬇️
+        $activeJornada = $request->query('jornada');
+
+        $query = Partido::with(['localTeam', 'visitorTeam', 'eventos.jugador', 'eventos.equipo'])
+            ->orderBy('jornada', 'asc') // ⬅️ Ordenar primero por jornada
             ->orderBy('fecha_hora', 'asc');
 
+        // 2. Aplicar filtros de ESTADO (pending, finished, all)
         if ($filter === 'pending') {
             $query->where('estado', 'pendiente');
         } elseif ($filter === 'finished') {
-            $query->where('estado', 'finalizado')->orderBy('fecha_hora', 'desc'); // Recientes primero
+            $query->where('estado', 'finalizado');
         }
-        // Si $filter es 'all' o cualquier otro valor, se cargan todos.
+
+        // 3. Aplicar filtro de JORNADA si se selecciona una específica
+        if ($activeJornada) {
+            $query->where('jornada', $activeJornada);
+        }
 
         $allMatches = $query->get();
 
-        // 3. Agrupar los partidos por fecha
-        $matchesByDate = $allMatches->groupBy(function ($match) {
-            return \Carbon\Carbon::parse($match->fecha_hora)->format('Y-m-d');
-        });
+        // 4. Agrupar los partidos por JORNADA (CRÍTICO)
+        // Ya no agrupamos por fecha, sino por el número de jornada.
+        $matchesByJornada = $allMatches->groupBy('jornada');
+
+        // 5. Determinar todas las jornadas existentes para el selector
+        $allJornadas = Partido::select('jornada')->distinct()->orderBy('jornada', 'asc')->pluck('jornada');
+        // Determinar la jornada más baja que contiene partidos pendientes (para el foco inicial)
+        $firstPendingJornada = Partido::where('estado', 'pendiente')->min('jornada');
+
+        // Si no hay jornada activa en la URL, usar la primera pendiente
+        if (!$activeJornada && $firstPendingJornada) {
+            $activeJornada = $firstPendingJornada;
+        } elseif (!$activeJornada) {
+            $activeJornada = $allJornadas->first(); // Si no hay pendientes, usar la primera jornada existente
+        }
+
 
         $data = $this->loadAllData();
-        $data['matchesByDate'] = $matchesByDate;
+        $data['matchesByJornada'] = $matchesByJornada; // ⬅️ Nuevo nombre
         $data['activeView'] = 'calendar';
-        $data['activeFilter'] = $filter; // ⬅️ Pasar el filtro activo a la vista
+        $data['activeFilter'] = $filter;
+        $data['allJornadas'] = $allJornadas; // Para el selector
+        $data['activeJornada'] = (int) $activeJornada; // Para saber qué pestaña resaltar
 
         return view('calendar', $data);
     }

@@ -11,7 +11,7 @@
                     <option value="">Selecciona Partido...</option>
                     @foreach($pendingMatches as $match)
                         <option value="{{ $match->id }}" @selected(request('match_id') == $match->id)>
-                            {{ $match->localTeam->nombre }} vs {{ $match->visitorTeam->nombre }} ({{ \Carbon\Carbon::parse($match->fecha_hora)->format('d/m/Y') }})
+                            (Jornada {{ $match->jornada }}) - {{ $match->localTeam->nombre }} vs {{ $match->visitorTeam->nombre }} ({{ \Carbon\Carbon::parse($match->fecha_hora)->format('d/m/Y') }})
                         </option>
                     @endforeach
                 </select>
