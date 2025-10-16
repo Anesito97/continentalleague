@@ -157,5 +157,48 @@ class LeagueSeeder extends Seeder
             'fecha_hora' => Carbon::now()->addDays(5)->setTime(18, 30),
             'estado' => 'pendiente'
         ]);
+
+                // 5. CREAR NOTICIAS (Para el Slider)
+        
+        // Define una URL de imagen genérica para el banner
+        $newsImageUrl = asset('uploads/news/banner_default.jpg'); 
+
+        DB::table('noticias')->insert([
+            [
+                'titulo' => '¡Titanes FC en Racha! Imparables en la Jornada 3',
+                'contenido' => 'El Titanes FC demostró su poder ofensivo al golear 5-0 al Lobos Plateados, afianzándose en la cima de la tabla. Marco Goleador anotó un doblete y lidera la tabla de goleadores.',
+                'imagen_url' => $newsImageUrl,
+                'publicada_en' => Carbon::now()->subHours(12),
+                'created_at' => Carbon::now(), 'updated_at' => Carbon::now(),
+            ],
+            [
+                'titulo' => 'Duelo en la Cumbre: Halcones vs. Dragones, ¿quién dominará?',
+                'contenido' => 'El próximo partido entre Halcones Rojos y Dragones Azules será crucial para definir la mitad superior de la tabla. Ambos equipos buscan asegurar un puesto de honor.',
+                'imagen_url' => $newsImageUrl,
+                'publicada_en' => Carbon::now()->subHours(8),
+                'created_at' => Carbon::now(), 'updated_at' => Carbon::now(),
+            ],
+            [
+                'titulo' => 'Leo Máquina Brilla con un Hat-trick a pesar del Empate',
+                'contenido' => 'Leo Máquina (Halcones Rojos) tuvo una actuación estelar con tres goles, pero no fue suficiente para asegurar la victoria contra Titanes FC en el emocionante empate 3-3.',
+                'imagen_url' => $newsImageUrl,
+                'publicada_en' => Carbon::now()->subDays(1),
+                'created_at' => Carbon::now(), 'updated_at' => Carbon::now(),
+            ],
+            [
+                'titulo' => 'Dragones Azules se recuperan con una victoria clave de visitante',
+                'contenido' => 'Nico Tirador marcó los dos goles en la victoria 2-0 de los Dragones Azules sobre Lobos Plateados, mostrando solidez defensiva.',
+                'imagen_url' => $newsImageUrl,
+                'publicada_en' => Carbon::now()->subDays(2),
+                'created_at' => Carbon::now(), 'updated_at' => Carbon::now(),
+            ],
+            [
+                'titulo' => '¡Lobos y Titanes se enfrentarán en la Jornada 5!',
+                'contenido' => 'Uno de los duelos más esperados de la temporada regular se aproxima. Analizamos las claves del partido que enfrentará a Lobos Plateados contra el líder Titanes FC.',
+                'imagen_url' => $newsImageUrl,
+                'publicada_en' => Carbon::now()->subDays(3),
+                'created_at' => Carbon::now(), 'updated_at' => Carbon::now(),
+            ],
+        ]);
     }
 }

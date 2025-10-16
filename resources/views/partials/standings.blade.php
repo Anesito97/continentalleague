@@ -11,6 +11,8 @@
     $topImpactPlayer = $players->sortByDesc(fn($p) => $p->goles + $p->asistencias)->first();
 @endphp
 
+@include('partials.news_slider', ['newsItems' => $newsItems])
+
 <h2 class="text-3xl font-bold mb-6">Resumen de la Liga</h2>
 
 @if ($nextMatch)

@@ -13,7 +13,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;700;900&amp;display=swap"
         rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
-
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <script>
         tailwind.config = {
@@ -160,11 +161,44 @@
                 transform: rotate(360deg);
             }
         }
+
+        .swiper-button-prev,
+        .swiper-button-next {
+            color: #10b981 !important;
+            /* Usar color primario */
+            top: 50%;
+            transform: translateY(-50%) scale(0.6);
+            /* Reducir tamaño al 60% */
+            width: 30px;
+            /* Reducir ancho del área de clic */
+            height: 30px;
+            /* Reducir alto del área de clic */
+            transition: transform 0.3s;
+        }
+
+        .swiper-button-prev:hover,
+        .swiper-button-next:hover {
+            transform: translateY(-50%) scale(0.8);
+            /* Efecto sutil al pasar el ratón */
+        }
+
+        /* En móvil, ocultar flechas o hacerlas muy pequeñas */
+        @media (max-width: 640px) {
+
+            .swiper-button-prev,
+            .swiper-button-next {
+                display: none !important;
+                /* Ocultar totalmente en móvil para no estorbar */
+            }
+        }
     </style>
 </head>
 
 <body class="bg-dark-bg text-white font-display loading">
-
+    @php
+        // Si el controlador no la pasó (ej. en una vista @yield), asumimos 'home'
+        $activeView = $activeView ?? 'home';
+    @endphp
     {{-- 1. OVERLAY DEL LOADER --}}
     <div id="loader-overlay">
         <div class="spinner"></div>
@@ -334,6 +368,48 @@
         function navigate(route) {
             window.location.href = route;
         }
+
+        document.addEventListener('DOMContentLoaded', function() {
+
+            if (typeof Swiper !== 'undefined') {
+                new Swiper('.news-swiper', {
+                    loop: true,
+
+                    // ⬇️ AJUSTES PARA EL EFECTO ESPECTACULAR (Ver la otra venir) ⬇️
+                    slidesPerView: 1.1, // Muestra una diapositiva completa y parte de la siguiente (1.1)
+                    spaceBetween: 20, // Espacio entre slides
+                    centeredSlides: true, // Centra el slide activo (opcional)
+
+                    // Auto-Play
+                    autoplay: {
+                        delay: 5000,
+                        disableOnInteraction: false,
+                    },
+
+                    // Si quieres el efecto 3D:
+                    /*
+                    effect: 'coverflow',
+                    coverflowEffect: {
+                        rotate: 50,
+                        stretch: 0,
+                        depth: 100,
+                        modifier: 1,
+                        slideShadows: true,
+                    },
+                    */
+
+                    // Paginación y Navegación (con las flechas reducidas por el CSS)
+                    pagination: {
+                        el: '.swiper-pagination',
+                        clickable: true,
+                    },
+                    navigation: {
+                        nextEl: '.swiper-button-next',
+                        prevEl: '.swiper-button-prev',
+                    },
+                });
+            }
+        });
     </script>
 
 </body>

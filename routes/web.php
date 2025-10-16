@@ -5,12 +5,20 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\TeamController;
 use App\Http\Controllers\PlayerController;
 use App\Http\Controllers\MatchController;
+use App\Http\Controllers\PublicController;
+use App\Http\Controllers\NewsAdminController;
 
 // --- RUTA PÚBLICA / HOME ---
 // Esta ruta carga la vista principal, incluyendo clasificación y estadísticas.
 Route::get('/', [DashboardController::class, 'index'])->name('home');
 
 Route::get('calendar', [DashboardController::class, 'showCalendar'])->name('matches.calendar');
+
+// Lista de todas las noticias (con paginación)
+Route::get('news', [PublicController::class, 'indexNews'])->name('news.index');
+
+// Detalle de una noticia
+Route::get('news/{noticia:id}', [PublicController::class, 'showNews'])->name('news.show');
 
 // --- AUTENTICACIÓN ---
 Route::post('login', [AuthController::class, 'login'])->name('login');
@@ -27,7 +35,7 @@ Route::middleware(\App\Http\Middleware\AdminCheck::class)
         Route::get('players', [DashboardController::class, 'adminPlayers'])->name('admin.players');
         Route::get('matches', [DashboardController::class, 'adminMatches'])->name('admin.matches');
         Route::get('finalize-match', [DashboardController::class, 'adminFinalizeMatch'])->name('admin.finalize-match');
-        Route::get('/', [DashboardController::class, 'adminPanel'])->name('admin.panel');
+        Route::get('/', [DashboardController::class, 'adminTeams'])->name('admin.panel');
 
         // ⬇️ Rutas POST para registro ⬇️
         // CRUD DE EQUIPOS
@@ -52,6 +60,17 @@ Route::middleware(\App\Http\Middleware\AdminCheck::class)
         Route::delete('matches/{partido}', [MatchController::class, 'destroy'])->name('matches.destroy');
 
         Route::get('teams/{equipo}/players', [DashboardController::class, 'showTeamPlayers'])->name('teams.players');
+
+        // RUTA DE NAVEGACIÓN
+        Route::get('news', [DashboardController::class, 'adminNews'])->name('admin.news');
+        // CRUD DE NOTICIAS
+        Route::post('news', [NewsAdminController::class, 'store'])->name('news.store');
+        Route::delete('news/{noticia}', [NewsAdminController::class, 'destroy'])->name('news.destroy');
+
+        // RUTAS DE EDICIÓN (Añadir si implementas el edit/update en el controlador)
+        Route::get('news/{noticia}/edit', [DashboardController::class, 'editNews'])->name('admin.news.edit');
+        // RUTA PUT PARA ACTUALIZAR (Debe existir)
+        Route::put('news/{noticia}', [NewsAdminController::class, 'update'])->name('news.update');
 
         // RUTAS PENDIENTES (Ej: teams/delete/{id}, players/edit/{id}, etc.)
     });

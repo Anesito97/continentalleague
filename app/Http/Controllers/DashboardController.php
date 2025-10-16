@@ -5,15 +5,19 @@ use App\Models\Equipo;
 use App\Models\Jugador;
 use App\Models\Partido;
 use Illuminate\Http\Request;
+use App\Models\Noticia;
+
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
 
 class DashboardController extends Controller
 {
     // Función central que carga TODOS los datos necesarios
-private function loadAllData()
+    private function loadAllData()
     {
         // FIX CRÍTICO: Cargar TODOS los jugadores para rankings globales.
         $players = Jugador::with('equipo')->get();
-        
+
         // Carga de equipos y cálculo de la guía de forma (se mantiene)
         $teams = Equipo::orderByDesc('puntos')->orderByDesc('goles_a_favor')->get();
 
@@ -34,11 +38,11 @@ private function loadAllData()
 
         $teams = $teams->map(function ($team) {
             // ... (Lógica de cálculo de form_guide y discipline_points)
-            
+
             // Calculamos disciplina (requiere la relación jugadores previamente cargada)
             $disciplinePoints = ($team->jugadores->sum('amarillas') * 1) + ($team->jugadores->sum('rojas') * 3);
             $team->discipline_points = $disciplinePoints;
-            
+
             // Lógica de forma
             $lastMatches = Partido::where('estado', 'finalizado')
                 ->where(function ($query) use ($team) {
@@ -52,11 +56,17 @@ private function loadAllData()
             foreach ($lastMatches as $match) {
                 $result = 'P';
                 if ($match->equipo_local_id === $team->id) {
-                    if ($match->goles_local > $match->goles_visitante) { $result = 'G'; } 
-                    elseif ($match->goles_local === $match->goles_visitante) { $result = 'E'; }
+                    if ($match->goles_local > $match->goles_visitante) {
+                        $result = 'G';
+                    } elseif ($match->goles_local === $match->goles_visitante) {
+                        $result = 'E';
+                    }
                 } elseif ($match->equipo_visitante_id === $team->id) {
-                    if ($match->goles_visitante > $match->goles_local) { $result = 'G'; } 
-                    elseif ($match->goles_visitante === $match->goles_local) { $result = 'E'; }
+                    if ($match->goles_visitante > $match->goles_local) {
+                        $result = 'G';
+                    } elseif ($match->goles_visitante === $match->goles_local) {
+                        $result = 'E';
+                    }
                 }
                 $formGuide .= $result;
             }
@@ -66,7 +76,7 @@ private function loadAllData()
         });
 
         // ⬇️ CALCULAR TOPS: Ordenar globalmente y filtrar por criterio (>= 1) ⬇️
-        
+
         // Goleadores: Orden descendente por Goles (solo si tienen > 0)
         $topScorers = $players->filter(fn($p) => $p->goles > 0)->sortByDesc('goles');
 
@@ -75,24 +85,36 @@ private function loadAllData()
 
         // Porteros: Orden descendente por Paradas (solo si son porteros y tienen > 0)
         $topKeepers = $players->filter(fn($p) => strtolower($p->posicion) === 'portero' && $p->paradas > 0)->sortByDesc('paradas');
-        
+
         // MÉTICAS DE DASHBOARD (Aseguramos que operen con colecciones completas)
         $topImpactPlayer = $players->sortByDesc(fn($p) => $p->goles + $p->asistencias)->first();
         $bestDefenseTeam = $teams->sortBy('goles_en_contra')->first();
         $mostOffensiveTeam = $teams->sortByDesc('goles_a_favor')->first();
         $cleanestTeam = $teams->sortBy('discipline_points')->first();
-        
+
         // Calcular variables generales
         $totalMatches = $teams->sum('partidos_jugados') / 2;
         $totalGoals = $teams->sum('goles_a_favor');
         $avgGoals = ($totalMatches > 0) ? number_format($totalGoals / $totalMatches, 2) : 0;
-        
+
+        $newsItems = \App\Models\Noticia::orderBy('created_at', 'desc')->take(5)->get();
 
         return compact(
-            'teams', 'players', 'pendingMatches', 'recentMatches', 
-            'topScorers', 'topAssists', 'topKeepers', 
-            'topImpactPlayer', 'bestDefenseTeam', 'mostOffensiveTeam', 'cleanestTeam',
-            'totalMatches', 'totalGoals', 'avgGoals'
+            'teams',
+            'players',
+            'pendingMatches',
+            'recentMatches',
+            'topScorers',
+            'topAssists',
+            'topKeepers',
+            'topImpactPlayer',
+            'bestDefenseTeam',
+            'mostOffensiveTeam',
+            'cleanestTeam',
+            'totalMatches',
+            'totalGoals',
+            'avgGoals',
+            'newsItems'
         );
     }
 
@@ -102,39 +124,75 @@ private function loadAllData()
         $data = $this->loadAllData();
 
         // ⬇️ Determinar la vista activa (home por defecto) ⬇️
+        $data['news'] = $this->getEmptyNewsPaginator();
         $data['activeView'] = $request->query('view', 'home');
 
         return view('index', $data);
     }
 
+    private function getEmptyNewsPaginator()
+    {
+        return new \Illuminate\Pagination\LengthAwarePaginator(
+            items: new \Illuminate\Support\Collection(),
+            total: 0,
+            perPage: 10,
+            currentPage: 1
+        );
+    }
+
     // 2. VISTAS DE ADMINISTRACIÓN (Llama a loadAllData() y añade la vista activa)
     public function adminTeams()
     {
-        session(['activeAdminContent' => 'teams']); // ⬅️ Guardar en sesión
-        return $this->adminPanel();
-    }
-    public function adminPlayers()
-    {
-        session(['activeAdminContent' => 'players']); // ⬅️ Guardar en sesión
-        return $this->adminPanel();
-    }
-    public function adminMatches()
-    {
-        session(['activeAdminContent' => 'matches']); // ⬅️ Guardar en sesión
-        return $this->adminPanel();
-    }
-    public function adminFinalizeMatch()
-    {
-        session(['activeAdminContent' => 'finalize-match']); // ⬅️ Guardar en sesión
-        return $this->adminPanel();
+        session(['activeAdminContent' => 'teams']);
+        $data = $this->loadAllData();
+        // ⬇️ FIX: Inicializar $news para la vista, si no fue cargada ⬇️
+        $data['news'] = $this->getEmptyNewsPaginator();
+        $data['activeView'] = 'admin';
+
+        return view('index', $data);
     }
 
-    // Y en adminPanel(), aseguramos que se recupere:
-    public function adminPanel()
+    public function adminPlayers()
     {
+        session(['activeAdminContent' => 'players']);
         $data = $this->loadAllData();
-        $data['activeView'] = 'admin'; // ⬅️ Fuerza la vista a 'admin'
-        // ... (el resto del código adminPanel)
+        $data['news'] = $this->getEmptyNewsPaginator();
+        $data['activeView'] = 'admin';
+
+        return view('index', $data);
+    }
+
+    public function adminMatches()
+    {
+        session(['activeAdminContent' => 'matches']);
+        $data = $this->loadAllData();
+        $data['news'] = $this->getEmptyNewsPaginator();
+        $data['activeView'] = 'admin';
+
+        return view('index', $data);
+    }
+
+    public function adminFinalizeMatch()
+    {
+        session(['activeAdminContent' => 'finalize-match']);
+        $data = $this->loadAllData();
+        $data['news'] = $this->getEmptyNewsPaginator();
+        $data['activeView'] = 'admin';
+
+        return view('index', $data);
+    }
+
+    public function adminNews()
+    {
+        // Cargar las noticias paginadas reales
+        $news = \App\Models\Noticia::orderBy('publicada_en', 'desc')->paginate(10);
+
+        session(['activeAdminContent' => 'news']);
+        $data = $this->loadAllData();
+
+        // Aquí, $data['news'] obtiene los datos reales, NO el paginador vacío.
+        $data['news'] = $news;
+        $data['activeView'] = 'admin';
 
         return view('index', $data);
     }
@@ -162,6 +220,21 @@ private function loadAllData()
         $data['type'] = 'match';
         // Asegúrate de cargar las relaciones necesarias para el formulario de partido
         $partido->load(['localTeam', 'visitorTeam']);
+        return view('edit', $data);
+    }
+
+    public function editNews(Noticia $noticia)
+    {
+        // Cargar todos los datos base (equipos, jugadores) necesarios para el layout
+        $data = $this->loadAllData();
+
+        // Asignar el ítem actual y su tipo para la vista edit.blade.php
+        $data['item'] = $noticia;
+        $data['type'] = 'news';
+
+        // Necesitas pasar los equipos si el formulario de edición (edit.blade.php) los requiere
+        // $data['teams'] = $data['teams']; 
+
         return view('edit', $data);
     }
 

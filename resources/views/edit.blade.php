@@ -1,3 +1,26 @@
+@php
+    // Define the base route name for PUT/DELETE actions.
+    // 'news' and 'matches' must be handled as special singular/plural cases.
+    $baseRouteName = match ($type) {
+        'news' => 'news',       // Route name is 'news.update'
+        'match' => 'matches',   // Route name is 'matches.update'
+        'team' => 'teams',      // Route name is 'teams.update'
+        'player' => 'players',  // Route name is 'players.update'
+        default => 'error'      // Fallback
+    };
+
+    // Define the correct URL segment based on the base route name
+    // (We need to use the base route name for the URL actions)
+    $updateRoute = $baseRouteName . '.update';
+    $destroyRoute = $baseRouteName . '.destroy';
+    $cancelRoute = 'admin.' . $baseRouteName;
+
+    // Define the base name for the item being edited (for use in the form structure)
+    // For news, we edit 'titulo' and 'contenido' (using $item->titulo)
+    $itemName = $item->nombre ?? $item->titulo ?? ('ID ' . $item->id);
+
+@endphp
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -32,13 +55,13 @@
         }
 
         /* Inputs Consistentes */
-        input[type="text"], input[type="number"], input[type="file"], input[type="date"], input[type="time"], select {
+        input[type="text"], input[type="number"], input[type="file"], input[type="date"], input[type="time"], select, textarea {
             background-color: #374151;
             border-color: #4b5563;
             transition: border-color 0.3s;
         }
 
-        input:focus, select:focus {
+        input:focus, select:focus, textarea:focus {
             border-color: var(--color-primary) !important;
             box-shadow: 0 0 0 1px var(--color-primary); /* Efecto de enfoque sutil */
         }
@@ -48,13 +71,13 @@
     <div class="max-w-4xl mx-auto py-10">
         <div class="card p-6">
             <h2 class="text-4xl font-bold text-white mb-6 border-b border-blue-500 pb-2">
-                Editar {{ ucfirst($type) }}: {{ $item->nombre ?? 'ID ' . $item->id }}
+                Editar {{ ucfirst($type) }}: {{ $itemName }}
             </h2>
 
             @include('partials.alerts')
 
             <form method="POST" 
-                  action="{{ route($type === 'match' ? 'matches.update' : $type . 's.update', $item->id) }}" 
+                  action="{{ route($updateRoute, $item->id) }}" 
                   enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
@@ -79,17 +102,23 @@
                 {{-- FORMULARIO DE PARTIDO --}}
                 @elseif($type === 'match')
                     @include('admin.forms.match_edit', ['match' => $item, 'teams' => $teams])
+
+                {{-- FORMULARIO DE NOTICIAS (NUEVO) --}}
+                @elseif($type === 'news')
+                    @include('admin.forms.news_edit', ['item' => $item])
                 @endif
 
                 <div class="mt-6 flex justify-end space-x-3">
                     <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition">Guardar Cambios</button>
-                    <a href="{{ route($type === 'match' ? 'admin.matches' : 'admin.' . $type . 's') }}" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg transition">Cancelar</a>
+                    {{-- ⬇️ CANCELAR: Usa la variable $cancelRoute ⬇️ --}}
+                    <a href="{{ route($cancelRoute) }}" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg transition">Cancelar</a>
                 </div>
             </form>
 
+            {{-- FORMULARIO DE ELIMINACIÓN (DELETE) --}}
             <form method="POST" 
-                  action="{{ route($type === 'match' ? 'matches.destroy' : $type . 's.destroy', $item->id) }}" 
-                  onsubmit="return confirm('¿CONFIRMAS ELIMINAR {{ ucfirst($type) }} ({{ $item->nombre ?? $item->id }})?');" 
+                  action="{{ route($destroyRoute, $item->id) }}" 
+                  onsubmit="return confirm('¿CONFIRMAS ELIMINAR {{ ucfirst($type) }} ({{ $itemName }})?');" 
                   class="mt-4 border-t border-gray-700 pt-4">
                 @csrf
                 @method('DELETE')
