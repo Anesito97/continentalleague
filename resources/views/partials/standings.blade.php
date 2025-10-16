@@ -87,10 +87,20 @@
                 @forelse($teams as $index => $team)
                     @php
                         $positionClass = '';
+                        $pointsTextColor = 'text-green-400';
+                        
+                        // 1er Lugar: Amarillo
                         if ($index === 0) {
                             $positionClass = 'bg-yellow-900/30 text-yellow-400 border-l-4 border-yellow-400';
-                        } elseif ($index < 4) {
-                            $positionClass = 'bg-green-900/30 text-green-400 border-l-4 border-green-400';
+                            $pointsTextColor = 'text-yellow-300';
+                        // 2do Lugar: Azul Secundario
+                        } elseif ($index === 1) {
+                            $positionClass = 'bg-blue-900/30 text-blue-400 border-l-4 border-blue-400';
+                            $pointsTextColor = 'text-blue-300';
+                        // 3er Lugar en adelante: Verde Primario
+                        } else {
+                            $positionClass = 'bg-primary/20 text-green-400 border-l-4 border-primary';
+                            $pointsTextColor = 'text-green-300';
                         }
 
                         $goalDiff = $team->goles_a_favor - $team->goles_en_contra;
@@ -104,8 +114,7 @@
                                 class="w-8 h-8 rounded-full object-cover mr-3" />
                             <span class="font-medium text-white">{{ $team->nombre }}</span>
                         </td>
-                        <td
-                            class="py-3 px-2 text-center font-bold {{ $index < 4 ? 'text-yellow-300' : 'text-green-400' }}">
+                        <td class="py-3 px-2 text-center font-bold {{ $pointsTextColor }}">
                             {{ $team->puntos }}</td>
                         <td class="py-3 px-2 text-center">{{ $team->partidos_jugados }}</td>
                         <td class="py-3 px-2 text-center">{{ $team->ganados }}</td>
@@ -129,7 +138,7 @@
                     </tr>
                 @empty
                     <tr class="hover:bg-gray-700 transition">
-                        <td colspan="10" class="py-4 text-center text-gray-500">Aún no hay equipos.</td>
+                        <td colspan="11" class="py-4 text-center text-gray-500">Aún no hay equipos.</td>
                     </tr>
                 @endforelse
             </tbody>
