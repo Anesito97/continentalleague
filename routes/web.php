@@ -23,6 +23,8 @@ Route::get('news/{noticia:id}', [PublicController::class, 'showNews'])->name('ne
 // REglas
 Route::get('rules', [DashboardController::class, 'showRules'])->name('rules.index');
 
+Route::get('team/{equipo}', [PublicController::class, 'showTeamProfile'])->name('team.profile');
+
 // --- AUTENTICACIÓN ---
 Route::post('login', [AuthController::class, 'login'])->name('login');
 Route::get('logout', [AuthController::class, 'logout'])->name('logout');

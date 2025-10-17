@@ -29,22 +29,30 @@
 
                 {{-- EQUIPO LOCAL --}}
                 <div class="flex flex-col items-center w-full md:w-5/12">
-                    <img src="{{ $nextMatch->localTeam->escudo_url ?? 'https://placehold.co/100x100/1f2937/FFFFFF?text=LOCAL' }}"
-                        alt="Logo Local" class="w-20 h-20 rounded-full object-cover border-4 border-primary/50 mb-2" />
-                    <span class="text-xl font-extrabold text-white">{{ $nextMatch->localTeam->nombre }}</span>
-                    <span class="text-sm text-gray-400">Local</span>
+                    <a href="{{ route('team.profile', $nextMatch->localTeam->id) }}"
+                        class="flex flex-col items-center hover:opacity-90 transition">
+
+                        <img src="{{ $nextMatch->localTeam->escudo_url ?? 'https://placehold.co/100x100/1f2937/FFFFFF?text=LOCAL' }}"
+                            alt="Logo Local"
+                            class="w-20 h-20 rounded-full object-cover border-4 border-primary/50 mb-2" />
+
+                        <span class="text-xl font-extrabold text-white">{{ $nextMatch->localTeam->nombre }}</span>
+                        <span class="text-sm text-gray-400">Local</span>
+
+                    </a>
                 </div>
 
                 {{-- CENTRO: VS, Fecha y Hora y JORNADA --}}
                 <div class="w-full md:w-2/12">
                     <div class="bg-gray-700/70 border border-white/10 rounded-xl p-2 md:p-3 mx-auto shadow-lg">
                         <span class="text-2xl font-black text-red-500 block mb-1">VS</span>
-                        
+
                         {{-- ⬇️ JORNADA AÑADIDA ⬇️ --}}
                         @if ($nextMatch->jornada)
-                            <span class="text-sm font-bold text-primary block mb-1">Jornada {{ $nextMatch->jornada }}</span>
+                            <span class="text-sm font-bold text-primary block mb-1">Jornada
+                                {{ $nextMatch->jornada }}</span>
                         @endif
-                        
+
                         <span class="text-xs font-semibold text-white block">
                             {{ \Carbon\Carbon::parse($nextMatch->fecha_hora)->locale('es')->isoFormat('D MMM') }}
                         </span>
@@ -55,11 +63,17 @@
 
                 {{-- EQUIPO VISITANTE --}}
                 <div class="flex flex-col items-center w-full md:w-5/12">
-                    <img src="{{ $nextMatch->visitorTeam->escudo_url ?? 'https://placehold.co/100x100/1f2937/FFFFFF?text=VISIT' }}"
-                        alt="Logo Visitante"
-                        class="w-20 h-20 rounded-full object-cover border-4 border-secondary/50 mb-2" />
-                    <span class="text-xl font-extrabold text-white">{{ $nextMatch->visitorTeam->nombre }}</span>
-                    <span class="text-sm text-gray-400">Visitante</span>
+                    <a href="{{ route('team.profile', $nextMatch->visitorTeam->id) }}"
+                        class="flex flex-col items-center hover:opacity-90 transition">
+
+                        <img src="{{ $nextMatch->visitorTeam->escudo_url ?? 'https://placehold.co/100x100/1f2937/FFFFFF?text=LOCAL' }}"
+                            alt="Logo Local"
+                            class="w-20 h-20 rounded-full object-cover border-4 border-secondary/50 mb-2" />
+
+                        <span class="text-xl font-extrabold text-white">{{ $nextMatch->visitorTeam->nombre }}</span>
+                        <span class="text-sm text-gray-400">Local</span>
+
+                    </a>
                 </div>
 
             </div>
@@ -94,16 +108,16 @@
                     @php
                         $positionClass = '';
                         $pointsTextColor = 'text-green-400';
-                        
+
                         // 1er Lugar: Amarillo
                         if ($index === 0) {
                             $positionClass = 'bg-yellow-900/30 text-yellow-400 border-l-4 border-yellow-400';
                             $pointsTextColor = 'text-yellow-300';
-                        // 2do Lugar: Azul Secundario
+                            // 2do Lugar: Azul Secundario
                         } elseif ($index === 1) {
                             $positionClass = 'bg-blue-900/30 text-blue-400 border-l-4 border-blue-400';
                             $pointsTextColor = 'text-blue-300';
-                        // 3er Lugar en adelante: Verde Primario
+                            // 3er Lugar en adelante: Verde Primario
                         } else {
                             $positionClass = 'bg-primary/20 text-green-400 border-l-4 border-primary';
                             $pointsTextColor = 'text-green-300';
@@ -114,11 +128,14 @@
 
                     <tr class="hover:bg-gray-700 transition {{ $positionClass }}">
                         <td class="py-3 px-2 font-bold">{{ $index + 1 }}</td>
-                        <td class="py-3 px-2 flex items-center">
-                            <img src="{{ $team->escudo_url ?? 'https://placehold.co/50x50/1f2937/FFFFFF?text=LOGO' }}"
-                                onerror="this.src='https://placehold.co/50x50/1f2937/FFFFFF?text=LOGO'"
-                                class="w-8 h-8 rounded-full object-cover mr-3" />
-                            <span class="font-medium text-white">{{ $team->nombre }}</span>
+                        <td class="py-3 px-2">
+                            <a href="{{ route('team.profile', $team->id) }}"
+                                class="flex items-center hover:text-green-300 transition">
+                                <img src="{{ $team->escudo_url ?? 'https://placehold.co/50x50/1f2937/FFFFFF?text=LOGO' }}"
+                                    onerror="this.src='https://placehold.co/50x50/1f2937/FFFFFF?text=LOGO'"
+                                    class="w-8 h-8 rounded-full object-cover mr-3" />
+                                <span class="font-medium text-white">{{ $team->nombre }}</span>
+                            </a>
                         </td>
                         <td class="py-3 px-2 text-center font-bold {{ $pointsTextColor }}">
                             {{ $team->puntos }}</td>
@@ -239,33 +256,42 @@
 <h3 class="text-2xl font-bold mb-4">Equipos Destacados</h3>
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
     @forelse($topTeams as $team)
-        <div class="bg-card-bg rounded-lg p-6 flex flex-col items-start shadow-xl border border-primary/20">
-            <div class="flex items-center gap-3 mb-4">
-                <img src="{{ $team->escudo_url ?? 'https://placehold.co/50x50/1f2937/FFFFFF?text=L' }}"
-                    onerror="this.src='https://placehold.co/50x50/1f2937/FFFFFF?text=L'"
-                    class="w-10 h-10 rounded-full object-cover border-2 border-primary/50">
+        {{-- ⬇️ 1. Envolver toda la tarjeta en un enlace <a> ⬇️ --}}
+        <a href="{{ route('team.profile', $team->id) }}" class="block">
+            <div
+                class="bg-card-bg rounded-lg p-6 flex flex-col items-start shadow-xl border border-primary/20 
+                        transform hover:scale-[1.03] transition duration-200">
 
-                <h4 class="text-xl font-bold">{{ $team->nombre }}</h4>
+                {{-- Logo y Título --}}
+                <div class="flex items-center gap-3 mb-4">
+                    <img src="{{ $team->escudo_url ?? 'https://placehold.co/50x50/1f2937/FFFFFF?text=L' }}"
+                        onerror="this.src='https://placehold.co/50x50/1f2937/FFFFFF?text=L'"
+                        class="w-10 h-10 rounded-full object-cover border-2 border-primary/50">
+
+                    <h4 class="text-xl font-bold">{{ $team->nombre }}</h4>
+                </div>
+
+                {{-- Grid de Estadísticas --}}
+                <div class="grid grid-cols-2 gap-4 w-full">
+                    <div>
+                        <p class="text-white/70 text-sm">Puntos</p>
+                        <p class="text-xl font-bold text-primary">{{ $team->puntos }}</p>
+                    </div>
+                    <div>
+                        <p class="text-white/70 text-sm">Partidos Jugados</p>
+                        <p class="text-xl font-bold">{{ $team->partidos_jugados }}</p>
+                    </div>
+                    <div>
+                        <p class="text-white/70 text-sm">Victorias</p>
+                        <p class="text-xl font-bold text-green-500">{{ $team->ganados }}</p>
+                    </div>
+                    <div>
+                        <p class="text-white/70 text-sm">Derrotas</p>
+                        <p class="text-xl font-bold text-red-500">{{ $team->perdidos }}</p>
+                    </div>
+                </div>
             </div>
-            <div class="grid grid-cols-2 gap-4 w-full">
-                <div>
-                    <p class="text-white/70 text-sm">Puntos</p>
-                    <p class="text-xl font-bold text-primary">{{ $team->puntos }}</p>
-                </div>
-                <div>
-                    <p class="text-white/70 text-sm">Partidos Jugados</p>
-                    <p class="text-xl font-bold">{{ $team->partidos_jugados }}</p>
-                </div>
-                <div>
-                    <p class="text-white/70 text-sm">Victorias</p>
-                    <p class="text-xl font-bold text-green-500">{{ $team->ganados }}</p>
-                </div>
-                <div>
-                    <p class="text-white/70 text-sm">Derrotas</p>
-                    <p class="text-xl font-bold text-red-500">{{ $team->perdidos }}</p>
-                </div>
-            </div>
-        </div>
+        </a>
     @empty
         <p class="text-white/50 p-6">Aún no hay suficientes equipos para mostrar un detalle destacado.</p>
     @endforelse

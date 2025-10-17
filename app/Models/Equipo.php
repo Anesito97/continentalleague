@@ -14,4 +14,14 @@ class Equipo extends Model
     {
         return $this->hasMany(Jugador::class);
     }
+
+    public function localMatches()
+    {
+        return $this->hasMany(Partido::class, 'equipo_local_id');
+    }
+
+    public function visitorMatches()
+    {
+        return $this->hasMany(Partido::class, 'equipo_visitante_id');
+    }
 }
