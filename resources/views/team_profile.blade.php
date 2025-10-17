@@ -76,6 +76,13 @@
             {{-- Columna 1: LISTA DE JUGADORES (Tabla) --}}
             <div class="lg:col-span-2 card p-4 shadow-xl">
                 <h3 class="text-2xl font-bold mb-4 text-primary">Plantilla y Estadísticas</h3>
+
+                @php
+                    // Contamos el total de jugadores
+                    $totalPlayers = $equipo->jugadores->count();
+                    $limit = 4; // Límite de filas a mostrar inicialmente
+                @endphp
+
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-700">
                         <thead>
@@ -85,17 +92,19 @@
                                 <th class="py-3 px-2 text-center">POS</th>
                                 <th class="py-3 px-2 text-center">⚽</th>
                                 <th class="py-3 px-2 text-center">👟</th>
-                                {{-- ⬇️ VISIBLE EN MÓVIL: Paradas 🧤 (Antes oculto) ⬇️ --}}
                                 <th class="py-3 px-2 text-center">🧤</th>
-                                {{-- ⬇️ VISIBLE EN MÓVIL: Tarjeta Roja 🟥 (Antes oculto) ⬇️ --}}
                                 <th class="py-3 px-2 text-center">🟥</th>
-                                {{-- ⬇️ VISIBLE EN MÓVIL: Tarjeta Amarilla A (Antes oculto) ⬇️ --}}
                                 <th class="py-3 px-2 text-center">A</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-800 text-sm">
                             @forelse($equipo->jugadores as $player)
-                                <tr class="hover:bg-gray-700 transition">
+                                @php
+                                    // ⬇️ Lógica para ocultar filas después del límite ⬇️
+                                    $isHidden = $loop->iteration > $limit ? 'player-row hidden' : 'player-row';
+                                @endphp
+
+                                <tr class="hover:bg-gray-700 transition {{ $isHidden }}">
                                     <td class="py-3 px-2 font-bold text-gray-300">{{ $player->numero }}</td>
                                     <td class="py-3 px-2 flex items-center">
                                         <img src="{{ $player->foto_url ?? asset('images/placeholder_jug.png') }}"
@@ -106,8 +115,6 @@
                                     <td class="py-3 px-2 text-center text-red-400 font-bold">{{ $player->goles }}</td>
                                     <td class="py-3 px-2 text-center text-yellow-400 font-bold">{{ $player->asistencias }}
                                     </td>
-
-                                    {{-- ⬇️ AHORA SIEMPRE VISIBLE ⬇️ --}}
                                     <td class="py-3 px-2 text-center">{{ $player->paradas }}</td>
                                     <td class="py-3 px-2 text-center text-red-500">{{ $player->rojas }}</td>
                                     <td class="py-3 px-2 text-center text-yellow-300">{{ $player->amarillas }}</td>
@@ -121,6 +128,14 @@
                         </tbody>
                     </table>
                 </div>
+
+                {{-- BOTÓN DE TOGGLE (Solo si hay más jugadores que el límite) --}}
+                @if ($totalPlayers > $limit)
+                    <button id="toggle-players-btn" onclick="togglePlayerList()"
+                        class="mt-4 w-full bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 rounded-lg transition text-sm">
+                        Ver Plantilla Completa ({{ $totalPlayers }} jugadores)
+                    </button>
+                @endif
             </div>
 
             {{-- Columna 2: Récords del Equipo e Historial Reciente --}}
@@ -267,4 +282,34 @@
             </div>
         </div>
     </div>
+    <script>
+        function togglePlayerList() {
+            const rows = document.querySelectorAll('.player-row');
+            const button = document.getElementById('toggle-players-btn');
+            let isExpanded = button.dataset.expanded === 'true';
+
+            rows.forEach(row => {
+                // Mostrar u ocultar las filas que tienen la clase 'hidden'
+                if (row.classList.contains('hidden')) {
+                    row.classList.remove('hidden');
+                }
+            });
+
+            if (isExpanded) {
+                // Si estaba expandido, ahora ocultamos (solo filas > 4)
+                rows.forEach((row, index) => {
+                    if (index >=
+                        {{ $limit }}) { // Oculta filas de la 5ta en adelante (índice 4 en adelante)
+                        row.classList.add('hidden');
+                    }
+                });
+                button.textContent = 'Ver Plantilla Completa ({{ $totalPlayers }} jugadores)';
+                button.dataset.expanded = 'false';
+            } else {
+                // Si estaba colapsado, ahora mostramos todo
+                button.textContent = 'Ocultar Plantilla';
+                button.dataset.expanded = 'true';
+            }
+        }
+    </script>
 @endsection
