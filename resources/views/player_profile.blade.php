@@ -78,6 +78,30 @@
                     </div>
                 </div>
 
+                <div class="card p-4 shadow-xl">
+                    <h4 class="text-xl font-bold mb-3 text-secondary">Récords de Anotación</h4>
+                    <div class="space-y-3 text-sm">
+
+                        <p class="text-gray-300 flex justify-between">
+                            Dobletes (2 Goles): <span
+                                class="font-bold text-yellow-300">{{ $goalRecords['dobletes'] }}</span>
+                        </p>
+                        <p class="text-gray-300 flex justify-between">
+                            Hat-Tricks (3 Goles): <span
+                                class="font-bold text-red-400">{{ $goalRecords['hat_tricks'] }}</span>
+                        </p>
+                        <p class="text-gray-300 flex justify-between">
+                            Póker (4 Goles): <span class="font-bold text-purple-400">{{ $goalRecords['poker'] }}</span>
+                        </p>
+                        <p class="text-gray-300 flex justify-between">
+                            Manita (5 Goles): <span class="font-bold text-primary">{{ $goalRecords['manita'] }}</span>
+                        </p>
+                        <p class="text-gray-300 flex justify-between border-t border-gray-700 pt-3 mt-3">
+                            Más de 5 Goles: <span class="font-bold text-white">{{ $goalRecords['mas_cinco'] }}</span>
+                        </p>
+                    </div>
+                </div>
+
                 {{-- ⬇️ NUEVO BLOQUE: EFICIENCIA Y DISCIPLINA ⬇️ --}}
                 <div class="card p-4 shadow-xl">
                     <h4 class="text-xl font-bold mb-3 text-secondary">Eficiencia y Disciplina</h4>
@@ -178,7 +202,8 @@
                         <div class="flex justify-between items-center p-3 rounded-lg border-l-4 {{ $eventBgColor }}">
                             <div class="flex-grow">
                                 <span class="font-semibold text-white block">{{ $eventText }}
-                                    ({{ $event->minuto }}')</span>
+                                    ({{ $event->minuto }}')
+                                </span>
                                 <span class="text-xs text-gray-400">vs {{ $opponent }}
                                     ({{ $score }})</span><br>
                                 <span class="text-xs text-gray-400">Jornada {{ $p->jornada }}</span>

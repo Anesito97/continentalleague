@@ -206,6 +206,36 @@ class PublicController extends Controller
             ? number_format(($jugador->equipo->ganados / $pj) * 100, 1)
             : 0;
 
+        $goalRecords = [
+            'dobletes' => 0,    // 2 goles
+            'hat_tricks' => 0,  // 3 goles
+            'poker' => 0,       // 4 goles
+            'manita' => 0,      // 5 goles
+            'mas_cinco' => 0    // > 5 goles
+        ];
+
+        // 1. Agrupar los eventos por Partido ID
+        $goalsByMatch = $jugador->eventos
+            ->where('tipo_evento', 'gol')
+            ->groupBy('partido_id');
+
+        // 2. Contar los goles en cada partido
+        foreach ($goalsByMatch as $matchId => $goals) {
+            $goalCount = $goals->count();
+
+            if ($goalCount === 2) {
+                $goalRecords['dobletes']++;
+            } elseif ($goalCount === 3) {
+                $goalRecords['hat_tricks']++;
+            } elseif ($goalCount === 4) {
+                $goalRecords['poker']++;
+            } elseif ($goalCount === 5) {
+                $goalRecords['manita']++;
+            } elseif ($goalCount > 5) {
+                $goalRecords['mas_cinco']++;
+            }
+        }
+
 
         // 3. Preparar los datos para la vista
         $data = [
@@ -219,6 +249,7 @@ class PublicController extends Controller
             'apjRatio' => $apjRatio,
             'disciplineScore' => $disciplineScore,
             'keeperEfficiency' => $keeperEfficiency,
+            'goalRecords' => $goalRecords,
 
             // ⬇️ NUEVOS DATOS AGREGADOS ⬇️
             'participationRate' => $participationRate,
