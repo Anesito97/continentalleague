@@ -147,6 +147,8 @@
                     @forelse($recentEvents as $event)
                         @php
                             $p = $event->partido;
+
+                            // ⬇️ DEFINICIÓN DE CLASES Y TEXTO DEL EVENTO ⬇️
                             $eventText = match ($event->tipo_evento) {
                                 'gol' => 'Marcó un Gol ⚽',
                                 'asistencia' => 'Dio una Asistencia 👟',
@@ -155,20 +157,30 @@
                                 'roja' => 'Recibió Tarjeta Roja 🟥',
                                 default => ucfirst($event->tipo_evento),
                             };
+
+                            // ⬇️ ASIGNACIÓN DEL COLOR DE FONDO POR TIPO DE EVENTO ⬇️
+                            $eventBgColor = match ($event->tipo_evento) {
+                                'gol' => 'bg-green-800/50 border-green-400', // Verde para Goles
+                                'asistencia' => 'bg-yellow-800/40 border-yellow-400', // Amarillo para Asistencia
+                                'parada' => 'bg-blue-800/40 border-blue-400', // Azul para Paradas
+                                'amarilla' => 'bg-orange-900/40 border-yellow-500', // Naranja/Amarillo para Amarilla
+                                'roja' => 'bg-red-900/40 border-red-500', // Rojo Oscuro para Roja
+                                default => 'bg-gray-800/60 border-gray-600',
+                            };
+
                             $score = "{$p->goles_local} - {$p->goles_visitante}";
                             $opponent =
                                 $p->equipo_local_id === $jugador->equipo_id
                                     ? $p->visitorTeam->nombre
                                     : $p->localTeam->nombre;
-                            $bgColor = $p->equipo_local_id === $jugador->equipo_id ? 'bg-gray-800' : 'bg-gray-800/80';
                         @endphp
 
-                        <div
-                            class="flex justify-between items-center p-3 rounded-lg {{ $bgColor }} border-l-4 border-primary">
+                        <div class="flex justify-between items-center p-3 rounded-lg border-l-4 {{ $eventBgColor }}">
                             <div class="flex-grow">
                                 <span class="font-semibold text-white block">{{ $eventText }}
                                     ({{ $event->minuto }}')</span>
-                                <span class="text-xs text-gray-400">vs {{ $opponent }} ({{ $score }})</span><br>
+                                <span class="text-xs text-gray-400">vs {{ $opponent }}
+                                    ({{ $score }})</span><br>
                                 <span class="text-xs text-gray-400">Jornada {{ $p->jornada }}</span>
                             </div>
                             <span
