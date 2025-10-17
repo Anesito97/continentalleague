@@ -45,22 +45,28 @@
                     {{-- ⬇️ Métrica Destacada (Top Goleador) - EXISTENTE ⬇️ --}}
                     @if ($topScorer)
                         <div class="bg-primary/20 p-4 rounded-lg text-center shadow-inner">
-                            <span class="text-sm font-semibold text-primary block mb-1">GOLEADOR</span>
-                            <img src="{{ $topScorer->foto_url ?? asset('images/placeholder_jug.png') }}"
-                                class="w-16 h-16 rounded-full object-cover mx-auto mb-2 border-2 border-primary" />
-                            <p class="text-lg font-extrabold leading-tight">{{ $topScorer->nombre }}</p>
-                            <p class="text-sm text-red-400">{{ $topScorer->goles }} Goles</p>
+                            <a href="{{ route('player.profile', $topScorer->id) }}"
+                                class="block hover:opacity-80 transition duration-150">
+                                <span class="text-sm font-semibold text-primary block mb-1">GOLEADOR</span>
+                                <img src="{{ $topScorer->foto_url ?? asset('images/placeholder_jug.png') }}"
+                                    class="w-16 h-16 rounded-full object-cover mx-auto mb-2 border-2 border-primary" />
+                                <p class="text-lg font-extrabold leading-tight">{{ $topScorer->nombre }}</p>
+                                <p class="text-sm text-red-400">{{ $topScorer->goles }} Goles</p>
+                            </a>
                         </div>
                     @endif
 
                     {{-- ⬇️ NUEVA MÉTRICA: Top Asistente ⬇️ --}}
                     @if (isset($topAssist))
                         <div class="bg-yellow-800/20 p-4 rounded-lg text-center shadow-inner">
-                            <span class="text-sm font-semibold text-yellow-400 block mb-1">ASISTENTE CLAVE</span>
-                            <img src="{{ $topAssist->foto_url ?? asset('images/placeholder_jug.png') }}"
-                                class="w-16 h-16 rounded-full object-cover mx-auto mb-2 border-2 border-yellow-400" />
-                            <p class="text-lg font-extrabold leading-tight">{{ $topAssist->nombre }}</p>
-                            <p class="text-sm text-yellow-400">{{ $topAssist->asistencias }} Asist.</p>
+                            <a href="{{ route('player.profile', $topAssist->id) }}"
+                                class="block hover:opacity-80 transition duration-150">
+                                <span class="text-sm font-semibold text-yellow-400 block mb-1">ASISTENTE CLAVE</span>
+                                <img src="{{ $topAssist->foto_url ?? asset('images/placeholder_jug.png') }}"
+                                    class="w-16 h-16 rounded-full object-cover mx-auto mb-2 border-2 border-yellow-400" />
+                                <p class="text-lg font-extrabold leading-tight">{{ $topAssist->nombre }}</p>
+                                <p class="text-sm text-yellow-400">{{ $topAssist->asistencias }} Asist.</p>
+                            </a>
                         </div>
                     @endif
                 </div>
@@ -106,14 +112,20 @@
 
                                 <tr class="hover:bg-gray-700 transition {{ $isHidden }}">
                                     <td class="py-3 px-2 font-bold text-gray-300">{{ $player->numero }}</td>
-                                    <td class="py-3 px-2 flex items-center">
-                                        <img src="{{ $player->foto_url ?? asset('images/placeholder_jug.png') }}"
-                                            class="w-8 h-8 rounded-full object-cover mr-3" />
-                                        <span class="font-medium text-white">{{ $player->nombre }}</span>
+                                    <td class="py-3 px-2">
+                                        <a href="{{ route('player.profile', $player->id) }}"
+                                            class="flex items-center hover:text-green-300 transition">
+
+                                            <img src="{{ $player->foto_url ?? asset('images/placeholder_jug.png') }}"
+                                                class="w-8 h-8 rounded-full object-cover mr-3" />
+                                            <span class="font-medium text-white">{{ $player->nombre }}</span>
+                                        </a>
                                     </td>
-                                    <td class="py-3 px-2 text-center text-gray-400">{{ ucfirst($player->posicion) }}</td>
+                                    <td class="py-3 px-2 text-center text-gray-400">{{ ucfirst($player->posicion) }}
+                                    </td>
                                     <td class="py-3 px-2 text-center text-red-400 font-bold">{{ $player->goles }}</td>
-                                    <td class="py-3 px-2 text-center text-yellow-400 font-bold">{{ $player->asistencias }}
+                                    <td class="py-3 px-2 text-center text-yellow-400 font-bold">
+                                        {{ $player->asistencias }}
                                     </td>
                                     <td class="py-3 px-2 text-center">{{ $player->paradas }}</td>
                                     <td class="py-3 px-2 text-center text-red-500">{{ $player->rojas }}</td>

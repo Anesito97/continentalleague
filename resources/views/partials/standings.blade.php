@@ -205,10 +205,18 @@
     <div class="bg-card-bg rounded-lg p-6 flex flex-col items-center justify-center text-center shadow-lg">
         <span class="material-symbols-outlined text-purple-400 text-5xl mb-2">star_rate</span>
         <p class="text-white/70 text-sm">Jugador Más Influyente</p>
+
         @if ($topImpactPlayer)
-            <p class="text-xl font-bold">{{ $topImpactPlayer->nombre }}</p>
-            <p class="text-white/70 text-sm">{{ $topImpactPlayer->goles + $topImpactPlayer->asistencias }} Puntos de
-                Impacto</p>
+            {{-- ⬇️ CORRECCIÓN: Envolver la información en el enlace ⬇️ --}}
+            <a href="{{ route('player.profile', $topImpactPlayer->id) }}"
+                class="block hover:opacity-80 transition duration-150">
+
+                <p class="text-xl font-bold">{{ $topImpactPlayer->nombre }}</p>
+                <p class="text-white/70 text-sm">{{ $topImpactPlayer->goles + $topImpactPlayer->asistencias }} Puntos
+                    de
+                    Impacto</p>
+
+            </a>
         @else
             <p class="text-xl font-bold text-white/50">N/A</p>
         @endif

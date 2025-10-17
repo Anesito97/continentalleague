@@ -191,6 +191,70 @@
                 /* Ocultar totalmente en móvil para no estorbar */
             }
         }
+
+        .tooltip-container {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+            /* Indica que es interactivo */
+        }
+
+        .tooltip-content {
+            visibility: hidden;
+            opacity: 0;
+            width: 250px;
+            /* Ancho fijo para el contenido */
+            background-color: #374151;
+            /* Gris oscuro para el fondo */
+            color: #e5e7eb;
+            text-align: left;
+            border-radius: 6px;
+            padding: 10px;
+            position: absolute;
+            z-index: 100;
+            bottom: 125%;
+            /* Posiciona encima del elemento */
+            left: 50%;
+            margin-left: -125px;
+            /* Centrar el tooltip */
+            transition: opacity 0.3s, visibility 0.3s;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+            font-family: sans-serif;
+            font-size: 12px;
+            line-height: 1.4;
+        }
+
+        /* Mostrar el tooltip al hacer hover */
+        .tooltip-container:hover .tooltip-content {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        /* Pequeña flecha para indicar la conexión */
+        .tooltip-content::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            /* En la parte inferior */
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #374151 transparent transparent transparent;
+        }
+
+        /* Ajuste específico para móvil (opcional): hacerlo más pequeño */
+        @media (max-width: 640px) {
+            .tooltip-content {
+                width: 200px;
+                left: 0%;
+                margin-left: 0;
+            }
+
+            .tooltip-content::after {
+                left: 10%;
+            }
+        }
     </style>
 </head>
 

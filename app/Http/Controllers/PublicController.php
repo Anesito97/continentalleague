@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Noticia;
 use App\Models\Equipo; // Necesario para loadAllData si lo mueves aquí
+use App\Models\Jugador;
 use Illuminate\Support\Collection;
 
 class PublicController extends Controller
@@ -152,5 +153,83 @@ class PublicController extends Controller
             $streak .= $result;
         }
         return strrev($streak); // Retorna la racha en orden cronológico inverso (el último jugado es la primera letra)
+    }
+
+    public function showPlayerProfile(Jugador $jugador)
+    {
+        // 1. Cargar relaciones CRÍTICAS: Equipo y Eventos
+        $jugador->load([
+            'equipo',
+            'eventos' => fn($query) => $query->with('partido')->orderBy('minuto', 'asc'),
+        ]);
+
+        // 2. CÁLCULO DE MÉTRICAS INDIVIDUALES AVANZADAS
+        $pj = $jugador->equipo->partidos_jugados ?? 0;
+        $equipoTotalGoles = $jugador->equipo->goles_a_favor ?? 1; // Usar 1 para evitar división por cero
+
+        // A. Puntuación de Impacto (MVP Score - Existente)
+        $mvpScore = ($jugador->goles * 3) + ($jugador->asistencias * 2) + ($jugador->paradas * 0.5) - ($jugador->rojas * 3) - ($jugador->amarillas * 1);
+
+        // B. Ratio G/PJ y A/PJ (Existente)
+        $gpjRatio = $pj > 0 ? number_format($jugador->goles / $pj, 2) : 0;
+        $apjRatio = $pj > 0 ? number_format($jugador->asistencias / $pj, 2) : 0;
+
+        // C. Tarjetas Totales (Existente)
+        $disciplineScore = ($jugador->rojas * 3) + ($jugador->amarillas * 1);
+
+        // D. Eficiencia de Portero (Existente)
+        $keeperEfficiency = 0;
+        if (strtolower($jugador->posicion) === 'portero' && $pj > 0) {
+            $golesEnContra = $jugador->equipo->goles_en_contra ?? 0;
+            $keeperEfficiency = number_format(($jugador->paradas / ($golesEnContra + $jugador->paradas)) * 100, 1);
+        }
+
+        // E. Historial de Eventos (Existente)
+        $recentEvents = $jugador->eventos->sortByDesc(fn($e) => $e->partido->fecha_hora)->take(10);
+
+
+        // ⬇️ 1. NUEVA MÉTRICA: Participación en Goles (G+A / Total Goles del Equipo) ⬇️
+        $totalGoalContributions = $jugador->goles + $jugador->asistencias;
+        $participationRate = $equipoTotalGoles > 0
+            ? number_format(($totalGoalContributions / $equipoTotalGoles) * 100, 1)
+            : 0;
+
+        // ⬇️ 2. NUEVA MÉTRICA: Contribución Promedio por Evento (Asumiendo 10 disparos simulados) ⬇️
+        // Usaremos esta métrica como un indicador de 'calidad del toque'
+        $totalActions = $jugador->goles + $jugador->asistencias + ($jugador->paradas > 0 ? $jugador->paradas : 0);
+        $contributionPerMatch = $pj > 0 ? number_format($totalActions / $pj, 2) : 0;
+
+        // ⬇️ 3. NUEVA MÉTRICA: Porcentaje de Victorias cuando el jugador participa ⬇️
+        // Esto es un indicador avanzado y solo se puede simular parcialmente con los datos que tenemos.
+        // Simularemos la 'Tasa de Victorias en PJ' (Victorias Equipo / PJ Equipo)
+        $winRateWithPlayer = $pj > 0
+            ? number_format(($jugador->equipo->ganados / $pj) * 100, 1)
+            : 0;
+
+
+        // 3. Preparar los datos para la vista
+        $data = [
+            'jugador' => $jugador,
+            'equipo' => $jugador->equipo,
+            'activeView' => 'player_profile',
+
+            // MÉTRICAS AVANZADAS
+            'mvpScore' => $mvpScore,
+            'gpjRatio' => $gpjRatio,
+            'apjRatio' => $apjRatio,
+            'disciplineScore' => $disciplineScore,
+            'keeperEfficiency' => $keeperEfficiency,
+
+            // ⬇️ NUEVOS DATOS AGREGADOS ⬇️
+            'participationRate' => $participationRate,
+            'contributionPerMatch' => $contributionPerMatch,
+            'winRateWithPlayer' => $winRateWithPlayer,
+
+            // Historial
+            'recentEvents' => $recentEvents,
+            'pj' => $pj,
+        ];
+
+        return view('player_profile', $data);
     }
 }

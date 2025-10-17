@@ -24,6 +24,7 @@ Route::get('news/{noticia:id}', [PublicController::class, 'showNews'])->name('ne
 Route::get('rules', [DashboardController::class, 'showRules'])->name('rules.index');
 
 Route::get('team/{equipo}', [PublicController::class, 'showTeamProfile'])->name('team.profile');
+Route::get('player/{jugador}', [PublicController::class, 'showPlayerProfile'])->name('player.profile');
 
 // --- AUTENTICACIÓN ---
 Route::post('login', [AuthController::class, 'login'])->name('login');
