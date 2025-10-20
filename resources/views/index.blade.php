@@ -435,14 +435,25 @@
 
         document.addEventListener('DOMContentLoaded', function() {
 
+            // Aseguramos que el script se ejecute después de que el DOM esté cargado
             if (typeof Swiper !== 'undefined') {
                 new Swiper('.news-swiper', {
                     loop: true,
 
-                    // ⬇️ AJUSTES PARA EL EFECTO ESPECTACULAR (Ver la otra venir) ⬇️
-                    slidesPerView: 1.1, // Muestra una diapositiva completa y parte de la siguiente (1.1)
-                    spaceBetween: 20, // Espacio entre slides
-                    centeredSlides: true, // Centra el slide activo (opcional)
+                    // Usamos un solo slide centrado para que el efecto se aplique correctamente
+                    slidesPerView: 'auto',
+                    centeredSlides: true,
+                    spaceBetween: 50, // Espacio entre las tarjetas
+
+                    // ⬇️ EFECTO COVERFLOW 3D ⬇️
+                    effect: 'coverflow',
+                    coverflowEffect: {
+                        rotate: 30, // Grados de rotación lateral
+                        stretch: 0, // Estiramiento (cero para mantener tamaño)
+                        depth: 100, // Profundidad de perspectiva (qué tan lejos se ven)
+                        modifier: 1, // Multiplicador del efecto
+                        slideShadows: false, // Desactivar sombras de slide por defecto para usar las nuestras
+                    },
 
                     // Auto-Play
                     autoplay: {
@@ -450,19 +461,7 @@
                         disableOnInteraction: false,
                     },
 
-                    // Si quieres el efecto 3D:
-                    /*
-                    effect: 'coverflow',
-                    coverflowEffect: {
-                        rotate: 50,
-                        stretch: 0,
-                        depth: 100,
-                        modifier: 1,
-                        slideShadows: true,
-                    },
-                    */
-
-                    // Paginación y Navegación (con las flechas reducidas por el CSS)
+                    // Paginación y Navegación
                     pagination: {
                         el: '.swiper-pagination',
                         clickable: true,
