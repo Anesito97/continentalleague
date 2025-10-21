@@ -7,6 +7,7 @@ use App\Http\Controllers\PlayerController;
 use App\Http\Controllers\MatchController;
 use App\Http\Controllers\PublicController;
 use App\Http\Controllers\NewsAdminController;
+use App\Http\Controllers\VoteController;
 
 // --- RUTA PÚBLICA / HOME ---
 // Esta ruta carga la vista principal, incluyendo clasificación y estadísticas.
@@ -25,6 +26,8 @@ Route::get('rules', [DashboardController::class, 'showRules'])->name('rules.inde
 
 Route::get('team/{equipo}', [PublicController::class, 'showTeamProfile'])->name('team.profile');
 Route::get('player/{jugador}', [PublicController::class, 'showPlayerProfile'])->name('player.profile');
+
+Route::post('vote/{match_id}', [VoteController::class, 'handleVote'])->name('community.vote');
 
 // --- AUTENTICACIÓN ---
 Route::post('login', [AuthController::class, 'login'])->name('login');

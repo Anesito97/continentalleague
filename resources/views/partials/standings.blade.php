@@ -30,6 +30,14 @@
 
         // Si no hay historial, usamos el 50/50 y lo etiquetamos como "Basado en Racha"
         $probTitle = $h2hTotal > 0 ? 'Probabilidad (Basado en H2H)' : 'Probabilidad (Estimada)';
+
+        $votedCookieName = 'voted_' . $nextMatch->id;
+        $hasVoted = request()->cookie($votedCookieName);
+        $votingStartTime = \Carbon\Carbon::parse($nextMatch->fecha_hora)->subHour();
+        $isVotingActive = Carbon\Carbon::now()->lt($votingStartTime);
+
+        // NOTA: Asumimos que $communityLocalProb, $communityVisitorProb, $communityDrawProb están calculados
+
     @endphp
 
     {{-- ---------------------------------------------------- --}}
@@ -59,10 +67,7 @@
 
                 {{-- ⬇️ 2. CENTRO: VS Y JORNADA (Limpiado y Centrado) ⬇️ --}}
                 <div class="w-2/12 flex flex-col items-center justify-start flex-shrink-0 pt-4 sm:pt-6">
-
-                    {{-- VS (Elemento de Alto Impacto) --}}
-                    <div
-                        class="py-1 mx-auto max-w-full">
+                    <div class="py-1 mx-auto max-w-full">
                         <span class="text-5xl font-black text-red-500 block leading-none">VS</span>
                     </div>
                 </div>
@@ -84,44 +89,131 @@
             {{-- ⬇️ 2. SECCIÓN DE DATOS DE TIEMPO Y PROBABILIDAD (FILA COMPLETA) ⬇️ --}}
             <div class="w-full text-center mt-4 pt-4 border-t border-gray-700">
 
-                {{-- Fecha y Hora (Movidas desde el centro y estilizadas) --}}
-                <span class="text-lg font-semibold text-white block mb-3">
-                    {{ \Carbon\Carbon::parse($nextMatch->fecha_hora)->locale('es')->isoFormat('dddd, D [de] MMMM') }}
-                    <span class="text-gray-400 font-normal">a las</span>
-                    {{ \Carbon\Carbon::parse($nextMatch->fecha_hora)->format('h:i A') }}
-                </span>
+                {{-- Fecha y Hora (Jerarquía) --}}
+                <div class="mb-4">
+                    <span class="text-lg font-semibold text-white block mb-1">
+                        {{ \Carbon\Carbon::parse($nextMatch->fecha_hora)->locale('es')->isoFormat('dddd, D [de] MMMM') }}
+                    </span>
+                    <span class="text-sm text-gray-400 font-normal">
+                        A las <span
+                            class="font-bold text-white">{{ \Carbon\Carbon::parse($nextMatch->fecha_hora)->format('h:i A') }}</span>
+                    </span>
+                </div>
 
-                {{-- Probabilidad y Barra --}}
-                <span class="text-sm font-semibold text-gray-400 block mb-2">{{ $probTitle }}</span>
+                {{-- ⬇️ CONTENEDOR DE ANÁLISIS Y ACCIÓN (NUEVA FILA) ⬇️ --}}
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full mx-auto">
 
-                <div class="flex w-3/4 max-w-md h-3 rounded-full overflow-hidden text-xs font-bold mx-auto">
-                    {{-- Local Win (Verde) --}}
-                    <div class="bg-green-500 flex items-center justify-center" style="width: {{ $localProb }}%;">
-                        @if ($localProb > 15)
-                            <span class="text-[10px]">{{ $localProb }}%</span>
+                    {{-- COLUMNA 1: PROBABILIDAD H2H (Análisis) --}}
+                    <div class="flex flex-col items-center p-3 border border-gray-700 rounded-lg">
+                        <span class="text-xs font-semibold text-gray-400 block mb-2">{{ $probTitle }}</span>
+
+                        {{-- Barra de Probabilidad H2H --}}
+                        <div class="flex w-full max-w-md h-3 rounded-full overflow-hidden text-xs font-bold">
+                            <div class="bg-green-500 flex items-center justify-center"
+                                style="width: {{ $localProb }}%;">
+                                @if ($localProb > 15)
+                                    <span class="text-[10px]">{{ $localProb }}%</span>
+                                @endif
+                            </div>
+                            <div class="bg-yellow-500 flex items-center justify-center"
+                                style="width: {{ $drawProb }}%;">
+                                @if ($drawProb > 5)
+                                    <span class="text-[10px]">{{ $drawProb }}%</span>
+                                @endif
+                            </div>
+                            <div class="bg-red-500 flex items-center justify-center"
+                                style="width: {{ $visitorProb }}%;">
+                                @if ($visitorProb > 15)
+                                    <span class="text-[10px]">{{ $visitorProb }}%</span>
+                                @endif
+                            </div>
+                        </div>
+
+                        {{-- Detalle H2H --}}
+                        @if ($h2hTotal > 0)
+                            <p class="text-xs text-gray-400 pt-2">
+                                Historial H2H: {{ $h2hTotal }} encuentros (G: {{ $h2hRecord['G'] }}, E:
+                                {{ $h2hRecord['E'] }}, P: {{ $h2hRecord['P'] }})
+                            </p>
                         @endif
                     </div>
-                    {{-- Draw (Amarillo) --}}
-                    <div class="bg-yellow-500 flex items-center justify-center" style="width: {{ $drawProb }}%;">
-                        @if ($drawProb > 5)
-                            <span class="text-[10px]">{{ $drawProb }}%</span>
-                        @endif
-                    </div>
-                    {{-- Visitor Win (Rojo) --}}
-                    <div class="bg-red-500 flex items-center justify-center" style="width: {{ $visitorProb }}%;">
-                        @if ($visitorProb > 15)
-                            <span class="text-[10px]">{{ $visitorProb }}%</span>
+
+                    {{-- COLUMNA 2: VOTACIÓN COMUNITARIA (Acción) --}}
+                    <div class="flex flex-col items-center p-3 border border-gray-700 rounded-lg">
+
+                        @if ($isVotingActive && !$hasVoted)
+                            <form method="POST" action="{{ route('community.vote', $nextMatch->id) }}" class="w-full">
+                                @csrf
+                                <input type="hidden" name="match_id" value="{{ $nextMatch->id }}">
+
+                                <p class="text-sm font-semibold text-primary mb-2">¿Quién crees que ganará? (Vota)</p>
+                                <div class="flex justify-center space-x-3 w-full">
+                                    <button type="submit" name="voto" value="local"
+                                        class="bg-primary hover:bg-green-600 px-3 py-1 rounded-full text-white text-xs flex-grow">{{ $nextMatch->localTeam->nombre }}</button>
+                                    <button type="submit" name="voto" value="draw"
+                                        class="bg-yellow-500 hover:bg-yellow-600 px-3 py-1 rounded-full text-gray-900 text-xs flex-shrink-0">E</button>
+                                    <button type="submit" name="voto" value="visitor"
+                                        class="bg-red-500 hover:bg-red-600 px-3 py-1 rounded-full text-white text-xs flex-grow">{{ $nextMatch->visitorTeam->nombre }}</button>
+                                </div>
+                            </form>
+                        @else
+                            <p class="text-sm font-semibold text-gray-400 mb-2">Voto Comunitario Actual:</p>
+                            @if ($hasVoted)
+                                <p class="text-xs font-semibold text-green-400 mt-1">¡Gracias por votar!</p><br>
+                            @endif
+
+                            @if (!$isVotingActive)
+                                <p class="text-sm text-red-400">¡Votación cerrada!</p>
+
+                                {{-- Muestra el resultado de la comunidad si ya votó --}}
+                                <div
+                                    class="flex w-3/4 max-w-md h-3 rounded-full overflow-hidden text-xs font-bold mx-auto">
+                                    <div class="bg-green-500 flex items-center justify-center"
+                                        style="width: {{ $communityLocalProb }}%;">
+                                        @if ($communityLocalProb > 15)
+                                            <span class="text-[10px]">{{ $communityLocalProb }}%</span>
+                                        @endif
+                                    </div>
+                                    <div class="bg-yellow-500 flex items-center justify-center"
+                                        style="width: {{ $communityDrawProb }}%;">
+                                        @if ($communityDrawProb > 5)
+                                            <span class="text-[10px]">{{ $communityDrawProb }}%</span>
+                                        @endif
+                                    </div>
+                                    <div class="bg-red-500 flex items-center justify-center"
+                                        style="width: {{ $communityVisitorProb }}%;">
+                                        @if ($communityVisitorProb > 15)
+                                            <span class="text-[10px]">{{ $communityVisitorProb }}%</span>
+                                        @endif
+                                    </div>
+                                </div>
+                            @else
+                                {{-- Muestra el resultado de la comunidad si ya votó --}}
+                                <div
+                                    class="flex w-3/4 max-w-md h-3 rounded-full overflow-hidden text-xs font-bold mx-auto">
+                                    <div class="bg-green-500 flex items-center justify-center"
+                                        style="width: {{ $communityLocalProb }}%;">
+                                        @if ($communityLocalProb > 15)
+                                            <span class="text-[10px]">{{ $communityLocalProb }}%</span>
+                                        @endif
+                                    </div>
+                                    <div class="bg-yellow-500 flex items-center justify-center"
+                                        style="width: {{ $communityDrawProb }}%;">
+                                        @if ($communityDrawProb > 5)
+                                            <span class="text-[10px]">{{ $communityDrawProb }}%</span>
+                                        @endif
+                                    </div>
+                                    <div class="bg-red-500 flex items-center justify-center"
+                                        style="width: {{ $communityVisitorProb }}%;">
+                                        @if ($communityVisitorProb > 15)
+                                            <span class="text-[10px]">{{ $communityVisitorProb }}%</span>
+                                        @endif
+                                    </div>
+                                </div>
+                            @endif
                         @endif
                     </div>
                 </div>
-
-                {{-- Detalle H2H --}}
-                @if ($h2hTotal > 0)
-                    <p class="text-xs text-gray-400 pt-3">
-                        Historial H2H: {{ $h2hTotal }} encuentros (G: {{ $h2hRecord['G'] }}, E:
-                        {{ $h2hRecord['E'] }}, P: {{ $h2hRecord['P'] }})
-                    </p>
-                @endif
             </div>
 
         </div>

@@ -6,6 +6,7 @@ use App\Models\Jugador;
 use App\Models\Partido;
 use Illuminate\Http\Request;
 use App\Models\Noticia;
+use App\Http\Controllers\VoteController;
 
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
@@ -111,6 +112,13 @@ class DashboardController extends Controller
             $h2hRecord = ['G' => 0, 'E' => 0, 'P' => 0, 'total' => 0];
         }
 
+        $communityVotes = VoteController::getVotes($nextMatch->id ?? null);
+        $communityTotal = array_sum($communityVotes);
+
+        $communityLocalProb = $communityTotal > 0 ? number_format(($communityVotes['local'] / $communityTotal) * 100, 0) : 33;
+        $communityVisitorProb = $communityTotal > 0 ? number_format(($communityVotes['visitor'] / $communityTotal) * 100, 0) : 33;
+        $communityDrawProb = 100 - $communityLocalProb - $communityVisitorProb; // El restante
+
         return compact(
             'teams',
             'players',
@@ -130,6 +138,9 @@ class DashboardController extends Controller
             'activeJornada',
             'nextMatch',
             'h2hRecord',
+            'communityLocalProb',
+            'communityVisitorProb', 
+            'communityDrawProb',
         );
     }
 
