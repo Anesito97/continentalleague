@@ -5,6 +5,7 @@ use Illuminate\Http\Request;
 use App\Models\Noticia;
 use App\Models\Equipo; // Necesario para loadAllData si lo mueves aquí
 use App\Models\Jugador;
+use App\Models\GalleryItem;
 use Illuminate\Support\Collection;
 
 class PublicController extends Controller
@@ -262,5 +263,18 @@ class PublicController extends Controller
         ];
 
         return view('player_profile', $data);
+    }
+
+    public function showGallery()
+    {
+        // Cargar ítems de la galería, ordenados por fecha, paginados a 15 por página
+        $galleryItems = GalleryItem::with('match.localTeam', 'match.visitorTeam')
+            ->orderBy('created_at', 'desc')
+            ->paginate(15);
+
+        // Carga de datos para el layout
+        $teams = Equipo::all();
+
+        return view('gallery.index', compact('galleryItems', 'teams')); // Nueva vista: gallery/index.blade.php
     }
 }

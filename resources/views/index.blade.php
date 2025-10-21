@@ -375,6 +375,17 @@
     <div id="edit-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 z-50 hidden items-center justify-center">
     </div>
 
+    {{-- ⬇️ MODAL LIGHTBOX PARA VISUALIZACIÓN DE IMAGEN ⬇️ --}}
+    <div id="lightbox-modal"
+        class="fixed inset-0 bg-black/90 z-[10000] hidden items-center justify-center cursor-pointer"
+        onclick="closeLightbox()">
+        <div class="relative max-w-full max-h-full">
+            <img id="lightbox-image" src="" alt="Imagen Ampliada"
+                class="max-w-full max-h-screen object-contain">
+            <div id="lightbox-caption" class="text-white text-center p-3 absolute bottom-0 w-full bg-black/50"></div>
+        </div>
+    </div>
+
 
     {{-- 4. SCRIPTS FINALES (Toggle de Sidebar y Manejo de Loader) --}}
     <script>
@@ -480,6 +491,28 @@
                         prevEl: '.swiper-button-prev',
                     },
                 });
+            }
+        });
+
+        // ⬇️ FUNCIONES DE LIGHTBOX ⬇️
+        function openLightbox(imageUrl, title) {
+            document.getElementById('lightbox-image').src = imageUrl;
+            document.getElementById('lightbox-caption').textContent = title;
+            document.getElementById('lightbox-modal').classList.add('flex');
+            document.getElementById('lightbox-modal').classList.remove('hidden');
+            document.body.classList.add('overflow-hidden'); // Bloquear scroll
+        }
+
+        function closeLightbox() {
+            document.getElementById('lightbox-modal').classList.add('hidden');
+            document.getElementById('lightbox-modal').classList.remove('flex');
+            document.body.classList.remove('overflow-hidden'); // Restaurar scroll
+        }
+
+        // Escucha la tecla ESC para cerrar
+        document.addEventListener('keydown', function(e) {
+            if (e.key === "Escape") {
+                closeLightbox();
             }
         });
     </script>

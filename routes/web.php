@@ -29,6 +29,8 @@ Route::get('player/{jugador}', [PublicController::class, 'showPlayerProfile'])->
 
 Route::post('vote/{match_id}', [VoteController::class, 'handleVote'])->name('community.vote');
 
+Route::get('gallery', [PublicController::class, 'showGallery'])->name('gallery.index');
+
 // --- AUTENTICACIÓN ---
 Route::post('login', [AuthController::class, 'login'])->name('login');
 Route::get('logout', [AuthController::class, 'logout'])->name('logout');

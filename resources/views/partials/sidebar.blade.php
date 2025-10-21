@@ -53,6 +53,14 @@
                 <span class="font-medium">Reglas de la Liga</span>
             </a>
 
+            {{-- GALERÍA --}}
+            <a href="{{ route('gallery.index') }}"
+                class="flex items-center gap-3 px-4 py-3 rounded-lg text-white/70 hover:bg-white/5 
+                       @if (request()->routeIs('gallery.*')) bg-primary/20 text-primary @endif">
+                <span class="material-symbols-outlined">photo_library</span>
+                <span class="font-medium">Galería</span>
+            </a>
+
             <br><br>
             {{-- Panel de Administración --}}
             @if (session('is_admin'))
