@@ -16,67 +16,114 @@
 <h2 class="text-3xl font-bold mb-6">Resumen de la Liga</h2>
 
 @if ($nextMatch)
+    @php
+        // Usamos el historial H2H para la probabilidad simple
+        $localTeamId = $nextMatch->localTeam->id;
+        $h2hLocalWins = $h2hRecord['G'] ?? 0;
+        $h2hVisitorWins = $h2hRecord['P'] ?? 0;
+        $h2hTotal = $h2hRecord['total'] ?? 0;
+
+        // Probabilidad de Victoria Local (Basado en el historial H2H)
+        $localProb = $h2hTotal > 0 ? number_format(($h2hLocalWins / $h2hTotal) * 100, 0) : 50;
+        $visitorProb = $h2hTotal > 0 ? number_format(($h2hVisitorWins / $h2hTotal) * 100, 0) : 50;
+        $drawProb = 100 - ($localProb + $visitorProb);
+
+        // Si no hay historial, usamos el 50/50 y lo etiquetamos como "Basado en Racha"
+        $probTitle = $h2hTotal > 0 ? 'Probabilidad (Basado en H2H)' : 'Probabilidad (Estimada)';
+    @endphp
+
     {{-- ---------------------------------------------------- --}}
-    {{-- 1. TARJETA DE DUELO DESTACADA (COMPACTA Y VISUAL) --}}
+    {{-- 1. TARJETA DE DUELO DESTACADA (ANALÍTICA Y COMPACTA) --}}
     {{-- ---------------------------------------------------- --}}
 
-    <h3 class="text-2xl font-bold mb-4 mt-8">Próximo Gran Duelo</h3>
+    <h3 class="text-2xl font-bold mb-4 mt-8">Próximo Gran Duelo | Jornada {{ $nextMatch->jornada }}</h3>
 
     <div class="flex justify-center">
-        {{-- Contenedor principal centrado, máximo 3XL de ancho --}}
-        <div class="card max-w-3xl w-full p-4 sm:p-6 shadow-2xl transition duration-500 hover:translate-y-0">
-            <div class="flex flex-col md:flex-row items-center justify-between text-center space-y-4 md:space-y-0">
+        <div class="card max-w-4xl w-full p-4 sm:p-6 shadow-2xl transition duration-500 hover:translate-y-0">
 
-                {{-- EQUIPO LOCAL --}}
-                <div class="flex flex-col items-center w-full md:w-5/12">
+            {{-- ⬇️ 1. CONTENEDOR PRINCIPAL DEL DUELO (FLEX-ROW) ⬇️ --}}
+            <div class="flex flex-row items-start justify-between space-x-2">
+
+                {{-- 1. EQUIPO LOCAL --}}
+                <div class="flex flex-col items-center w-5/12 text-center flex-shrink-0">
                     <a href="{{ route('team.profile', $nextMatch->localTeam->id) }}"
                         class="flex flex-col items-center hover:opacity-90 transition">
-
                         <img src="{{ $nextMatch->localTeam->escudo_url ?? 'https://placehold.co/100x100/1f2937/FFFFFF?text=LOCAL' }}"
                             alt="Logo Local"
-                            class="w-20 h-20 rounded-full object-cover border-4 border-primary/50 mb-2" />
-
-                        <span class="text-xl font-extrabold text-white">{{ $nextMatch->localTeam->nombre }}</span>
-                        <span class="text-sm text-gray-400">Local</span>
-
+                            class="w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover border-4 border-primary/50 mb-1" />
+                        <span
+                            class="text-sm sm:text-xl font-extrabold text-white overflow-hidden whitespace-nowrap max-w-full">{{ $nextMatch->localTeam->nombre }}</span>
+                        <span class="text-[10px] text-gray-400">Local</span>
                     </a>
                 </div>
 
-                {{-- CENTRO: VS, Fecha y Hora y JORNADA --}}
-                <div class="w-full md:w-2/12">
-                    <div class="bg-gray-700/70 border border-white/10 rounded-xl p-2 md:p-3 mx-auto shadow-lg">
-                        <span class="text-2xl font-black text-red-500 block mb-1">VS</span>
+                {{-- ⬇️ 2. CENTRO: VS Y JORNADA (Limpiado y Centrado) ⬇️ --}}
+                <div class="w-2/12 flex flex-col items-center justify-start flex-shrink-0 pt-4 sm:pt-6">
 
-                        {{-- ⬇️ JORNADA AÑADIDA ⬇️ --}}
-                        @if ($nextMatch->jornada)
-                            <span class="text-sm font-bold text-primary block mb-1">Jornada
-                                {{ $nextMatch->jornada }}</span>
-                        @endif
-
-                        <span class="text-xs font-semibold text-white block">
-                            {{ \Carbon\Carbon::parse($nextMatch->fecha_hora)->locale('es')->isoFormat('D MMM') }}
-                        </span>
-                        <span
-                            class="text-xs text-gray-400">{{ \Carbon\Carbon::parse($nextMatch->fecha_hora)->format('H:i') }}</span>
+                    {{-- VS (Elemento de Alto Impacto) --}}
+                    <div
+                        class="py-1 mx-auto max-w-full">
+                        <span class="text-5xl font-black text-red-500 block leading-none">VS</span>
                     </div>
                 </div>
 
-                {{-- EQUIPO VISITANTE --}}
-                <div class="flex flex-col items-center w-full md:w-5/12">
+                {{-- 3. EQUIPO VISITANTE --}}
+                <div class="flex flex-col items-center w-5/12 text-center flex-shrink-0">
                     <a href="{{ route('team.profile', $nextMatch->visitorTeam->id) }}"
                         class="flex flex-col items-center hover:opacity-90 transition">
-
-                        <img src="{{ $nextMatch->visitorTeam->escudo_url ?? 'https://placehold.co/100x100/1f2937/FFFFFF?text=LOCAL' }}"
-                            alt="Logo Local"
-                            class="w-20 h-20 rounded-full object-cover border-4 border-secondary/50 mb-2" />
-
-                        <span class="text-xl font-extrabold text-white">{{ $nextMatch->visitorTeam->nombre }}</span>
-                        <span class="text-sm text-gray-400">Local</span>
-
+                        <img src="{{ $nextMatch->visitorTeam->escudo_url ?? 'https://placehold.co/100x100/1f2937/FFFFFF?text=VISIT' }}"
+                            alt="Logo Visitante"
+                            class="w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover border-4 border-secondary/50 mb-1" />
+                        <span
+                            class="text-sm sm:text-xl font-extrabold text-white overflow-hidden whitespace-nowrap max-w-full">{{ $nextMatch->visitorTeam->nombre }}</span>
+                        <span class="text-[10px] text-gray-400">Visitante</span>
                     </a>
                 </div>
-
             </div>
+
+            {{-- ⬇️ 2. SECCIÓN DE DATOS DE TIEMPO Y PROBABILIDAD (FILA COMPLETA) ⬇️ --}}
+            <div class="w-full text-center mt-4 pt-4 border-t border-gray-700">
+
+                {{-- Fecha y Hora (Movidas desde el centro y estilizadas) --}}
+                <span class="text-lg font-semibold text-white block mb-3">
+                    {{ \Carbon\Carbon::parse($nextMatch->fecha_hora)->locale('es')->isoFormat('dddd, D [de] MMMM') }}
+                    <span class="text-gray-400 font-normal">a las</span>
+                    {{ \Carbon\Carbon::parse($nextMatch->fecha_hora)->format('h:i A') }}
+                </span>
+
+                {{-- Probabilidad y Barra --}}
+                <span class="text-sm font-semibold text-gray-400 block mb-2">{{ $probTitle }}</span>
+
+                <div class="flex w-3/4 max-w-md h-3 rounded-full overflow-hidden text-xs font-bold mx-auto">
+                    {{-- Local Win (Verde) --}}
+                    <div class="bg-green-500 flex items-center justify-center" style="width: {{ $localProb }}%;">
+                        @if ($localProb > 15)
+                            <span class="text-[10px]">{{ $localProb }}%</span>
+                        @endif
+                    </div>
+                    {{-- Draw (Amarillo) --}}
+                    <div class="bg-yellow-500 flex items-center justify-center" style="width: {{ $drawProb }}%;">
+                        @if ($drawProb > 5)
+                            <span class="text-[10px]">{{ $drawProb }}%</span>
+                        @endif
+                    </div>
+                    {{-- Visitor Win (Rojo) --}}
+                    <div class="bg-red-500 flex items-center justify-center" style="width: {{ $visitorProb }}%;">
+                        @if ($visitorProb > 15)
+                            <span class="text-[10px]">{{ $visitorProb }}%</span>
+                        @endif
+                    </div>
+                </div>
+
+                {{-- Detalle H2H --}}
+                @if ($h2hTotal > 0)
+                    <p class="text-xs text-gray-400 pt-3">
+                        Historial H2H: {{ $h2hTotal }} encuentros (G: {{ $h2hRecord['G'] }}, E:
+                        {{ $h2hRecord['E'] }}, P: {{ $h2hRecord['P'] }})
+                    </p>
+                @endif
+            </div>
+
         </div>
     </div>
 @endif
@@ -271,7 +318,7 @@
             $totalGoals = $gf + $gc;
             $offensiveRatio = $totalGoals > 0 ? ($gf / $totalGoals) * 100 : 0;
             $coneDegree = $offensiveRatio * 3.6;
-            $diffSign = ($gf - $gc) >= 0 ? 'text-green-400' : 'text-red-400';
+            $diffSign = $gf - $gc >= 0 ? 'text-green-400' : 'text-red-400';
             $goalDiff = $gf - $gc;
             $winRatio = $team->partidos_jugados > 0 ? ($team->ganados / $team->partidos_jugados) * 100 : 0;
             $winWidth = number_format($winRatio, 0);
@@ -282,29 +329,29 @@
             <div
                 class="bg-card-bg rounded-lg p-5 flex flex-col shadow-xl border border-primary/20 
                         transform hover:scale-[1.03] transition duration-200 relative overflow-hidden">
-                
+
                 {{-- ⬇️ 1. CABECERA PRINCIPAL (Nombre, Logo y Rank) ⬇️ --}}
                 <div class="flex items-center justify-between w-full border-b border-gray-700 pb-3 mb-3">
                     <div class="flex items-center gap-3">
                         <img src="{{ $team->escudo_url ?? 'https://placehold.co/50x50/1f2937/FFFFFF?text=L' }}"
                             onerror="this.src='https://placehold.co/50x50/1f2937/FFFFFF?text=L'"
                             class="w-10 h-10 rounded-full object-cover border-2 {{ $rank === 1 ? 'border-yellow-400' : 'border-primary/50' }}">
-                            
+
                         <h4 class="text-xl font-extrabold text-white">{{ $team->nombre }}</h4>
                     </div>
-                    
+
                     {{-- Rank Badge --}}
                     <span class="text-xs font-bold px-3 py-1 rounded-full {{ $rankClass }}">
                         #{{ $rank }}
                     </span>
                 </div>
-                
+
                 {{-- ⬇️ 2. CONTENIDO PRINCIPAL: DIVISION EN DOS COLUMNAS ⬇️ --}}
                 <div class="grid grid-cols-2 gap-4 w-full">
-                    
+
                     {{-- COLUMNA IZQUIERDA: RENDIMIENTO DETALLADO (Datos duros) --}}
                     <div class="space-y-3">
-                        
+
                         {{-- Métrica: PUNTOS --}}
                         <div class="text-left">
                             <p class="text-white/70 text-sm">Puntos</p>
@@ -314,9 +361,10 @@
                         {{-- Métrica: DIFERENCIA --}}
                         <div class="text-left">
                             <p class="text-white/70 text-sm">DIF</p>
-                            <p class="text-2xl font-bold {{ $diffSign }}">{{ $goalDiff > 0 ? '+' : '' }}{{ $goalDiff }}</p>
+                            <p class="text-2xl font-bold {{ $diffSign }}">
+                                {{ $goalDiff > 0 ? '+' : '' }}{{ $goalDiff }}</p>
                         </div>
-                        
+
                         {{-- Métrica: Partidos Jugados --}}
                         <div class="text-left">
                             <p class="text-white/70 text-sm">PJ</p>
@@ -326,10 +374,10 @@
 
                     {{-- ⬇️ COLUMNA DERECHA: GRÁFICOS Y ANÁLISIS (Agrupación Visual) ⬇️ --}}
                     <div class="space-y-4 text-right flex flex-col justify-between items-end">
-                        
+
                         {{-- GRÁFICO OFENSIVO/DEFENSIVO --}}
                         <div class="flex flex-col items-end w-full">
-                            
+
                             {{-- ⬇️ LEYENDA CLARA Y CONCISA ⬇️ --}}
                             <div class="flex text-[10px] font-semibold space-x-2 text-gray-400 mb-1">
                                 <span class="flex items-center">
@@ -339,19 +387,22 @@
                                     <span class="w-2 h-2 rounded-full bg-red-500 mr-1"></span> Defensa
                                 </span>
                             </div>
-                            
+
                             {{-- Gráfica de Pastel --}}
-                            <div class="pie-chart flex items-center justify-center flex-shrink-0" 
-                                 style="background: conic-gradient(#ef4444 0deg, #ef4444 {{ 360 - $coneDegree }}deg, #10b981 {{ 360 - $coneDegree }}deg, #10b981 360deg); width: 60px; height: 60px;">
-                                 <span class="text-xs font-bold text-white z-20">{{ number_format($offensiveRatio, 0) }}%</span>
+                            <div class="pie-chart flex items-center justify-center flex-shrink-0"
+                                style="background: conic-gradient(#ef4444 0deg, #ef4444 {{ 360 - $coneDegree }}deg, #10b981 {{ 360 - $coneDegree }}deg, #10b981 360deg); width: 60px; height: 60px;">
+                                <span
+                                    class="text-xs font-bold text-white z-20">{{ number_format($offensiveRatio, 0) }}%</span>
                             </div>
                         </div>
 
                         {{-- Barra de Progreso (Ratio de Victoria) --}}
                         <div class="w-full mt-auto">
-                            <p class="text-xs font-semibold text-gray-400 mb-1">Ratio Victoria: <span class="text-green-500">{{ number_format($winRatio, 0) }}%</span></p>
+                            <p class="text-xs font-semibold text-gray-400 mb-1">Ratio Victoria: <span
+                                    class="text-green-500">{{ number_format($winRatio, 0) }}%</span></p>
                             <div class="w-full h-2 rounded-full bg-red-600 overflow-hidden">
-                                <div class="h-full rounded-full bg-green-500" style="width: {{ $winWidth }}%;"></div>
+                                <div class="h-full rounded-full bg-green-500" style="width: {{ $winWidth }}%;">
+                                </div>
                             </div>
                         </div>
 
@@ -360,7 +411,8 @@
                             <p class="text-xs font-semibold text-gray-400 mb-1">Última Forma</p>
                             <div class="flex space-x-1 justify-end">
                                 @foreach (str_split($team->form_guide ?? '-----') as $result)
-                                    <span class="w-4 h-4 flex items-center justify-center rounded-sm text-xs font-bold text-white/90"
+                                    <span
+                                        class="w-4 h-4 flex items-center justify-center rounded-sm text-xs font-bold text-white/90"
                                         style="background-color: {{ $result === 'G' ? '#10b981' : ($result === 'E' ? '#f59e0b' : ($result === 'P' ? '#ef4444' : '#374151')) }};">
                                         {{ $result }}
                                     </span>

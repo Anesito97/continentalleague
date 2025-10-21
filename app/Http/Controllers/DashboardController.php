@@ -102,6 +102,15 @@ class DashboardController extends Controller
 
         $newsItems = \App\Models\Noticia::orderBy('created_at', 'desc')->take(5)->get();
 
+        $nextMatch = $pendingMatches->first();
+
+        if ($nextMatch) {
+            // ⬇️ CÁLCULO H2H PARA EL DUELO DESTACADO ⬇️
+            $h2hRecord = $this->calculateH2H($nextMatch->localTeam, $nextMatch->visitorTeam);
+        } else {
+            $h2hRecord = ['G' => 0, 'E' => 0, 'P' => 0, 'total' => 0];
+        }
+
         return compact(
             'teams',
             'players',
@@ -119,7 +128,44 @@ class DashboardController extends Controller
             'avgGoals',
             'newsItems',
             'activeJornada',
+            'nextMatch',
+            'h2hRecord',
         );
+    }
+
+    // app/Http/Controllers/PublicController.php (Añadir esta función auxiliar)
+
+    private function calculateH2H(Equipo $team1, Equipo $team2)
+    {
+        // Buscar todos los partidos finalizados entre estos dos equipos
+        $h2hMatches = Partido::where('estado', 'finalizado')
+            ->where(function ($query) use ($team1, $team2) {
+                $query->where(function ($q) use ($team1, $team2) {
+                    $q->where('equipo_local_id', $team1->id)->where('equipo_visitante_id', $team2->id);
+                })->orWhere(function ($q) use ($team1, $team2) {
+                    $q->where('equipo_local_id', $team2->id)->where('equipo_visitante_id', $team1->id);
+                });
+            })
+            ->orderBy('fecha_hora', 'desc')
+            ->get();
+
+        $record = ['G' => 0, 'E' => 0, 'P' => 0, 'total' => $h2hMatches->count()];
+
+        foreach ($h2hMatches as $match) {
+            $team1IsLocal = $match->equipo_local_id === $team1->id;
+            $team1Score = $team1IsLocal ? $match->goles_local : $match->goles_visitante;
+            $team2Score = $team1IsLocal ? $match->goles_visitante : $match->goles_local;
+
+            if ($team1Score > $team2Score) {
+                $record['G']++;
+            } elseif ($team1Score < $team2Score) {
+                $record['P']++;
+            } else {
+                $record['E']++;
+            }
+        }
+
+        return $record;
     }
 
     // 1. VISTA PÚBLICA (HOME/STANDINGS/STATS)
