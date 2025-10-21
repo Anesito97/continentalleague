@@ -6,7 +6,7 @@
     $totalTeams = $teams->count();
     $nextMatch = $pendingMatches->first();
     // Obtener los primeros 3 equipos para el detalle
-    $topTeams = $teams->take(3);
+    $topTeams = $teams->take(10);
     $avgGoals = $totalMatches > 0 ? number_format($totalGoals / $totalMatches, 2) : 0;
     $topImpactPlayer = $players->sortByDesc(fn($p) => $p->goles + $p->asistencias)->first();
 @endphp
@@ -259,43 +259,114 @@
 </div>
 
 {{-- ---------------------------------------------------- --}}
-{{-- 3. DETALLE POR EQUIPO (TOP 4) --}}
+{{-- 3. ANÁLISIS RÁPIDO DE EQUIPOS (Top 4) --}}
 {{-- ---------------------------------------------------- --}}
-<h3 class="text-2xl font-bold mb-4">Equipos Destacados</h3>
+<h3 class="text-2xl font-bold mb-4">Análisis Rápido de Equipos</h3>
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-    @forelse($topTeams as $team)
-        {{-- ⬇️ 1. Envolver toda la tarjeta en un enlace <a> ⬇️ --}}
+    @forelse($topTeams as $index => $team)
+        @php
+            $rank = $index + 1;
+            $gf = $team->goles_a_favor;
+            $gc = $team->goles_en_contra;
+            $totalGoals = $gf + $gc;
+            $offensiveRatio = $totalGoals > 0 ? ($gf / $totalGoals) * 100 : 0;
+            $coneDegree = $offensiveRatio * 3.6;
+            $diffSign = ($gf - $gc) >= 0 ? 'text-green-400' : 'text-red-400';
+            $goalDiff = $gf - $gc;
+            $winRatio = $team->partidos_jugados > 0 ? ($team->ganados / $team->partidos_jugados) * 100 : 0;
+            $winWidth = number_format($winRatio, 0);
+            $rankClass = $rank === 1 ? 'bg-yellow-400 text-gray-900' : 'bg-gray-600 text-white';
+        @endphp
+
         <a href="{{ route('team.profile', $team->id) }}" class="block">
             <div
-                class="bg-card-bg rounded-lg p-6 flex flex-col items-start shadow-xl border border-primary/20 
-                        transform hover:scale-[1.03] transition duration-200">
-
-                {{-- Logo y Título --}}
-                <div class="flex items-center gap-3 mb-4">
-                    <img src="{{ $team->escudo_url ?? 'https://placehold.co/50x50/1f2937/FFFFFF?text=L' }}"
-                        onerror="this.src='https://placehold.co/50x50/1f2937/FFFFFF?text=L'"
-                        class="w-10 h-10 rounded-full object-cover border-2 border-primary/50">
-
-                    <h4 class="text-xl font-bold">{{ $team->nombre }}</h4>
+                class="bg-card-bg rounded-lg p-5 flex flex-col shadow-xl border border-primary/20 
+                        transform hover:scale-[1.03] transition duration-200 relative overflow-hidden">
+                
+                {{-- ⬇️ 1. CABECERA PRINCIPAL (Nombre, Logo y Rank) ⬇️ --}}
+                <div class="flex items-center justify-between w-full border-b border-gray-700 pb-3 mb-3">
+                    <div class="flex items-center gap-3">
+                        <img src="{{ $team->escudo_url ?? 'https://placehold.co/50x50/1f2937/FFFFFF?text=L' }}"
+                            onerror="this.src='https://placehold.co/50x50/1f2937/FFFFFF?text=L'"
+                            class="w-10 h-10 rounded-full object-cover border-2 {{ $rank === 1 ? 'border-yellow-400' : 'border-primary/50' }}">
+                            
+                        <h4 class="text-xl font-extrabold text-white">{{ $team->nombre }}</h4>
+                    </div>
+                    
+                    {{-- Rank Badge --}}
+                    <span class="text-xs font-bold px-3 py-1 rounded-full {{ $rankClass }}">
+                        #{{ $rank }}
+                    </span>
                 </div>
-
-                {{-- Grid de Estadísticas --}}
+                
+                {{-- ⬇️ 2. CONTENIDO PRINCIPAL: DIVISION EN DOS COLUMNAS ⬇️ --}}
                 <div class="grid grid-cols-2 gap-4 w-full">
-                    <div>
-                        <p class="text-white/70 text-sm">Puntos</p>
-                        <p class="text-xl font-bold text-primary">{{ $team->puntos }}</p>
+                    
+                    {{-- COLUMNA IZQUIERDA: RENDIMIENTO DETALLADO (Datos duros) --}}
+                    <div class="space-y-3">
+                        
+                        {{-- Métrica: PUNTOS --}}
+                        <div class="text-left">
+                            <p class="text-white/70 text-sm">Puntos</p>
+                            <p class="text-2xl font-bold text-primary">{{ $team->puntos }}</p>
+                        </div>
+
+                        {{-- Métrica: DIFERENCIA --}}
+                        <div class="text-left">
+                            <p class="text-white/70 text-sm">DIF</p>
+                            <p class="text-2xl font-bold {{ $diffSign }}">{{ $goalDiff > 0 ? '+' : '' }}{{ $goalDiff }}</p>
+                        </div>
+                        
+                        {{-- Métrica: Partidos Jugados --}}
+                        <div class="text-left">
+                            <p class="text-white/70 text-sm">PJ</p>
+                            <p class="text-xl font-bold">{{ $team->partidos_jugados }}</p>
+                        </div>
                     </div>
-                    <div>
-                        <p class="text-white/70 text-sm">Partidos Jugados</p>
-                        <p class="text-xl font-bold">{{ $team->partidos_jugados }}</p>
-                    </div>
-                    <div>
-                        <p class="text-white/70 text-sm">Victorias</p>
-                        <p class="text-xl font-bold text-green-500">{{ $team->ganados }}</p>
-                    </div>
-                    <div>
-                        <p class="text-white/70 text-sm">Derrotas</p>
-                        <p class="text-xl font-bold text-red-500">{{ $team->perdidos }}</p>
+
+                    {{-- ⬇️ COLUMNA DERECHA: GRÁFICOS Y ANÁLISIS (Agrupación Visual) ⬇️ --}}
+                    <div class="space-y-4 text-right flex flex-col justify-between items-end">
+                        
+                        {{-- GRÁFICO OFENSIVO/DEFENSIVO --}}
+                        <div class="flex flex-col items-end w-full">
+                            
+                            {{-- ⬇️ LEYENDA CLARA Y CONCISA ⬇️ --}}
+                            <div class="flex text-[10px] font-semibold space-x-2 text-gray-400 mb-1">
+                                <span class="flex items-center">
+                                    <span class="w-2 h-2 rounded-full bg-green-500 mr-1"></span> Ataque
+                                </span>
+                                <span class="flex items-center">
+                                    <span class="w-2 h-2 rounded-full bg-red-500 mr-1"></span> Defensa
+                                </span>
+                            </div>
+                            
+                            {{-- Gráfica de Pastel --}}
+                            <div class="pie-chart flex items-center justify-center flex-shrink-0" 
+                                 style="background: conic-gradient(#ef4444 0deg, #ef4444 {{ 360 - $coneDegree }}deg, #10b981 {{ 360 - $coneDegree }}deg, #10b981 360deg); width: 60px; height: 60px;">
+                                 <span class="text-xs font-bold text-white z-20">{{ number_format($offensiveRatio, 0) }}%</span>
+                            </div>
+                        </div>
+
+                        {{-- Barra de Progreso (Ratio de Victoria) --}}
+                        <div class="w-full mt-auto">
+                            <p class="text-xs font-semibold text-gray-400 mb-1">Ratio Victoria: <span class="text-green-500">{{ number_format($winRatio, 0) }}%</span></p>
+                            <div class="w-full h-2 rounded-full bg-red-600 overflow-hidden">
+                                <div class="h-full rounded-full bg-green-500" style="width: {{ $winWidth }}%;"></div>
+                            </div>
+                        </div>
+
+                        {{-- Guía de Forma --}}
+                        <div class="w-full pt-1">
+                            <p class="text-xs font-semibold text-gray-400 mb-1">Última Forma</p>
+                            <div class="flex space-x-1 justify-end">
+                                @foreach (str_split($team->form_guide ?? '-----') as $result)
+                                    <span class="w-4 h-4 flex items-center justify-center rounded-sm text-xs font-bold text-white/90"
+                                        style="background-color: {{ $result === 'G' ? '#10b981' : ($result === 'E' ? '#f59e0b' : ($result === 'P' ? '#ef4444' : '#374151')) }};">
+                                        {{ $result }}
+                                    </span>
+                                @endforeach
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -255,6 +255,15 @@
                 left: 10%;
             }
         }
+
+        .pie-chart {
+            border-radius: 50%;
+            position: relative;
+            width: 60px;
+            /* Tamaño del círculo */
+            height: 60px;
+            z-index: 10;
+        }
     </style>
 </head>
 
