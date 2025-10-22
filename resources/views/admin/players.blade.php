@@ -80,6 +80,14 @@
                             onerror="this.src='https://placehold.co/100x100/1f2937/FFFFFF?text=JUGADOR'"
                             class="w-8 h-8 rounded-full object-cover">
                         <span>{{ $player->nombre }} (#{{ $player->numero }})</span>
+                        @if ($player->esta_lesionado)
+                            <span title="Lesionado" class="ml-2 text-red-500">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                                </svg>
+                            </span>
+                        @endif
                     </div>
 
                     {{-- ✅ LÍNEA MODIFICADA AQUÍ 👇 --}}

@@ -49,9 +49,12 @@ class PlayerController extends Controller
             'equipo_id' => 'required|exists:equipos,id',
             'posicion_general' => 'required|string',
             'posicion_especifica' => 'required|string',
+            'esta_lesionado' => 'nullable|boolean',
         ]);
 
         $data = $request->only(['nombre', 'numero', 'equipo_id', 'posicion_general', 'posicion_especifica']);
+
+        $data['esta_lesionado'] = $request->has('esta_lesionado');
 
         if ($request->hasFile('photo') && $request->file('photo')->isValid()) {
             $file = $request->file('photo');

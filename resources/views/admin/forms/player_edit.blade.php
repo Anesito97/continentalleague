@@ -52,6 +52,23 @@
             </div>
         </div>
     </fieldset>
+    
+    <fieldset class="border border-gray-600 rounded-lg p-4">
+        <legend class="px-2 text-lg font-semibold text-gray-300">Estado del Jugador</legend>
+        <div class="mt-4">
+            <label for="esta_lesionado" class="flex items-center cursor-pointer">
+                <div class="relative">
+                    <input type="checkbox" id="esta_lesionado" name="esta_lesionado" class="sr-only" 
+                           @if(old('esta_lesionado', $player->esta_lesionado)) checked @endif value="1">
+                    <div class="block bg-gray-600 w-14 h-8 rounded-full"></div>
+                    <div class="dot absolute left-1 top-1 bg-white w-6 h-6 rounded-full transition-transform duration-300 ease-in-out"></div>
+                </div>
+                <div class="ml-4 font-medium text-gray-300">
+                    Marcar como Lesionado
+                </div>
+            </label>
+        </div>
+    </fieldset>
 
     <fieldset class="border border-gray-600 rounded-lg p-4">
         <legend class="px-2 text-lg font-semibold text-gray-300">Fotografía</legend>
@@ -63,9 +80,9 @@
             </div>
             
             <div class="flex-grow w-full">
-                <label for="photo-upload" class="block text-sm font-medium text-gray-400 mb-2">Subir Nueva Foto (Sustituir)</label>
+                <label for="photo-upload" class="block text-sm font-medium text-gray-400 mb-2">Subir Nueva Foto</label>
                 <label for="photo-upload" class="w-full flex items-center justify-center px-4 py-3 bg-gray-700 border-2 border-dashed border-gray-500 rounded-lg cursor-pointer hover:bg-gray-600 hover:border-blue-500 transition">
-                    <svg class="w-6 h-6 text-gray-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                    <svg class="w-6 h-6 text-gray-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
                     <span id="file-name" class="text-gray-400">Seleccionar un archivo...</span>
                 </label>
                 <input id="photo-upload" type="file" name="photo" accept="image/*" class="hidden">
@@ -73,6 +90,17 @@
         </div>
     </fieldset>
 </div>
+
+<style>
+    /* Mueve el círculo cuando el checkbox está activado */
+    input:checked ~ .dot {
+        transform: translateX(100%);
+    }
+    /* Cambia el color del fondo cuando está activado */
+    input:checked ~ .block {
+        background-color: #ef4444; /* Rojo para indicar lesión */
+    }
+</style>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -90,7 +118,7 @@
         updateGeneralPosition();
         positionSelect.addEventListener('change', updateGeneralPosition);
 
-        // --- Nueva lógica para la vista previa de la imagen ---
+        // --- Lógica para la vista previa de la imagen (existente) ---
         const photoUpload = document.getElementById('photo-upload');
         const imagePreview = document.getElementById('image-preview');
         const fileNameSpan = document.getElementById('file-name');
@@ -98,17 +126,13 @@
         photoUpload.addEventListener('change', function(event) {
             const file = event.target.files[0];
             if (file) {
-                // Actualizar la vista previa de la imagen
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     imagePreview.src = e.target.result;
                 }
                 reader.readAsDataURL(file);
-
-                // Actualizar el nombre del archivo
                 fileNameSpan.textContent = file.name;
             } else {
-                // Si el usuario cancela, se revierte al estado inicial
                 imagePreview.src = "{{ $player->foto_url ?? 'https://placehold.co/100x100/1f2937/FFFFFF?text=JUGADOR' }}";
                 fileNameSpan.textContent = "Seleccionar un archivo...";
             }

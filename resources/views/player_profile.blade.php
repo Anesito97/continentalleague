@@ -13,7 +13,19 @@
                 <img src="{{ $jugador->foto_url ?? asset('images/placeholder_jug.png') }}" alt="{{ $jugador->nombre }}"
                     class="w-40 h-40 rounded-full object-cover border-4 border-secondary shadow-lg mb-3" />
 
-                <h1 class="text-4xl font-extrabold text-white">{{ $jugador->nombre }}</h1>
+                <div class="flex items-center justify-center">
+                    <h1 class="text-4xl font-extrabold text-white">{{ $jugador->nombre }}</h1>
+
+                    {{-- ✅ Condicional para mostrar el icono de lesión --}}
+                    @if ($jugador->esta_lesionado)
+                        <span title="Lesionado" class="ml-3 text-red-500">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor" stroke-width="3">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                            </svg>
+                        </span>
+                    @endif
+                </div>
                 <p class="text-xl text-gray-400">
                     #{{ $jugador->numero }} &bull; {{ ucfirst($jugador->posicion_especifica) }}
                 </p>

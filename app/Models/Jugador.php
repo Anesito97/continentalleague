@@ -8,7 +8,7 @@ class Jugador extends Model
 {
     protected $table = 'jugadores';
 
-    protected $fillable = ['equipo_id', 'nombre', 'numero', 'posicion_general', 'posicion_especifica', 'foto_url', 'goles', 'asistencias', 'paradas', 'amarillas', 'rojas'];
+    protected $fillable = ['equipo_id', 'nombre', 'numero', 'posicion_general', 'posicion_especifica', 'esta_lesionado', 'foto_url', 'goles', 'asistencias', 'paradas', 'amarillas', 'rojas'];
 
     public function equipo()
     {

@@ -119,9 +119,20 @@
                                             <img src="{{ $player->foto_url ?? asset('images/placeholder_jug.png') }}"
                                                 class="w-8 h-8 rounded-full object-cover mr-3" />
                                             <span class="font-medium text-white">{{ $player->nombre }}</span>
+
+                                            @if ($player->esta_lesionado)
+                                                <span title="Lesionado" class="ml-2 text-red-500">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
+                                                        viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            d="M12 4v16m8-8H4" />
+                                                    </svg>
+                                                </span>
+                                            @endif
                                         </a>
                                     </td>
-                                    <td class="py-3 px-2 text-center text-gray-400">{{ ucfirst($player->posicion_especifica) }}
+                                    <td class="py-3 px-2 text-center text-gray-400">
+                                        {{ ucfirst($player->posicion_especifica) }}
                                     </td>
                                     <td class="py-3 px-2 text-center text-red-400 font-bold">{{ $player->goles }}</td>
                                     <td class="py-3 px-2 text-center text-yellow-400 font-bold">
