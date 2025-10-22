@@ -24,12 +24,12 @@
         $h2hTotal = $h2hRecord['total'] ?? 0;
 
         // Probabilidad de Victoria Local (Basado en el historial H2H)
-        $localProb = $h2hTotal > 0 ? number_format(($h2hLocalWins / $h2hTotal) * 100, 0) : 33;
-        $visitorProb = $h2hTotal > 0 ? number_format(($h2hVisitorWins / $h2hTotal) * 100, 0) : 33;
-        $drawProb = 100 - ($localProb + $visitorProb);
+        $localProb = $prediction['localProb'];
+        $visitorProb = $prediction['visitorProb'];
+        $drawProb = $prediction['drawProb'];
 
         // Si no hay historial, usamos el 50/50 y lo etiquetamos como "Basado en Racha"
-        $probTitle = $h2hTotal > 0 ? 'Probabilidad (Basado en H2H)' : 'Probabilidad (Estimada)';
+        $probTitle = $prediction['title'];
 
         $votedCookieName = 'voted_' . $nextMatch->id;
         $hasVoted = request()->cookie($votedCookieName);

@@ -104,12 +104,15 @@ class DashboardController extends Controller
         $newsItems = \App\Models\Noticia::orderBy('created_at', 'desc')->take(5)->get();
 
         $nextMatch = $pendingMatches->first();
+        $prediction = ['localProb' => 34, 'drawProb' => 33, 'visitorProb' => 33, 'title' => 'Probabilidad (Estimada)'];
+        $h2hRecord = ['G' => 0, 'E' => 0, 'P' => 0, 'total' => 0]; // Inicializamos por si no hay partido
 
         if ($nextMatch) {
-            // ⬇️ CÁLCULO H2H PARA EL DUELO DESTACADO ⬇️
+            // ⬇️ NUEVO CÁLCULO DE PREDICCIÓN COMBINADO ⬇️
+            $prediction = $this->getMatchPrediction($nextMatch->localTeam, $nextMatch->visitorTeam);
+
+            // También obtenemos el H2H para mostrarlo en la vista, aunque ya se usa dentro de la predicción
             $h2hRecord = $this->calculateH2H($nextMatch->localTeam, $nextMatch->visitorTeam);
-        } else {
-            $h2hRecord = ['G' => 0, 'E' => 0, 'P' => 0, 'total' => 0];
         }
 
         $communityVotes = VoteController::getVotes($nextMatch->id ?? null);
@@ -138,6 +141,7 @@ class DashboardController extends Controller
             'activeJornada',
             'nextMatch',
             'h2hRecord',
+            'prediction',
             'communityLocalProb',
             'communityVisitorProb',
             'communityDrawProb',
@@ -177,6 +181,100 @@ class DashboardController extends Controller
         }
 
         return $record;
+    }
+
+    private function getRecentForm(Equipo $team, int $limit = 3)
+    {
+        $recentMatches = Partido::where('estado', 'finalizado')
+            ->where(function ($query) use ($team) {
+                $query->where('equipo_local_id', $team->id)
+                    ->orWhere('equipo_visitante_id', $team->id);
+            })
+            ->orderBy('fecha_hora', 'desc')
+            ->take($limit)
+            ->get();
+
+        $form = ['G' => 0, 'E' => 0, 'P' => 0, 'total' => $recentMatches->count()];
+
+        foreach ($recentMatches as $match) {
+            $isLocal = $match->equipo_local_id === $team->id;
+            $teamScore = $isLocal ? $match->goles_local : $match->goles_visitante;
+            $opponentScore = $isLocal ? $match->goles_visitante : $match->goles_local;
+
+            if ($teamScore > $opponentScore) {
+                $form['G']++;
+            } elseif ($teamScore < $opponentScore) {
+                $form['P']++;
+            } else {
+                $form['E']++;
+            }
+        }
+
+        return $form;
+    }
+
+    private function getMatchPrediction(Equipo $localTeam, Equipo $visitorTeam)
+    {
+        // --- 1. Definir Pesos ---
+        $h2hWeight = 0.6;  // 60% de importancia para el H2H
+        $formWeight = 0.4; // 40% de importancia para la racha
+
+        // --- 2. Obtener Datos ---
+        $h2hRecord = $this->calculateH2H($localTeam, $visitorTeam);
+        $localForm = $this->getRecentForm($localTeam, 3);
+        $visitorForm = $this->getRecentForm($visitorTeam, 3);
+
+        // Si no hay datos de ningún tipo, devolvemos una estimación base.
+        if ($h2hRecord['total'] == 0 && $localForm['total'] == 0 && $visitorForm['total'] == 0) {
+            return [
+                'localProb' => 34,
+                'drawProb' => 33,
+                'visitorProb' => 33,
+                'title' => 'Probabilidad (Estimada)'
+            ];
+        }
+
+        // --- 3. Calcular "Puntuación de Poder" para cada factor ---
+        // Puntuación de 0 a 1 (0 = peor, 1 = mejor)
+        $h2hPoints = ($h2hRecord['G'] * 3) + ($h2hRecord['E'] * 1);
+        $h2hTotalPoints = $h2hRecord['total'] * 3;
+        $h2hScore = $h2hTotalPoints > 0 ? $h2hPoints / $h2hTotalPoints : 0.5; // 0.5 es neutral si no hay H2H
+
+        $localFormPoints = ($localForm['G'] * 3) + ($localForm['E'] * 1);
+        $localFormTotalPoints = $localForm['total'] * 3;
+        $localFormScore = $localFormTotalPoints > 0 ? $localFormPoints / $localFormTotalPoints : 0.5;
+
+        $visitorFormPoints = ($visitorForm['G'] * 3) + ($visitorForm['E'] * 1);
+        $visitorFormTotalPoints = $visitorForm['total'] * 3;
+        $visitorFormScore = $visitorFormTotalPoints > 0 ? $visitorFormPoints / $visitorFormTotalPoints : 0.5;
+
+        // --- 4. Combinar puntuaciones para obtener el "Power Score" final ---
+        // El H2H es relativo, la racha es absoluta. Combinamos para obtener el poder de cada equipo.
+        $localPower = ($h2hScore * $h2hWeight) + ($localFormScore * $formWeight);
+        // Para el visitante, su "H2H Score" es el inverso del local.
+        $visitorPower = ((1 - $h2hScore) * $h2hWeight) + ($visitorFormScore * $formWeight);
+
+        // --- 5. Convertir Power Scores a Probabilidades (Local, Visitante, Empate) ---
+        $totalPower = $localPower + $visitorPower;
+
+        // Si el poder total es cero, evitamos división por cero
+        if ($totalPower == 0)
+            $totalPower = 1;
+
+        // Distribuimos un 75% de la probabilidad entre victoria local y visitante
+        $winProbPool = 0.75;
+        $localProb = ($localPower / $totalPower) * $winProbPool;
+        $visitorProb = ($visitorPower / $totalPower) * $winProbPool;
+
+        // El 25% restante es para el empate
+        $drawProb = 1 - ($localProb + $visitorProb);
+
+        return [
+            'localProb' => round($localProb * 100),
+            'drawProb' => round($drawProb * 100),
+            'visitorProb' => round($visitorProb * 100),
+            'title' => 'Probabilidad (H2H + Racha)'
+        ];
     }
 
     // 1. VISTA PÚBLICA (HOME/STANDINGS/STATS)
