@@ -24,8 +24,8 @@
         $h2hTotal = $h2hRecord['total'] ?? 0;
 
         // Probabilidad de Victoria Local (Basado en el historial H2H)
-        $localProb = $h2hTotal > 0 ? number_format(($h2hLocalWins / $h2hTotal) * 100, 0) : 50;
-        $visitorProb = $h2hTotal > 0 ? number_format(($h2hVisitorWins / $h2hTotal) * 100, 0) : 50;
+        $localProb = $h2hTotal > 0 ? number_format(($h2hLocalWins / $h2hTotal) * 100, 0) : 33;
+        $visitorProb = $h2hTotal > 0 ? number_format(($h2hVisitorWins / $h2hTotal) * 100, 0) : 33;
         $drawProb = 100 - ($localProb + $visitorProb);
 
         // Si no hay historial, usamos el 50/50 y lo etiquetamos como "Basado en Racha"
@@ -35,9 +35,6 @@
         $hasVoted = request()->cookie($votedCookieName);
         $votingStartTime = \Carbon\Carbon::parse($nextMatch->fecha_hora)->subHour();
         $isVotingActive = Carbon\Carbon::now()->lt($votingStartTime);
-
-        // NOTA: Asumimos que $communityLocalProb, $communityVisitorProb, $communityDrawProb están calculados
-
     @endphp
 
     {{-- ---------------------------------------------------- --}}
@@ -100,31 +97,32 @@
                     </span>
                 </div>
 
-                {{-- ⬇️ CONTENEDOR DE ANÁLISIS Y ACCIÓN (NUEVA FILA) ⬇️ --}}
+                {{-- ⬇️ CONTENEDOR DE ANÁLISIS Y ACCIÓN (GRID CONSOLIDADO) ⬇️ --}}
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full mx-auto">
 
-                    {{-- COLUMNA 1: PROBABILIDAD H2H (Análisis) --}}
+                    {{-- COLUMNA 1: PROBABILIDAD H2H (Análisis Estático) --}}
                     <div class="flex flex-col items-center p-3 border border-gray-700 rounded-lg">
-                        <span class="text-xs font-semibold text-gray-400 block mb-2">{{ $probTitle }}</span>
+                        <span class="text-sm font-semibold text-gray-400 block mb-2">{{ $probTitle }}</span>
 
                         {{-- Barra de Probabilidad H2H --}}
-                        <div class="flex w-full max-w-md h-3 rounded-full overflow-hidden text-xs font-bold">
-                            <div class="bg-green-500 flex items-center justify-center"
+                        <div
+                            class="flex w-full max-w-xs h-3 rounded-full overflow-hidden text-xs font-bold shadow-inner">
+                            <div class="bg-green-500 flex items-center justify-center text-[10px]"
                                 style="width: {{ $localProb }}%;">
                                 @if ($localProb > 15)
-                                    <span class="text-[10px]">{{ $localProb }}%</span>
+                                    {{ $localProb }}%
                                 @endif
                             </div>
-                            <div class="bg-yellow-500 flex items-center justify-center"
+                            <div class="bg-yellow-500 flex items-center justify-center text-[10px] text-gray-900"
                                 style="width: {{ $drawProb }}%;">
                                 @if ($drawProb > 5)
-                                    <span class="text-[10px]">{{ $drawProb }}%</span>
+                                    {{ $drawProb }}%
                                 @endif
                             </div>
-                            <div class="bg-red-500 flex items-center justify-center"
+                            <div class="bg-red-500 flex items-center justify-center text-[10px]"
                                 style="width: {{ $visitorProb }}%;">
                                 @if ($visitorProb > 15)
-                                    <span class="text-[10px]">{{ $visitorProb }}%</span>
+                                    {{ $visitorProb }}%
                                 @endif
                             </div>
                         </div>
@@ -138,79 +136,68 @@
                         @endif
                     </div>
 
-                    {{-- COLUMNA 2: VOTACIÓN COMUNITARIA (Acción) --}}
-                    <div class="flex flex-col items-center p-3 border border-gray-700 rounded-lg">
+                    {{-- COLUMNA 2: VOTACIÓN COMUNITARIA (Acción y Resultado Dinámico) --}}
+                    <div
+                        class="flex flex-col items-center justify-center border-t md:border-t-0 md:border-l border-gray-700 pt-4 md:pt-0 md:pl-4">
 
                         @if ($isVotingActive && !$hasVoted)
-                            <form method="POST" action="{{ route('community.vote', $nextMatch->id) }}" class="w-full">
+                            <form method="POST" action="{{ route('community.vote', $nextMatch->id) }}"
+                                class="w-full max-w-sm">
                                 @csrf
                                 <input type="hidden" name="match_id" value="{{ $nextMatch->id }}">
 
-                                <p class="text-sm font-semibold text-primary mb-2">¿Quién crees que ganará? (Vota)</p>
-                                <div class="flex justify-center space-x-3 w-full">
+                                <p class="text-sm font-semibold text-primary mb-3">¿Quién crees que ganará? (Vota)</p>
+                                <div class="flex justify-center space-x-2 w-full">
                                     <button type="submit" name="voto" value="local"
-                                        class="bg-primary hover:bg-green-600 px-3 py-1 rounded-full text-white text-xs flex-grow">{{ $nextMatch->localTeam->nombre }}</button>
+                                        class="bg-primary hover:bg-green-600 px-2 py-1 rounded-full text-white text-xs flex-grow">{{ $nextMatch->localTeam->nombre }}</button>
                                     <button type="submit" name="voto" value="draw"
-                                        class="bg-yellow-500 hover:bg-yellow-600 px-3 py-1 rounded-full text-gray-900 text-xs flex-shrink-0">E</button>
+                                        class="bg-yellow-500 hover:bg-yellow-600 px-2 py-1 rounded-full text-gray-900 text-xs flex-shrink-0">E</button>
                                     <button type="submit" name="voto" value="visitor"
-                                        class="bg-red-500 hover:bg-red-600 px-3 py-1 rounded-full text-white text-xs flex-grow">{{ $nextMatch->visitorTeam->nombre }}</button>
+                                        class="bg-red-500 hover:bg-red-600 px-2 py-1 rounded-full text-white text-xs flex-grow">{{ $nextMatch->visitorTeam->nombre }}</button>
                                 </div>
                             </form>
                         @else
+                            {{-- Muestra el resultado de la comunidad --}}
                             <p class="text-sm font-semibold text-gray-400 mb-2">Voto Comunitario Actual:</p>
-                            @if ($hasVoted)
-                                <p class="text-xs font-semibold text-green-400 mt-1">¡Gracias por votar!</p><br>
-                            @endif
 
                             @if (!$isVotingActive)
-                                <p class="text-sm text-red-400">¡Votación cerrada!</p>
-
-                                {{-- Muestra el resultado de la comunidad si ya votó --}}
-                                <div
-                                    class="flex w-3/4 max-w-md h-3 rounded-full overflow-hidden text-xs font-bold mx-auto">
-                                    <div class="bg-green-500 flex items-center justify-center"
-                                        style="width: {{ $communityLocalProb }}%;">
-                                        @if ($communityLocalProb > 15)
-                                            <span class="text-[10px]">{{ $communityLocalProb }}%</span>
-                                        @endif
-                                    </div>
-                                    <div class="bg-yellow-500 flex items-center justify-center"
-                                        style="width: {{ $communityDrawProb }}%;">
-                                        @if ($communityDrawProb > 5)
-                                            <span class="text-[10px]">{{ $communityDrawProb }}%</span>
-                                        @endif
-                                    </div>
-                                    <div class="bg-red-500 flex items-center justify-center"
-                                        style="width: {{ $communityVisitorProb }}%;">
-                                        @if ($communityVisitorProb > 15)
-                                            <span class="text-[10px]">{{ $communityVisitorProb }}%</span>
-                                        @endif
-                                    </div>
-                                </div>
-                            @else
-                                {{-- Muestra el resultado de la comunidad si ya votó --}}
-                                <div
-                                    class="flex w-3/4 max-w-md h-3 rounded-full overflow-hidden text-xs font-bold mx-auto">
-                                    <div class="bg-green-500 flex items-center justify-center"
-                                        style="width: {{ $communityLocalProb }}%;">
-                                        @if ($communityLocalProb > 15)
-                                            <span class="text-[10px]">{{ $communityLocalProb }}%</span>
-                                        @endif
-                                    </div>
-                                    <div class="bg-yellow-500 flex items-center justify-center"
-                                        style="width: {{ $communityDrawProb }}%;">
-                                        @if ($communityDrawProb > 5)
-                                            <span class="text-[10px]">{{ $communityDrawProb }}%</span>
-                                        @endif
-                                    </div>
-                                    <div class="bg-red-500 flex items-center justify-center"
-                                        style="width: {{ $communityVisitorProb }}%;">
-                                        @if ($communityVisitorProb > 15)
-                                            <span class="text-[10px]">{{ $communityVisitorProb }}%</span>
-                                        @endif
-                                    </div>
-                                </div>
+                                <p class="text-xs text-red-400 mb-2">¡Votación cerrada!</p>
                             @endif
+
+                            @if ($hasVoted)
+                                <p class="text-xs font-semibold text-green-400 mb-2">¡Gracias por tu predicción!</p>
+                            @endif
+
+                            {{-- ⬇️ BARRA DE RESULTADOS Y CONTEO ⬇️ --}}
+                            <div class="flex flex-col items-center w-full">
+
+                                {{-- Contenedor de Conteo de Votos --}}
+                                <div class="flex justify-between w-full max-w-xs text-xs font-semibold mb-1">
+                                    {{-- ⬇️ MOSTRAR % Y CONTEO REAL ⬇️ --}}
+                                    <span class="text-green-400">
+                                        {{ $communityLocalProb }}% ({{ $communityVotes['local'] ?? 0 }} votos)
+                                    </span>
+                                    <span class="text-yellow-400">
+                                        {{ $communityDrawProb }}% ({{ $communityVotes['draw'] ?? 0 }} votos)
+                                    </span>
+                                    <span class="text-red-400">
+                                        {{ $communityVisitorProb }}% ({{ $communityVotes['visitor'] ?? 0 }} votos)
+                                    </span>
+                                </div>
+
+                                {{-- Barra de Probabilidad Comunitario --}}
+                                <div
+                                    class="flex w-full max-w-xs h-3 rounded-full overflow-hidden text-xs font-bold shadow-inner mt-2">
+                                    <div class="bg-green-500 flex items-center justify-center"
+                                        style="width: {{ $communityLocalProb }}%;"></div>
+                                    <div class="bg-yellow-500 flex items-center justify-center"
+                                        style="width: {{ $communityDrawProb }}%;"></div>
+                                    <div class="bg-red-500 flex items-center justify-center"
+                                        style="width: {{ $communityVisitorProb }}%;"></div>
+                                </div>
+
+                                <p class="text-xs text-gray-500 mt-2">Total de votos: {{ $communityTotal ?? 0 }}</p>
+                            </div>
                         @endif
                     </div>
                 </div>

@@ -139,12 +139,12 @@ class DashboardController extends Controller
             'nextMatch',
             'h2hRecord',
             'communityLocalProb',
-            'communityVisitorProb', 
+            'communityVisitorProb',
             'communityDrawProb',
+            'communityVotes',
+            'communityTotal'
         );
     }
-
-    // app/Http/Controllers/PublicController.php (Añadir esta función auxiliar)
 
     private function calculateH2H(Equipo $team1, Equipo $team2)
     {
