@@ -180,7 +180,7 @@ class PublicController extends Controller
 
         // D. Eficiencia de Portero (Existente)
         $keeperEfficiency = 0;
-        if (strtolower($jugador->posicion) === 'portero' && $pj > 0) {
+        if (strtolower($jugador->posicion_especifica) === 'portero' && $pj > 0) {
             $golesEnContra = $jugador->equipo->goles_en_contra ?? 0;
             $keeperEfficiency = number_format(($jugador->paradas / ($golesEnContra + $jugador->paradas)) * 100, 1);
         }

@@ -40,7 +40,7 @@
                                     <span class="font-medium text-white">{{ $player->nombre }}</span>
                                 </a>
                             </td>
-                            <td class="py-3 px-2 text-center text-gray-300">{{ ucfirst($player->posicion) }}</td>
+                            <td class="py-3 px-2 text-center text-gray-300">{{ ucfirst($player->posicion_especifica) }}</td>
                             <td class="py-3 px-2 text-center text-red-400 font-bold">{{ $player->goles }}</td>
                             <td class="py-3 px-2 text-center text-yellow-400 font-bold">{{ $player->asistencias }}</td>
                             <td class="py-3 px-2 text-center hidden sm:table-cell">{{ $player->paradas }}</td>

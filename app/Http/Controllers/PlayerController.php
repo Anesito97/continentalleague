@@ -32,6 +32,8 @@ class PlayerController extends Controller
             'nombre' => $request->name,
             'numero' => $request->number,
             'equipo_id' => $request->teamId,
+            'posicion_general' => $request->posicion_general,
+            'posicion_especifica' => $request->posicion_especifica,
             'posicion' => $request->position,
             'foto_url' => $photoUrl,
         ]);
@@ -45,10 +47,11 @@ class PlayerController extends Controller
             'nombre' => 'required|string|max:255',
             'numero' => 'required|integer|min:1|max:99',
             'equipo_id' => 'required|exists:equipos,id',
-            'posicion' => 'required|string',
+            'posicion_general' => 'required|string',
+            'posicion_especifica' => 'required|string',
         ]);
 
-        $data = $request->only(['nombre', 'numero', 'equipo_id', 'posicion']);
+        $data = $request->only(['nombre', 'numero', 'equipo_id', 'posicion_general', 'posicion_especifica']);
 
         if ($request->hasFile('photo') && $request->file('photo')->isValid()) {
             $file = $request->file('photo');

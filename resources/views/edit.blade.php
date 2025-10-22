@@ -1,24 +1,12 @@
 @php
-    // Define the base route name for PUT/DELETE actions.
-    // 'news' and 'matches' must be handled as special singular/plural cases.
+    // --- Lógica del controlador (sin cambios) ---
     $baseRouteName = match ($type) {
-        'news' => 'news',       // Route name is 'news.update'
-        'match' => 'matches',   // Route name is 'matches.update'
-        'team' => 'teams',      // Route name is 'teams.update'
-        'player' => 'players',  // Route name is 'players.update'
-        default => 'error'      // Fallback
+        'news' => 'news', 'match' => 'matches', 'team' => 'teams', 'player' => 'players', default => 'error'
     };
-
-    // Define the correct URL segment based on the base route name
-    // (We need to use the base route name for the URL actions)
     $updateRoute = $baseRouteName . '.update';
     $destroyRoute = $baseRouteName . '.destroy';
-    $cancelRoute = 'admin.' . $baseRouteName;
-
-    // Define the base name for the item being edited (for use in the form structure)
-    // For news, we edit 'titulo' and 'contenido' (using $item->titulo)
+    $cancelRoute = 'admin.' . ($type === 'news' ? 'news.index' : $baseRouteName);
     $itemName = $item->nombre ?? $item->titulo ?? ('ID ' . $item->id);
-
 @endphp
 
 <!DOCTYPE html>
@@ -26,12 +14,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Editar {{ ucfirst($type) }}</title>
+    <title>Editar {{ ucfirst($type) }} | Admin</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
         
-        :root { --color-primary: #10b981; --color-dark-bg: #111827; --color-card-bg: #1f2937; }
+        :root { 
+            --color-primary: #3b82f6; /* Azul como color principal */
+            --color-secondary: #4b5563; /* Gris para acciones secundarias */
+            --color-danger: #ef4444; /* Rojo para acciones destructivas */
+            --color-dark-bg: #111827; 
+            --color-card-bg: #1f2937;
+            --color-border: #374151;
+        }
 
         body {
             font-family: 'Inter', sans-serif;
@@ -39,92 +34,121 @@
             color: #e5e7eb;
         }
         
-        /* Estilos Profesionales */
-        .card {
-            background-color: var(--color-card-bg);
-            border-radius: 0.75rem;
-            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.5); 
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            padding: 1.5rem;
-        }
-
-        .card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 15px 20px rgba(0, 0, 0, 0.7);
-        }
-
-        /* Inputs Consistentes */
-        input[type="text"], input[type="number"], input[type="file"], input[type="date"], input[type="time"], select, textarea {
+        /* ✨ MEJORA: Estilo base para todos los inputs y selects */
+        .form-input {
             background-color: #374151;
-            border-color: #4b5563;
-            transition: border-color 0.3s;
+            border: 1px solid var(--color-border);
+            border-radius: 0.375rem; /* rounded-md */
+            transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            width: 100%;
+            padding: 0.5rem 0.75rem;
         }
-
-        input:focus, select:focus, textarea:focus {
-            border-color: var(--color-primary) !important;
-            box-shadow: 0 0 0 1px var(--color-primary); /* Efecto de enfoque sutil */
+        .form-input:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.4);
         }
     </style>
 </head>
-<body class="bg-gray-900 text-gray-100">
-    <div class="max-w-4xl mx-auto py-10">
-        <div class="card p-6">
-            <h2 class="text-4xl font-bold text-white mb-6 border-b border-blue-500 pb-2">
-                Editar {{ ucfirst($type) }}: {{ $itemName }}
-            </h2>
-
-            @include('partials.alerts')
-
-            <form method="POST" 
-                  action="{{ route($updateRoute, $item->id) }}" 
-                  enctype="multipart/form-data">
-                @csrf
-                @method('PUT')
-                
-                {{-- FORMULARIO DE EQUIPO --}}
-                @if($type === 'team')
-                    <div>
-                        <label class="block text-sm font-medium text-gray-400">Nombre</label>
-                        <input type="text" name="nombre" value="{{ old('nombre', $item->nombre) }}" required class="w-full px-3 py-2 mb-4 bg-gray-700 rounded-md text-white">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-400">Logo Actual</label>
-                        <img src="{{ $item->escudo_url ?? 'https://placehold.co/50x50/1f2937/FFFFFF?text=LOGO' }}" class="w-16 h-16 rounded-full object-cover my-2">
-                        <label class="block text-sm font-medium text-gray-400">Subir Nuevo Logo</label>
-                        <input type="file" name="logo" accept="image/*" class="w-full text-sm text-gray-300 mt-1 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
-                    </div>
-
-                {{-- FORMULARIO DE JUGADOR --}}
-                @elseif($type === 'player')
-                    @include('admin.forms.player_edit', ['player' => $item, 'teams' => $teams])
-
-                {{-- FORMULARIO DE PARTIDO --}}
-                @elseif($type === 'match')
-                    @include('admin.forms.match_edit', ['match' => $item, 'teams' => $teams])
-
-                {{-- FORMULARIO DE NOTICIAS (NUEVO) --}}
-                @elseif($type === 'news')
-                    @include('admin.forms.news_edit', ['item' => $item])
-                @endif
-
-                <div class="mt-6 flex justify-end space-x-3">
-                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition">Guardar Cambios</button>
-                    {{-- ⬇️ CANCELAR: Usa la variable $cancelRoute ⬇️ --}}
-                    <a href="{{ route($cancelRoute) }}" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg transition">Cancelar</a>
+<body class="antialiased">
+    <div class="container mx-auto max-w-4xl px-4 py-12">
+        <div class="bg-gray-800 border border-gray-700 rounded-xl shadow-2xl overflow-hidden">
+            <div class="p-6 sm:p-8">
+                <div class="border-b border-gray-700 pb-4 mb-6">
+                    <h1 class="text-3xl font-bold text-white leading-tight">Editar {{ ucfirst($type) }}</h1>
+                    <p class="text-gray-400 mt-1">Modificando: <span class="font-semibold text-primary">{{ $itemName }}</span></p>
                 </div>
-            </form>
 
-            {{-- FORMULARIO DE ELIMINACIÓN (DELETE) --}}
-            <form method="POST" 
-                  action="{{ route($destroyRoute, $item->id) }}" 
-                  onsubmit="return confirm('¿CONFIRMAS ELIMINAR {{ ucfirst($type) }} ({{ $itemName }})?');" 
-                  class="mt-4 border-t border-gray-700 pt-4">
-                @csrf
-                @method('DELETE')
-                <button type="submit" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg transition">Eliminar {{ ucfirst($type) }}</button>
-            </form>
+                @include('partials.alerts')
+
+                <form method="POST" action="{{ route($updateRoute, $item->id) }}" enctype="multipart/form-data" class="space-y-8">
+                    @csrf
+                    @method('PUT')
+                    
+                    {{-- ========= RENDERIZADO CONDICIONAL DE FORMULARIOS ========= --}}
+
+                    {{-- FORMULARIO DE EQUIPO (REDiseñado) --}}
+                    @if($type === 'team')
+                        <fieldset class="border border-gray-700 rounded-lg p-4">
+                            <legend class="px-2 text-lg font-semibold text-gray-300">Datos del Equipo</legend>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+                                <div class="md:col-span-2">
+                                    <label for="nombre" class="block text-sm font-medium text-gray-400 mb-1">Nombre</label>
+                                    <input type="text" id="nombre" name="nombre" value="{{ old('nombre', $item->nombre) }}" required class="form-input">
+                                </div>
+
+                                <div class="md:col-span-2 flex items-center gap-6">
+                                    <div class="flex-shrink-0">
+                                        <p class="text-sm font-medium text-gray-400 mb-2">Logo Actual</p>
+                                        <img id="logo-preview" src="{{ $item->escudo_url ?? 'https://placehold.co/100x100/374151/FFFFFF?text=LOGO' }}" class="w-20 h-20 rounded-full object-cover border-4 border-gray-600">
+                                    </div>
+                                    <div class="flex-grow">
+                                        <label for="logo-upload" class="block text-sm font-medium text-gray-400 mb-2">Subir Nuevo Logo</label>
+                                        <label for="logo-upload" class="w-full flex items-center justify-center px-4 py-3 bg-gray-700 border-2 border-dashed border-gray-500 rounded-lg cursor-pointer hover:bg-gray-600 hover:border-primary transition">
+                                            <span id="logo-filename" class="text-gray-400 text-sm">Seleccionar un archivo...</span>
+                                        </label>
+                                        <input id="logo-upload" type="file" name="logo" accept="image/*" class="hidden">
+                                    </div>
+                                </div>
+                            </div>
+                        </fieldset>
+
+                    {{-- FORMULARIO DE JUGADOR (Usa el parcial mejorado) --}}
+                    @elseif($type === 'player')
+                        @include('admin.forms.player_edit', ['player' => $item, 'teams' => $teams, 'positions' => $positions])
+
+                    {{-- FORMULARIO DE PARTIDO (Usa el parcial mejorado) --}}
+                    @elseif($type === 'match')
+                        @include('admin.forms.match_edit', ['match' => $item, 'teams' => $teams])
+
+                    {{-- FORMULARIO DE NOTICIAS --}}
+                    @elseif($type === 'news')
+                        @include('admin.forms.news_edit', ['item' => $item])
+                    @endif
+
+                    <div class="flex justify-end items-center gap-4 pt-6 border-t border-gray-700">
+                        <a href="{{ route($cancelRoute) }}" class="px-5 py-2.5 text-sm font-medium text-gray-300 bg-gray-600 rounded-lg hover:bg-gray-700 transition">Cancelar</a>
+                        <button type="submit" class="px-5 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition">Guardar Cambios</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="bg-red-900/20 border-t border-red-500/30 p-6 sm:p-8">
+                <div class="flex flex-col sm:flex-row justify-between sm:items-center">
+                    <div>
+                        <h3 class="text-xl font-bold text-red-400">Zona de Peligro</h3>
+                        <p class="text-red-300/80 mt-1 text-sm">Esta acción es irreversible y eliminará permanentemente el registro.</p>
+                    </div>
+                    <form method="POST" action="{{ route($destroyRoute, $item->id) }}" onsubmit="return confirm('ATENCIÓN: ¿Estás seguro de que quieres eliminar {{ $itemName }}? Esta acción no se puede deshacer.');" class="mt-4 sm:mt-0">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="px-5 py-2.5 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition w-full sm:w-auto">
+                            Eliminar {{ ucfirst($type) }}
+                        </button>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
+
+    @if($type === 'team')
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const logoUpload = document.getElementById('logo-upload');
+            const logoPreview = document.getElementById('logo-preview');
+            const logoFilename = document.getElementById('logo-filename');
+
+            logoUpload.addEventListener('change', function(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = e => logoPreview.src = e.target.result;
+                    reader.readAsDataURL(file);
+                    logoFilename.textContent = file.name;
+                }
+            });
+        });
+    </script>
+    @endif
 </body>
 </html>

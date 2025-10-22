@@ -34,11 +34,20 @@
                 </div>
                 <div>
                     <label for="player-position" class="block text-sm font-medium text-gray-400">Posición</label>
-                    <select id="player-position" name="position" required
+                    <input type="hidden" name="posicion_general" id="posicion_general_input">
+
+                    <select id="player-position" name="posicion_especifica" required
                         class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white">
-                        @foreach (['portero', 'defensa', 'medio', 'delantero'] as $pos)
-                            <option value="{{ $pos }}" @selected(old('position') == $pos)>{{ ucfirst($pos) }}
-                            </option>
+                        <option value="">Seleccionar Posición...</option>
+                        @foreach ($positions as $general => $specifics)
+                            <optgroup label="{{ $general }}">
+                                @foreach ($specifics as $abbr => $name)
+                                    <option value="{{ $abbr }}" data-general="{{ strtolower($general) }}"
+                                        @selected(old('posicion_especifica') == $abbr)>
+                                        {{ $name }} ({{ $abbr }})
+                                    </option>
+                                @endforeach
+                            </optgroup>
                         @endforeach
                     </select>
                 </div>
@@ -72,16 +81,18 @@
                             class="w-8 h-8 rounded-full object-cover">
                         <span>{{ $player->nombre }} (#{{ $player->numero }})</span>
                     </div>
-                    <span class="text-xs text-gray-400">{{ $player->equipo->nombre ?? 'N/A' }} -
-                        {{ ucfirst($player->posicion) }}</span>
+
+                    {{-- ✅ LÍNEA MODIFICADA AQUÍ 👇 --}}
+                    <span class="text-xs text-gray-400">
+                        {{ $player->equipo->nombre ?? 'N/A' }} -
+                        {{ ucfirst($player->posicion_general) }} ({{ strtoupper($player->posicion_especifica) }})
+                    </span>
 
                     {{-- ACCIONES DE EDITAR/ELIMINAR --}}
                     <div class="flex space-x-2">
-                        {{-- ⬇️ CORRECCIÓN: Usar enlace <a> para la ruta de edición ⬇️ --}}
                         <a href="{{ route('players.edit', $player->id) }}"
                             class="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded-md text-xs">Editar</a>
 
-                        {{-- Formulario de Eliminación --}}
                         <form method="POST" action="{{ route('players.destroy', $player->id) }}"
                             onsubmit="return confirm('¿Seguro que quieres eliminar a {{ $player->nombre }}?');">
                             @csrf
@@ -97,3 +108,25 @@
         </ul>
     </div>
 </div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const positionSelect = document.getElementById('player-position');
+        const generalPositionInput = document.getElementById('posicion_general_input');
+
+        // Función para actualizar el campo oculto
+        function updateGeneralPosition() {
+            const selectedOption = positionSelect.options[positionSelect.selectedIndex];
+            if (selectedOption && selectedOption.value) {
+                generalPositionInput.value = selectedOption.dataset.general;
+            } else {
+                generalPositionInput.value = '';
+            }
+        }
+
+        // Llama a la función al cargar la página (importante para el form de edición)
+        updateGeneralPosition();
+
+        // Y añade un listener para cuando cambie la selección
+        positionSelect.addEventListener('change', updateGeneralPosition);
+    });
+</script>

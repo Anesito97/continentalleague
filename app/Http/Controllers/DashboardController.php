@@ -88,7 +88,7 @@ class DashboardController extends Controller
         $topAssists = $players->filter(fn($p) => $p->asistencias > 0)->sortByDesc('asistencias');
 
         // Porteros: Orden descendente por Paradas (solo si son porteros y tienen > 0)
-        $topKeepers = $players->filter(fn($p) => strtolower($p->posicion) === 'portero' && $p->paradas > 0)->sortByDesc('paradas');
+        $topKeepers = $players->filter(fn($p) => strtolower($p->posicion_especifica) === 'portero' && $p->paradas > 0)->sortByDesc('paradas');
 
         // MÉTICAS DE DASHBOARD (Aseguramos que operen con colecciones completas)
         $topImpactPlayer = $players->sortByDesc(fn($p) => $p->goles + $p->asistencias)->first();
@@ -315,10 +315,41 @@ class DashboardController extends Controller
     {
         session(['activeAdminContent' => 'players']);
         $data = $this->loadAllData();
+        $data['positions'] = $this->getPositions();
         $data['news'] = $this->getEmptyNewsPaginator();
         $data['activeView'] = 'admin';
 
         return view('index', $data);
+    }
+
+
+
+    private function getPositions()
+    {
+        return [
+            'Portero' => [
+                'POR' => 'Portero',
+            ],
+            'Defensa' => [
+                'DFC' => 'Defensa Central',
+                'LI' => 'Lateral Izquierdo',
+                'LD' => 'Lateral Derecho',
+                'CAR' => 'Carrilero',
+            ],
+            'Medio' => [
+                'MCD' => 'Mediocentro Defensivo',
+                'MC' => 'Mediocentro',
+                'MCO' => 'Mediocentro Ofensivo',
+                'MI' => 'Interior Izquierdo',
+                'MD' => 'Interior Derecho',
+            ],
+            'Delantero' => [
+                'EI' => 'Extremo Izquierdo',
+                'ED' => 'Extremo Derecho',
+                'SD' => 'Segundo Delantero',
+                'DC' => 'Delantero Centro',
+            ],
+        ];
     }
 
     public function adminMatches()
@@ -368,6 +399,7 @@ class DashboardController extends Controller
     {
         $data = $this->loadAllData();
         $data['item'] = $jugador;
+        $data['positions'] = $this->getPositions();
         $data['type'] = 'player';
         return view('edit', $data);
     }

@@ -15,7 +15,7 @@
 
                 <h1 class="text-4xl font-extrabold text-white">{{ $jugador->nombre }}</h1>
                 <p class="text-xl text-gray-400">
-                    #{{ $jugador->numero }} &bull; {{ ucfirst($jugador->posicion) }}
+                    #{{ $jugador->numero }} &bull; {{ ucfirst($jugador->posicion_especifica) }}
                 </p>
                 <p class="text-lg text-primary">
                     Equipo: <a href="{{ route('team.profile', $equipo->id) }}"
@@ -110,7 +110,7 @@
                             Participación en Goles: <span class="font-bold text-primary">{{ $participationRate }}%</span>
                         </p>
 
-                        @if (strtolower($jugador->posicion) === 'portero')
+                        @if (strtolower($jugador->posicion_especifica) === 'portero')
                             <p class="text-gray-300 flex justify-between">
                                 Eficiencia Portero: <span class="font-bold text-blue-400">{{ $keeperEfficiency }}%</span>
                             </p>
