@@ -9,6 +9,7 @@
     $topTeams = $teams->take(10);
     $avgGoals = $totalMatches > 0 ? number_format($totalGoals / $totalMatches, 2) : 0;
     $topImpactPlayer = $players->sortByDesc(fn($p) => $p->goles + $p->asistencias)->first();
+    $injuredPlayers = $players->where('esta_lesionado', true);
 @endphp
 
 @include('partials.news_slider', ['newsItems' => $newsItems])
@@ -505,4 +506,69 @@
     @empty
         <p class="text-white/50 p-6">Aún no hay suficientes equipos para mostrar un detalle destacado.</p>
     @endforelse
+</div>
+{{-- ========================================================== --}}
+{{-- 4. CARD MEJORADA: PARTE MÉDICO DE LA LIGA (DINÁMICA)       --}}
+{{-- ========================================================== --}}
+<div class="mt-8">
+
+    @if ($injuredPlayers->isNotEmpty())
+        {{-- ESTADO 1: HAY JUGADORES LESIONADOS --}}
+        <h3 class="text-2xl font-bold mb-4 flex items-center gap-3">
+            <span class="text-red-500">
+                {{-- ✅ TAMAÑO AUMENTADO: Cambiamos h-4 w-4 por h-7 w-7 --}}
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                </svg>
+            </span>
+            <span>Jugadores Lesionados</span>
+        </h3>
+        <div class="bg-card-bg rounded-lg shadow-xl p-4 border border-red-500/30">
+            {{-- ✨ MEJORA: Se convierte en una cuadrícula para mejor visualización --}}
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-[450px] overflow-y-auto pr-2">
+                @foreach ($injuredPlayers as $player)
+                    <a href="{{ route('player.profile', $player->id) }}"
+                        class="block bg-gray-700/50 p-3 rounded-lg hover:bg-gray-700 hover:scale-105 transition-transform duration-200 group">
+                        <div class="flex items-center">
+                            <div class="relative flex-shrink-0">
+                                <img src="{{ $player->foto_url ?? 'https://placehold.co/50x50/1f2937/FFFFFF?text=JUG' }}"
+                                    class="w-14 h-14 rounded-full object-cover border-2 border-gray-600 group-hover:border-red-500 transition" />
+                                {{-- ✨ MEJORA: Icono de lesión más descriptivo --}}
+                                <div
+                                    class="absolute -bottom-1 -right-1 bg-red-600 rounded-full p-1 border-2 border-gray-800">
+                                    <i class="fa-solid fa-briefcase-medical text-white text-xs"></i>
+                                </div>
+                            </div>
+                            <div class="ml-4">
+                                <p class="font-bold text-white transition">{{ $player->nombre }}</p>
+                                <p class="text-sm text-gray-400">{{ $player->equipo->nombre ?? 'Sin Equipo' }}</p>
+                                {{-- ✨ MEJORA: Se añade la posición para más contexto --}}
+                                <span
+                                    class="mt-1 inline-block bg-gray-600 text-gray-300 text-xs font-bold px-2 py-0.5 rounded-full">
+                                    {{ strtoupper($player->posicion_especifica) }}
+                                </span>
+                            </div>
+                        </div>
+                    </a>
+                @endforeach
+            </div>
+        </div>
+    @else
+        {{-- ESTADO 2: NO HAY JUGADORES LESIONADOS (MENSAJE DIVERTIDO) --}}
+        <h3 class="text-2xl font-bold mb-4 flex items-center gap-3">
+            <i class="fa-solid fa-shield-heart text-green-500"></i>
+            <span>Estado de la Plantilla</span>
+        </h3>
+        <div class="bg-card-bg rounded-lg shadow-xl p-8 border border-green-500/30 text-center">
+            <div class="flex flex-col items-center">
+                <i class="fa-solid fa-shield-heart text-green-400 text-6xl mb-4 animate-pulse"></i>
+                <h4 class="text-xl font-bold text-white">¡Enfermería Vacía!</h4>
+                <p class="text-gray-400 mt-2">
+                    ¡Buenas noticias! El fisio está de vacaciones. <br class="hidden sm:block">
+                    Todos los jugadores están en plena forma y listos para jugar.
+                </p>
+            </div>
+        </div>
+    @endif
 </div>
