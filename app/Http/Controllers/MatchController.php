@@ -104,6 +104,7 @@ class MatchController extends Controller
             foreach ($events as $event) {
                 $playerId = (int) $event['player_id'];
                 $eventType = strtolower($event['event_type']);
+                $goal_type = strtolower($event['goal_type']);
                 $minuto = (int) $event['minuto'];
 
                 if ($playerId > 0) {
@@ -115,6 +116,7 @@ class MatchController extends Controller
                         'jugador_id' => $playerId,
                         'equipo_id' => $player->equipo_id,
                         'tipo_evento' => $eventType,
+                        'goal_type' => $goal_type,
                         'minuto' => $minuto,
                     ]);
 

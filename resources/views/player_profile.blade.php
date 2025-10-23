@@ -112,6 +112,31 @@
                             Más de 5 Goles: <span class="font-bold text-white">{{ $goalRecords['mas_cinco'] }}</span>
                         </p>
                     </div>
+                    {{-- ✅ NUEVA SECCIÓN: Desglose de Goles por Tipo --}}
+                    @if ($goalsByType->isNotEmpty())
+                        <div class="border-t border-gray-700 pt-4 mt-4">
+                            <h5 class="text-sm font-semibold text-gray-400 mb-2">Desglose de Goles</h5>
+                            <div class="space-y-3 text-sm">
+                                @foreach ($goalsByType as $type => $count)
+                                    {{-- Usamos un valor por defecto si el tipo es nulo o 'Jugada' --}}
+                                    @php
+                                        $goalTypeName = match ($type) {
+                                            'cabeza' => 'De Cabeza',
+                                            'penalti' => 'De Penalti',
+                                            'tiro libre' => 'De Tiro Libre',
+                                            'en contra' => 'En Contra',
+                                            'de jugada' => 'De Jugada Personal',
+                                            default => 'De Jugada Personal',
+                                        };
+                                    @endphp
+                                    <p class="text-gray-300 flex justify-between">
+                                        {{ $goalTypeName }}:
+                                        <span class="font-bold text-primary">{{ $count }}</span>
+                                    </p>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
                 </div>
 
                 {{-- ⬇️ NUEVO BLOQUE: EFICIENCIA Y DISCIPLINA ⬇️ --}}
@@ -186,7 +211,14 @@
 
                             // ⬇️ DEFINICIÓN DE CLASES Y TEXTO DEL EVENTO ⬇️
                             $eventText = match ($event->tipo_evento) {
-                                'gol' => 'Marcó un Gol ⚽',
+                                'gol' => match ($event->goal_type) {
+                                    'jugada' => 'Gol de Jugada Individual ⚽',
+                                    'cabeza' => 'Marcó un Gol de Cabeza ⚽',
+                                    'penalti' => 'Marcó de Penalti ⚽',
+                                    'tiro libre' => 'Marcó de Tiro Libre ⚽',
+                                    'en contra' => 'Marcó un Gol en Contra ⚽',
+                                    default => 'Marcó un Gol ⚽',
+                                },
                                 'asistencia' => 'Dio una Asistencia 👟',
                                 'parada' => 'Realizó una Parada 🧤',
                                 'amarilla' => 'Recibió Tarjeta Amarilla 🟨',

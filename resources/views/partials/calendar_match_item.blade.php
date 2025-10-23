@@ -1,18 +1,23 @@
 @php
     $statusColor = $match->estado === 'finalizado' ? 'bg-blue-600' : 'bg-primary';
-    $score = $match->estado === 'finalizado' ? "{$match->goles_local} - {$match->goles_visitante}" : $match->fecha_hora->format('H:i');
+    $score =
+        $match->estado === 'finalizado'
+            ? "{$match->goles_local} - {$match->goles_visitante}"
+            : $match->fecha_hora->format('H:i');
 @endphp
 
 <div class="p-3 bg-gray-800 rounded-lg shadow-md">
-    
+
     {{-- ENCABEZADO DE RESULTADO Y ESTADO --}}
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-2">
 
         {{-- Equipos --}}
         <span class="font-medium text-white mb-2 sm:mb-0 w-full sm:w-1/2">
-            <img src="{{ $match->localTeam->escudo_url ?? asset('images/placeholder.png') }}" class="w-6 h-6 inline-block rounded-full mr-2">
-            {{ $match->localTeam->nombre ?? 'N/A' }} <span class="text-gray-400 font-normal">vs</span> 
-            <img src="{{ $match->visitorTeam->escudo_url ?? asset('images/placeholder.png') }}" class="w-6 h-6 inline-block rounded-full mr-2">
+            <img src="{{ $match->localTeam->escudo_url ?? asset('images/placeholder.png') }}"
+                class="w-6 h-6 inline-block rounded-full mr-2">
+            {{ $match->localTeam->nombre ?? 'N/A' }} <span class="text-gray-400 font-normal">vs</span>
+            <img src="{{ $match->visitorTeam->escudo_url ?? asset('images/placeholder.png') }}"
+                class="w-6 h-6 inline-block rounded-full mr-2">
             {{ $match->visitorTeam->nombre ?? 'N/A' }}
         </span>
 
@@ -40,7 +45,19 @@
             <div class="flex text-xs text-gray-400">
                 {{-- Columna Local --}}
                 <div class="w-1/2 pr-2 space-y-1 border-r border-gray-600">
-                    @php $localEvents = $match->eventos->where('equipo_id', $match->equipo_local_id)->sortBy('minuto'); @endphp
+                    @php
+                        // Un evento es del equipo LOCAL si:
+                        // 1. Lo hizo un jugador local Y NO es un gol en contra.
+                        // 2. Lo hizo un jugador visitante Y SÍ es un gol en contra.
+                        $localEvents = $match->eventos
+                            ->filter(function ($event) use ($match) {
+                                $isOwnGoal = strtolower($event->goal_type ?? '') === 'en contra';
+                                return ($event->equipo_id == $match->equipo_local_id && !$isOwnGoal) ||
+                                    ($event->equipo_id == $match->equipo_visitante_id && $isOwnGoal);
+                            })
+                            ->sortBy('minuto');
+                    @endphp
+
                     @forelse($localEvents as $event)
                         @include('partials.event_item', ['event' => $event, 'align' => 'right'])
                     @empty
@@ -50,7 +67,19 @@
 
                 {{-- Columna Visitante --}}
                 <div class="w-1/2 pl-2 space-y-1">
-                    @php $visitorEvents = $match->eventos->where('equipo_id', $match->equipo_visitante_id)->sortBy('minuto'); @endphp
+                    @php
+                        // Un evento es del equipo VISITANTE si:
+                        // 1. Lo hizo un jugador visitante Y NO es un gol en contra.
+                        // 2. Lo hizo un jugador local Y SÍ es un gol en contra.
+                        $visitorEvents = $match->eventos
+                            ->filter(function ($event) use ($match) {
+                                $isOwnGoal = strtolower($event->goal_type ?? '') === 'en contra';
+                                return ($event->equipo_id == $match->equipo_visitante_id && !$isOwnGoal) ||
+                                    ($event->equipo_id == $match->equipo_local_id && $isOwnGoal);
+                            })
+                            ->sortBy('minuto');
+                    @endphp
+
                     @forelse($visitorEvents as $event)
                         @include('partials.event_item', ['event' => $event, 'align' => 'left'])
                     @empty

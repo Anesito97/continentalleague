@@ -18,6 +18,7 @@ class EventoPartido extends Model
         'jugador_id',
         'equipo_id',
         'tipo_evento',
+        'goal_type',
         'minuto',
     ];
 

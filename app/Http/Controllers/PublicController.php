@@ -237,6 +237,13 @@ class PublicController extends Controller
             }
         }
 
+        $goalsByType = $jugador->eventos
+            ->where('tipo_evento', 'gol')
+            ->groupBy('goal_type')
+            ->map(function ($group) {
+                return $group->count();
+            });
+
 
         // 3. Preparar los datos para la vista
         $data = [
@@ -259,6 +266,7 @@ class PublicController extends Controller
 
             // Historial
             'recentEvents' => $recentEvents,
+            'goalsByType' => $goalsByType,
             'pj' => $pj,
         ];
 
