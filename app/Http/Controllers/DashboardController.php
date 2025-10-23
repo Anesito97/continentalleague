@@ -81,8 +81,23 @@ class DashboardController extends Controller
 
         // ⬇️ CALCULAR TOPS: Ordenar globalmente y filtrar por criterio (>= 1) ⬇️
 
+        $playersWithCorrectGoals = $players->map(function ($player) {
+            // Contamos solo los eventos de tipo 'gol' que NO son 'en contra'
+            $validGoals = $player->eventos
+                ->where('tipo_evento', 'gol')
+                ->where(function ($event) {
+                    // strtolower para asegurar que funcione con 'en contra' o 'En Contra'
+                    return strtolower($event->goal_type ?? '') !== 'en contra';
+                })
+                ->count();
+
+            // Sobrescribimos temporalmente la propiedad 'goles' del jugador con el valor correcto
+            $player->goles = $validGoals;
+
+            return $player;
+        });
         // Goleadores: Orden descendente por Goles (solo si tienen > 0)
-        $topScorers = $players->filter(fn($p) => $p->goles > 0)->sortByDesc('goles');
+        $topScorers = $playersWithCorrectGoals->filter(fn($p) => $p->goles > 0)->sortByDesc('goles');
 
         // Asistentes: Orden descendente por Asistencias (solo si tienen > 0)
         $topAssists = $players->filter(fn($p) => $p->asistencias > 0)->sortByDesc('asistencias');

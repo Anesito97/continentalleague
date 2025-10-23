@@ -228,7 +228,12 @@
 
                             // ⬇️ ASIGNACIÓN DEL COLOR DE FONDO POR TIPO DE EVENTO ⬇️
                             $eventBgColor = match ($event->tipo_evento) {
-                                'gol' => 'bg-green-800/50 border-green-400', // Verde para Goles
+                                'gol' => match (strtolower($event->goal_type ?? '')) {
+                                    // ✅ CASO ESPECIAL: Si es gol 'en contra', usa un color distintivo (ej. morado)
+                                    'en contra' => 'bg-purple-900/50 border-purple-500',
+                                    // Para cualquier otro tipo de gol, usa el color verde normal
+                                    default => 'bg-green-800/50 border-green-400',
+                                },
                                 'asistencia' => 'bg-yellow-800/40 border-yellow-400', // Amarillo para Asistencia
                                 'parada' => 'bg-blue-800/40 border-blue-400', // Azul para Paradas
                                 'amarilla' => 'bg-orange-900/40 border-yellow-500', // Naranja/Amarillo para Amarilla
