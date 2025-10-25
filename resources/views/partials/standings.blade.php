@@ -138,7 +138,7 @@
                     </div>
 
                     {{-- COLUMNA 2: VOTACIÓN COMUNITARIA (Acción y Resultado Dinámico) --}}
-                    <div
+                    {{-- <div
                         class="flex flex-col items-center justify-center border-t md:border-t-0 md:border-l border-gray-700 pt-4 md:pt-0 md:pl-4">
 
                         @if ($isVotingActive && !$hasVoted)
@@ -158,7 +158,6 @@
                                 </div>
                             </form>
                         @else
-                            {{-- Muestra el resultado de la comunidad --}}
                             <p class="text-sm font-semibold text-gray-400 mb-2">Voto Comunitario Actual:</p>
 
                             @if (!$isVotingActive)
@@ -169,12 +168,9 @@
                                 <p class="text-xs font-semibold text-green-400 mb-2">¡Gracias por tu predicción!</p>
                             @endif
 
-                            {{-- ⬇️ BARRA DE RESULTADOS Y CONTEO ⬇️ --}}
                             <div class="flex flex-col items-center w-full">
 
-                                {{-- Contenedor de Conteo de Votos --}}
                                 <div class="flex justify-between w-full max-w-xs text-xs font-semibold mb-1">
-                                    {{-- ⬇️ MOSTRAR % Y CONTEO REAL ⬇️ --}}
                                     <span class="text-green-400">
                                         {{ $communityLocalProb }}% ({{ $communityVotes['local'] ?? 0 }} votos)
                                     </span>
@@ -186,7 +182,6 @@
                                     </span>
                                 </div>
 
-                                {{-- Barra de Probabilidad Comunitario --}}
                                 <div
                                     class="flex w-full max-w-xs h-3 rounded-full overflow-hidden text-xs font-bold shadow-inner mt-2">
                                     <div class="bg-green-500 flex items-center justify-center"
@@ -200,7 +195,7 @@
                                 <p class="text-xs text-gray-500 mt-2">Total de votos: {{ $communityTotal ?? 0 }}</p>
                             </div>
                         @endif
-                    </div>
+                    </div> --}}
                 </div>
             </div>
 

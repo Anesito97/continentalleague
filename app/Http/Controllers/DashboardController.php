@@ -288,7 +288,7 @@ class DashboardController extends Controller
             'localProb' => round($localProb * 100),
             'drawProb' => round($drawProb * 100),
             'visitorProb' => round($visitorProb * 100),
-            'title' => 'Probabilidad (H2H + Racha)'
+            'title' => 'Probabilidad (Estimada)'
         ];
     }
 
