@@ -138,9 +138,10 @@
                     </div>
 
                     {{-- COLUMNA 2: VOTACIÓN COMUNITARIA (Acción y Resultado Dinámico) --}}
-                    {{-- <div
+                    <div
                         class="flex flex-col items-center justify-center border-t md:border-t-0 md:border-l border-gray-700 pt-4 md:pt-0 md:pl-4">
-
+                        <p class="text-sm font-semibold text-gray-400 mb-2">( Reajustando sistema de votación )</p>
+                        {{--
                         @if ($isVotingActive && !$hasVoted)
                             <form method="POST" action="{{ route('community.vote', $nextMatch->id) }}"
                                 class="w-full max-w-sm">
@@ -194,8 +195,8 @@
 
                                 <p class="text-xs text-gray-500 mt-2">Total de votos: {{ $communityTotal ?? 0 }}</p>
                             </div>
-                        @endif
-                    </div> --}}
+                        @endif --}}
+                    </div>
                 </div>
             </div>
 
