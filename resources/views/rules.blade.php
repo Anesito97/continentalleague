@@ -21,7 +21,8 @@
 
                     <li>De más está decir como es el comportamiento de los jugadores. Equipo que se comporte mal, que el juego contra ellos sea engorroso ya sea porque discuten mucho u incluso entre ellos mismos automáticamente estará fuera del torneo.</li>
 
-                    <li>Los cambios son libres, cada árbitro va a designar una zona por la que deben hacer los cambios, esto ya depende del árbitro, si lo considera necesario o no.</li>
+                    {{-- <li>Los cambios son libres, cada árbitro va a designar una zona por la que deben hacer los cambios, esto ya depende del árbitro, si lo considera necesario o no.</li> --}}
+                    <li>Cuando se va a hacer un cambio el balón tiene que estar detenido y se hace por el medio del terreno, el jugador que sale lo puede hacer por cualquier lado del terreno o por el centro al igual que el jugador que entra, y hasta que no se finalice el cambio y árbitro indique, no se reinicia el partido.</li>
                 </ul>
             </div>
 
