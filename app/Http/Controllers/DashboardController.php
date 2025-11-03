@@ -137,6 +137,9 @@ class DashboardController extends Controller
         $communityVisitorProb = $communityTotal > 0 ? number_format(($communityVotes['visitor'] / $communityTotal) * 100, 0) : 33;
         $communityDrawProb = 100 - $communityLocalProb - $communityVisitorProb; // El restante
 
+        $positions = $this->getPositions();
+        $injuredPlayers = $players->where('esta_lesionado', true);
+
         return compact(
             'teams',
             'players',
@@ -161,7 +164,9 @@ class DashboardController extends Controller
             'communityVisitorProb',
             'communityDrawProb',
             'communityVotes',
-            'communityTotal'
+            'communityTotal',
+            'positions',
+            'injuredPlayers',
         );
     }
 
