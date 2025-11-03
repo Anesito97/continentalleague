@@ -103,7 +103,7 @@ class DashboardController extends Controller
         $topAssists = $players->filter(fn($p) => $p->asistencias > 0)->sortByDesc('asistencias');
 
         // Porteros: Orden descendente por Paradas (solo si son porteros y tienen > 0)
-        $topKeepers = $players->filter(fn($p) => strtolower($p->posicion_especifica) === 'portero' && $p->paradas > 0)->sortByDesc('paradas');
+        $topKeepers = $players->filter(fn($p) => $p->paradas > 0)->sortByDesc('paradas');
 
         // MÉTICAS DE DASHBOARD (Aseguramos que operen con colecciones completas)
         $topImpactPlayer = $players->sortByDesc(fn($p) => $p->goles + $p->asistencias)->first();
