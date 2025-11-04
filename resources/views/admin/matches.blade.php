@@ -89,4 +89,40 @@
             </ul>
         </div>
     </div>
+
+    {{-- LISTADO DE PARTIDOS FINALIZADOS CON ACCIONES --}}
+    <div id="matches-content" class="admin-content space-y-6">
+        {{-- ... (Formulario de Programación) ... --}}
+
+        {{-- LISTADO DE PARTIDOS PENDIENTES CON ACCIONES --}}
+        <div class="card p-4 hover:transform-none">
+            <h4 class="text-xl font-semibold mb-3">Partidos Finalizados</h4>
+            <ul id="pending-matches" class="space-y-2 text-sm text-gray-300">
+                @forelse($finalicedMatches as $match)
+                    <li class="p-2 bg-gray-700 rounded-md flex justify-between items-center">
+                        <span class="font-medium">{{ $match->localTeam->nombre }} vs
+                            {{ $match->visitorTeam->nombre }}</span>
+                        <span
+                            class="text-xs text-gray-400">{{ \Carbon\Carbon::parse($match->fecha_hora)->format('d/m/Y H:i') }}</span>
+
+                        {{-- ACCIONES --}}
+                        <div class="flex space-x-2">
+                            <a href="{{ route('matches.edit', $match->id) }}"
+                                class="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded-md text-xs">Editar</a>
+
+                            {{-- <form method="POST" action="{{ route('matches.destroy', $match->id) }}"
+                                onsubmit="return confirm('¿Seguro que quieres eliminar el partido {{ $match->localTeam->nombre }} vs {{ $match->visitorTeam->nombre }}?');">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit"
+                                    class="bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded-md text-xs">Eliminar</button>
+                            </form> --}}
+                        </div>
+                    </li>
+                @empty
+                    <li class="p-2 text-center text-gray-500">No hay partidos pendientes.</li>
+                @endforelse
+            </ul>
+        </div>
+    </div>
 </div>

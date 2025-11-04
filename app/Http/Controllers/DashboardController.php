@@ -29,6 +29,11 @@ class DashboardController extends Controller
             ->where('estado', 'pendiente')
             ->orderBy('fecha_hora', 'asc')
             ->get();
+            
+        $finalicedMatches = Partido::with(['localTeam', 'visitorTeam'])
+            ->where('estado', 'finalizado')
+            ->orderBy('fecha_hora', 'asc')
+            ->get();
 
         $recentMatches = Partido::with([
             'localTeam',
@@ -144,6 +149,7 @@ class DashboardController extends Controller
             'teams',
             'players',
             'pendingMatches',
+            'finalicedMatches',
             'recentMatches',
             'topScorers',
             'topAssists',
