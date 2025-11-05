@@ -20,7 +20,10 @@ class DashboardController extends Controller
         $players = Jugador::with('equipo')->get();
 
         // Carga de equipos y cálculo de la guía de forma (se mantiene)
-        $teams = Equipo::orderByDesc('puntos')->orderByDesc('goles_a_favor')->get();
+        $teams = Equipo::orderByDesc('puntos')
+               ->orderByRaw('(goles_a_favor - goles_en_contra) DESC')
+               ->orderByDesc('goles_a_favor')
+               ->get();
 
         // Obtener la jornada activa (la más baja con partidos pendientes)
         $activeJornada = Partido::where('estado', 'pendiente')->min('jornada');
