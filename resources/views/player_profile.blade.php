@@ -6,19 +6,22 @@
         {{-- ---------------------------------------------------- --}}
         {{-- CABECERA Y MÉTRICAS PRINCIPALES --}}
         {{-- ---------------------------------------------------- --}}
-        <div class="card p-6 shadow-2xl mb-8 border-b-4 border-primary">
+        {{-- MEJORA: "Glassmorphism" para la tarjeta "Hero" principal --}}
+        <div class="bg-card-bg/80 backdrop-blur-lg border border-white/10 p-6 shadow-2xl mb-8 rounded-lg">
             <div class="flex flex-col items-center space-y-4">
 
                 {{-- Foto y Nombre --}}
+                {{-- MEJORA: "Glow" (brillo) azulado para la foto --}}
                 <img src="{{ $jugador->foto_url ?? asset('images/placeholder_jug.png') }}" alt="{{ $jugador->nombre }}"
-                    class="w-40 h-40 rounded-full object-cover border-4 border-secondary shadow-lg mb-3" />
+                    class="w-40 h-40 rounded-full object-cover border-4 border-secondary shadow-lg shadow-secondary/50 mb-3" />
 
                 <div class="flex items-center justify-center">
                     <h1 class="text-4xl font-extrabold text-white">{{ $jugador->nombre }}</h1>
 
                     {{-- ✅ Condicional para mostrar el icono de lesión --}}
                     @if ($jugador->esta_lesionado)
-                        <span title="Lesionado" class="ml-3 text-red-500">
+                        {{-- MEJORA: Animación de pulso para la lesión --}}
+                        <span title="Lesionado" class="ml-3 text-red-500 animate-pulse">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
                                 stroke="currentColor" stroke-width="3">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
@@ -29,26 +32,29 @@
                 <p class="text-xl text-gray-400">
                     #{{ $jugador->numero }} &bull; {{ ucfirst($jugador->posicion_especifica) }}
                 </p>
-                <p class="text-lg text-primary">
-                    Equipo: <a href="{{ route('team.profile', $equipo->id) }}"
-                        class="font-bold hover:underline">{{ $equipo->nombre ?? 'Sin equipo' }}</a>
+                <p class="text-lg">
+                    Equipo: 
+                    {{-- MEJORA: Gradiente de texto para el enlace del equipo --}}
+                    <a href="{{ route('team.profile', $equipo->id) }}"
+                        class="font-bold hover:underline bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">{{ $equipo->nombre ?? 'Sin equipo' }}</a>
                 </p>
 
                 {{-- Bloque de Métricas Rápidas (Se mantiene) --}}
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-4 w-full md:w-3/4 text-center">
-                    <div class="bg-gray-700/50 p-3 rounded-lg">
+                    {{-- MEJORA: Mini-tarjetas "Glassmorphism" --}}
+                    <div class="bg-gray-900/50 backdrop-blur-sm border border-white/10 p-3 rounded-lg">
                         <span class="text-xl font-bold block text-red-400">{{ $jugador->goles }}</span>
                         <span class="text-xs text-gray-400">Goles</span>
                     </div>
-                    <div class="bg-gray-700/50 p-3 rounded-lg">
+                    <div class="bg-gray-900/50 backdrop-blur-sm border border-white/10 p-3 rounded-lg">
                         <span class="text-xl font-bold block text-yellow-400">{{ $jugador->asistencias }}</span>
                         <span class="text-xs text-gray-400">Asist.</span>
                     </div>
-                    <div class="bg-gray-700/50 p-3 rounded-lg">
+                    <div class="bg-gray-900/50 backdrop-blur-sm border border-white/10 p-3 rounded-lg">
                         <span class="text-xl font-bold block text-blue-400">{{ $jugador->paradas }}</span>
                         <span class="text-xs text-gray-400">Paradas</span>
                     </div>
-                    <div class="bg-gray-700/50 p-3 rounded-lg">
+                    <div class="bg-gray-900/50 backdrop-blur-sm border border-white/10 p-3 rounded-lg">
                         <span
                             class="text-xl font-bold block text-purple-400">{{ $jugador->goles + $jugador->asistencias }}</span>
                         <span class="text-xs text-gray-400">Impacto G/A</span>
@@ -67,8 +73,10 @@
             <div class="lg:col-span-1 space-y-6">
 
                 {{-- Bloque de Rendimiento Avanzado (ACTUALIZADO CON TASA DE VICTORIA Y PJ) --}}
-                <div class="card p-4 shadow-xl">
-                    <h4 class="text-xl font-bold mb-3 text-primary">Rendimiento y Frecuencia</h4>
+                {{-- MEJORA: "Glassmorphism" para la tarjeta --}}
+                <div class="bg-card-bg/80 backdrop-blur-lg border border-white/10 p-4 shadow-xl rounded-lg">
+                    {{-- MEJORA: Título con gradiente --}}
+                    <h4 class="text-xl font-bold mb-3 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">Rendimiento y Frecuencia</h4>
                     <div class="space-y-3">
                         <p class="text-gray-300 flex justify-between">
                             Partidos Jugados (Equipo): <span class="font-bold text-gray-300">{{ $pj }}</span>
@@ -77,7 +85,7 @@
                             Tasa de Victoria (Equipo): <span
                                 class="font-bold text-green-400">{{ $winRateWithPlayer }}%</span>
                         </p>
-                        <p class="text-gray-300 flex justify-between border-t border-gray-700 pt-3 mt-3">
+                        <p class="text-gray-300 flex justify-between border-t border-white/10 pt-3 mt-3">
                             Goles Promedio/PJ: <span class="font-bold text-red-400">{{ $gpjRatio }}</span>
                         </p>
                         <p class="text-gray-300 flex justify-between">
@@ -90,8 +98,10 @@
                     </div>
                 </div>
 
-                <div class="card p-4 shadow-xl">
-                    <h4 class="text-xl font-bold mb-3 text-secondary">Récords de Anotación</h4>
+                {{-- MEJORA: "Glassmorphism" para la tarjeta --}}
+                <div class="bg-card-bg/80 backdrop-blur-lg border border-white/10 p-4 shadow-xl rounded-lg">
+                    {{-- MEJORA: Título con gradiente --}}
+                    <h4 class="text-xl font-bold mb-3 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">Récords de Anotación</h4>
                     <div class="space-y-3 text-sm">
 
                         <p class="text-gray-300 flex justify-between">
@@ -108,13 +118,13 @@
                         <p class="text-gray-300 flex justify-between">
                             Manita (5 Goles): <span class="font-bold text-primary">{{ $goalRecords['manita'] }}</span>
                         </p>
-                        <p class="text-gray-300 flex justify-between border-t border-gray-700 pt-3 mt-3">
+                        <p class="text-gray-300 flex justify-between border-t border-white/10 pt-3 mt-3">
                             Más de 5 Goles: <span class="font-bold text-white">{{ $goalRecords['mas_cinco'] }}</span>
                         </p>
                     </div>
                     {{-- ✅ NUEVA SECCIÓN: Desglose de Goles por Tipo --}}
                     @if ($goalsByType->isNotEmpty())
-                        <div class="border-t border-gray-700 pt-4 mt-4">
+                        <div class="border-t border-white/10 pt-4 mt-4">
                             <h5 class="text-sm font-semibold text-gray-400 mb-2">Desglose de Goles</h5>
                             <div class="space-y-3 text-sm">
                                 @foreach ($goalsByType as $type => $count)
@@ -140,8 +150,10 @@
                 </div>
 
                 {{-- ⬇️ NUEVO BLOQUE: EFICIENCIA Y DISCIPLINA ⬇️ --}}
-                <div class="card p-4 shadow-xl">
-                    <h4 class="text-xl font-bold mb-3 text-secondary">Eficiencia y Disciplina</h4>
+                {{-- MEJORA: "Glassmorphism" para la tarjeta --}}
+                <div class="bg-card-bg/80 backdrop-blur-lg border border-white/10 p-4 shadow-xl rounded-lg">
+                    {{-- MEJORA: Título con gradiente --}}
+                    <h4 class="text-xl font-bold mb-3 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">Eficiencia y Disciplina</h4>
                     <div class="space-y-3">
                         <p class="text-gray-300 flex justify-between">
                             Participación en Goles: <span class="font-bold text-primary">{{ $participationRate }}%</span>
@@ -153,7 +165,7 @@
                             </p>
                         @endif
 
-                        <p class="text-gray-300 flex justify-between border-t border-gray-700 pt-3 mt-3">
+                        <p class="text-gray-300 flex justify-between border-t border-white/10 pt-3 mt-3">
                             Total Tarjetas Amarillas: <span
                                 class="font-bold text-yellow-300">{{ $jugador->amarillas }}</span>
                         </p>
@@ -164,13 +176,13 @@
                             Puntuación Disciplinaria: <span class="font-bold text-red-400">{{ $disciplineScore }}
                                 Pts</span>
                         </p>
-                        {{-- Evento	Multiplicador (Peso)	Razón
-                        Goles	+3	La contribución más alta al resultado.
-                        Asistencias	+2	Contribución ofensiva directa.
-                        Paradas	+0.5	Contribución defensiva (impacto moderado).
-                        Tarjeta Roja	-3	Máxima penalización disciplinaria (deja al equipo con 10).
-                        Tarjeta Amarilla	-1	Penalización disciplinaria leve. --}}
-                        <p class="text-gray-300 flex justify-between border-t border-gray-700 pt-3 mt-3">
+                        {{-- Evento Multiplicador (Peso)    Razón
+                        Goles   +3  La contribución más alta al resultado.
+                        Asistencias +2  Contribución ofensiva directa.
+                        Paradas +0.5    Contribución defensiva (impacto moderado).
+                        Tarjeta Roja    -3  Máxima penalización disciplinaria (deja al equipo con 10).
+                        Tarjeta Amarilla    -1  Penalización disciplinaria leve. --}}
+                        <p class="text-gray-300 flex justify-between border-t border-white/10 pt-3 mt-3">
                             <span class="flex items-center space-x-1">
                                 Puntuación MVP Total
                                 <div class="tooltip-container">
@@ -200,8 +212,10 @@
             </div>
 
             {{-- Columna 2: LISTA DE EVENTOS RECIENTES (Historial de Partidos) --}}
-            <div class="lg:col-span-2 card p-4 shadow-xl">
-                <h3 class="text-2xl font-bold mb-4 text-primary">Historial de Eventos Recientes</h3>
+            {{-- MEJORA: "Glassmorphism" para la tarjeta --}}
+            <div class="lg:col-span-2 bg-card-bg/80 backdrop-blur-lg border border-white/10 p-4 shadow-xl rounded-lg">
+                {{-- MEJORA: Título con gradiente --}}
+                <h3 class="text-2xl font-bold mb-4 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">Historial de Eventos Recientes</h3>
                 <p class="text-sm text-gray-500 mb-4">Muestra los últimos 10 eventos registrados por el jugador.</p>
 
                 <div class="space-y-3">
@@ -226,19 +240,17 @@
                                 default => ucfirst($event->tipo_evento),
                             };
 
-                            // ⬇️ ASIGNACIÓN DEL COLOR DE FONDO POR TIPO DE EVENTO ⬇️
+                            // ⬇️ MEJORA: ASIGNACIÓN DE COLOR "GLASS" POR TIPO DE EVENTO ⬇️
                             $eventBgColor = match ($event->tipo_evento) {
                                 'gol' => match (strtolower($event->goal_type ?? '')) {
-                                    // ✅ CASO ESPECIAL: Si es gol 'en contra', usa un color distintivo (ej. morado)
-                                    'en contra' => 'bg-purple-900/50 border-purple-500',
-                                    // Para cualquier otro tipo de gol, usa el color verde normal
-                                    default => 'bg-green-800/50 border-green-400',
+                                    'en contra' => 'bg-purple-500/20 border-purple-500', // Gol en contra
+                                    default => 'bg-green-500/20 border-green-500', // Gol normal
                                 },
-                                'asistencia' => 'bg-yellow-800/40 border-yellow-400', // Amarillo para Asistencia
-                                'parada' => 'bg-blue-800/40 border-blue-400', // Azul para Paradas
-                                'amarilla' => 'bg-orange-900/40 border-yellow-500', // Naranja/Amarillo para Amarilla
-                                'roja' => 'bg-red-900/40 border-red-500', // Rojo Oscuro para Roja
-                                default => 'bg-gray-800/60 border-gray-600',
+                                'asistencia' => 'bg-yellow-500/20 border-yellow-500', // Asistencia
+                                'parada' => 'bg-blue-500/20 border-blue-500', // Paradas
+                                'amarilla' => 'bg-yellow-600/20 border-yellow-600', // Amarilla
+                                'roja' => 'bg-red-500/20 border-red-500', // Roja
+                                default => 'bg-gray-700/20 border-gray-600',
                             };
 
                             $score = "{$p->goles_local} - {$p->goles_visitante}";
@@ -248,7 +260,8 @@
                                     : $p->localTeam->nombre;
                         @endphp
 
-                        <div class="flex justify-between items-center p-3 rounded-lg border-l-4 {{ $eventBgColor }}">
+                        {{-- MEJORA: Añadido backdrop-blur-sm al item --}}
+                        <div class="flex justify-between items-center p-3 rounded-lg border-l-4 {{ $eventBgColor }} backdrop-blur-sm">
                             <div class="flex-grow">
                                 <span class="font-semibold text-white block">{{ $eventText }}
                                     ({{ $event->minuto }}')

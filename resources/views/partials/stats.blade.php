@@ -25,23 +25,27 @@
 @endphp
 
 
-<h2 class="text-3xl font-bold text-white mb-4">Líderes de la Liga</h2>
+{{-- MEJORA: Título con gradiente --}}
+<h2 class="text-3xl font-bold mb-4 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+    Líderes de la Liga
+</h2>
 
 {{-- ---------------------------------------------------- --}}
 {{-- 1. TABS: Toggle between Scorers, Assists, and Keepers --}}
 {{-- ---------------------------------------------------- --}}
-<div class="flex space-x-4 mb-8 border-b border-gray-700">
+{{-- MEJORA: Tabs estilo "Píldora" (Pills) --}}
+<div class="flex space-x-2 sm:space-x-4 mb-8">
     <a href="{{ route('home', ['view' => 'stats', 'stat' => 'scorers']) }}"
-        class="py-2 px-4 font-semibold transition duration-200 {{ $activeStat === 'scorers' ? 'text-red-400 border-b-2 border-red-400' : 'text-gray-400 hover:text-white' }}">
-        Top Goleadores
+        class="py-2 px-4 font-semibold transition-all duration-300 rounded-md {{ $activeStat === 'scorers' ? 'bg-gradient-to-r from-primary to-emerald-600 text-white shadow-lg shadow-primary/30' : 'text-gray-400 hover:text-white hover:bg-white/10' }}">
+        Goleadores
     </a>
     <a href="{{ route('home', ['view' => 'stats', 'stat' => 'assists']) }}"
-        class="py-2 px-4 font-semibold transition duration-200 {{ $activeStat === 'assists' ? 'text-yellow-400 border-b-2 border-yellow-400' : 'text-gray-400 hover:text-white' }}">
-        Top Asistentes
+        class="py-2 px-4 font-semibold transition-all duration-300 rounded-md {{ $activeStat === 'assists' ? 'bg-gradient-to-r from-primary to-emerald-600 text-white shadow-lg shadow-primary/30' : 'text-gray-400 hover:text-white hover:bg-white/10' }}">
+        Asistentes
     </a>
     <a href="{{ route('home', ['view' => 'stats', 'stat' => 'keepers']) }}"
-        class="py-2 px-4 font-semibold transition duration-200 {{ $activeStat === 'keepers' ? 'text-blue-400 border-b-2 border-blue-400' : 'text-gray-400 hover:text-white' }}">
-        Top Porteros
+        class="py-2 px-4 font-semibold transition-all duration-300 rounded-md {{ $activeStat === 'keepers' ? 'bg-gradient-to-r from-primary to-emerald-600 text-white shadow-lg shadow-primary/30' : 'text-gray-400 hover:text-white hover:bg-white/10' }}">
+        Porteros
     </a>
 </div>
 
@@ -60,13 +64,30 @@
                     : ($activeStat === 'assists'
                         ? $player->asistencias
                         : $player->paradas);
-            $cardColor = $rank === 1 ? 'border-primary' : ($rank === 2 ? 'border-secondary' : 'border-gray-500');
-            $posColor = $rank === 1 ? 'text-primary' : ($rank === 2 ? 'text-secondary' : 'text-gray-400');
-            $backgroundColor = $rank === 1 ? 'bg-primary/20' : ($rank === 2 ? 'bg-secondary/20' : 'bg-gray-700/50');
+            
+            // Lógica de Estilos del Podio
+            $cardColor = 'border-gray-500';
+            $posColor = 'text-gray-400';
+            $backgroundColor = 'bg-gray-700/50';
+            $podiumClass = 'hover:md:-translate-y-1'; // Efecto hover sutil para 2 y 3
+
+            if ($rank === 1) {
+                $cardColor = 'border-primary';
+                $posColor = 'text-primary';
+                $backgroundColor = 'bg-primary/20';
+                // MEJORA: Clase para elevar y dar brillo al #1
+                $podiumClass = 'md:-translate-y-4 shadow-glow hover:md:-translate-y-6';
+            } elseif ($rank === 2) {
+                $cardColor = 'border-secondary';
+                $posColor = 'text-secondary';
+                $backgroundColor = 'bg-secondary/20';
+            }
+
         @endphp
 
+        {{-- MEJORA: Añadida transition-transform y la clase $podiumClass --}}
         <div
-            class="card p-3 sm:p-4 flex justify-between items-center border-b-4 {{ $cardColor }} shadow-xl {{ $backgroundColor }}">
+            class="card p-3 sm:p-4 flex justify-between items-center border-b-4 {{ $cardColor }} shadow-xl {{ $backgroundColor }} transition-all duration-300 {{ $podiumClass }}">
 
             {{-- SECCIÓN IZQUIERDA: Rank, Info y FOTO --}}
             <div class="flex items-center space-x-3">
@@ -109,11 +130,14 @@
 {{-- 3. DETAILED LIST (Rank 4 en adelante) --}}
 {{-- ---------------------------------------------------- --}}
 @if ($currentList->isNotEmpty())
-    <div class="bg-card-bg rounded-lg overflow-hidden shadow-xl">
+    {{-- MEJORA: "Glassmorphism" para la tabla --}}
+    <div
+        class="bg-card-bg/80 backdrop-blur-lg rounded-lg overflow-hidden shadow-xl border border-white/10">
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-white/5 text-sm">
                 <thead>
-                    <tr class="text-left text-xs font-semibold uppercase tracking-wider text-gray-400 bg-gray-800">
+                    {{-- MEJORA: Header de tabla un poco más nítido --}}
+                    <tr class="text-left text-xs font-semibold uppercase tracking-wider text-gray-400 bg-gray-900/50">
                         <th class="py-3 px-4 w-1/12">Rank</th>
                         <th class="py-3 px-4 w-5/12">Jugador</th>
                         <th class="py-3 px-4 text-center hidden sm:table-cell">PJ</th>
@@ -133,7 +157,7 @@
                                         : $player->paradas);
                             $matchesPlayed = $player->equipo->partidos_jugados ?? 0;
                         @endphp
-                        <tr class="hover:bg-white/5 transition duration-150">
+                        <tr class="hover:bg-white/10 transition duration-150">
                             <td class="py-3 px-4 text-center font-bold text-white/70">{{ $rank }}</td>
                             <td class="py-3 px-4">
                                 <a href="{{ route('player.profile', $player->id) }}"

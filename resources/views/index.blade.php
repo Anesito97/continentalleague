@@ -13,8 +13,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;700;900&amp;display=swap"
         rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+        xintegrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <script>
@@ -37,6 +40,10 @@
                         xl: "1rem",
                         full: "9999px",
                     },
+                    // NUEVO: Añadimos una sombra de "glow"
+                    boxShadow: {
+                        'glow': '0 0 15px 0 rgba(16, 185, 129, 0.4)', // Sombra con color primario
+                    }
                 },
             },
         };
@@ -74,8 +81,10 @@
 
         /* Adaptación de colores y fuente base */
         body {
+            /* MEJORA: Fondo con gradiente radial sutil para dar profundidad */
             background-color: #111827;
             /* dark-bg */
+            background-image: radial-gradient(ellipse at top center, #232a3b 0%, #111827 70%);
             font-family: 'Lexend', sans-serif;
             color: #e5e7eb;
         }
@@ -84,14 +93,16 @@
         .card {
             background-color: #1f2937;
             border-radius: 0.75rem;
-            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.5);
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            /* MEJORA: Sombra más oscura y borde más nítido */
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.08);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
         .card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 15px 20px rgba(0, 0, 0, 0.7);
+            transform: translateY(-5px);
+            /* MEJORA: Sombra de "glow" al pasar el ratón */
+            box-shadow: 0 15px 25px rgba(0, 0, 0, 0.7), 0 0 20px rgba(16, 185, 129, 0.3);
         }
 
         /* Iconos de Material Symbols (Para que se vean rellenos) */
@@ -124,7 +135,10 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: #111827;
+            /* MEJORA: Efecto cristal para el loader */
+            background-color: rgba(17, 24, 39, 0.8);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             z-index: 9999;
             display: flex;
             justify-content: center;
@@ -146,7 +160,10 @@
 
         .spinner {
             border: 4px solid rgba(255, 255, 255, 0.2);
-            border-top: 4px solid #10b981;
+            /* MEJORA: Gradiente para el spinner */
+            border-top-color: transparent;
+            border-left-color: #10b981;
+            border-right-color: #10b981;
             border-radius: 50%;
             width: 50px;
             height: 50px;
@@ -162,6 +179,36 @@
                 transform: rotate(360deg);
             }
         }
+
+        /* --- TOQUE ESPECIAL: Borde animado para Modales --- */
+        .modal-card-glow {
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .modal-card-glow::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -50%; /* Empezar fuera de la vista */
+            width: 100%;
+            height: 3px; /* Grosor del brillo */
+            background: linear-gradient(90deg, transparent, #10b981, #3b82f6, transparent);
+            animation: anim-glow 4s linear infinite;
+            box-shadow: 0 0 10px #10b981;
+        }
+
+        @keyframes anim-glow {
+            0% {
+                transform: translateX(-100%);
+            }
+            100% {
+                transform: translateX(200%); /* Moverse a través y salir */
+            }
+        }
+        /* --- Fin del Toque Especial --- */
+
 
         .swiper-button-prev,
         .swiper-button-next {
@@ -282,7 +329,9 @@
     <div id="app-container" class="flex flex-col sm:flex-row min-h-screen">
 
         {{-- ⬇️ HEADER MÓVIL (VISIBLE SÓLO EN PANTALLA PEQUEÑA) ⬇️ --}}
-        <header class="w-full bg-gray-800 shadow-xl sm:hidden sticky top-0 z-20">
+        {{-- MEJORA: "Glassmorphism" (efecto cristal) para el header pegajoso --}}
+        <header
+            class="w-full bg-gray-900/80 backdrop-blur-lg border-b border-white/10 shadow-xl sm:hidden sticky top-0 z-20">
             <div class="flex justify-between items-center px-4 py-3">
                 {{-- Título --}}
                 <div class="flex items-center space-x-3">
@@ -346,8 +395,11 @@
     @include('partials.alerts')
 
     {{-- MODAL DE LOGIN (AÑADIDO CONTENIDO FALTANTE para solucionar la opacidad) --}}
-    <div id="login-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 z-50 hidden items-center justify-center">
-        <div class="bg-gray-800 card p-6 w-11/12 max-w-sm border-t-4 border-green-500 shadow-2xl hover:transform-none">
+    {{-- MEJORA: Fondo del modal con efecto blur --}}
+    <div id="login-modal"
+        class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+        {{-- MEJORA: Tarjeta con borde animado (ver CSS) --}}
+        <div class="bg-gray-800 card p-6 w-11/12 max-w-sm shadow-2xl hover:transform-none modal-card-glow">
             <h4 class="text-xl font-bold mb-4 text-green-400">Acceso de Administrador</h4>
 
             <form method="POST" action="{{ route('login') }}">
@@ -355,40 +407,63 @@
                 <div class="mb-4">
                     <label for="login-username" class="block text-sm font-medium text-gray-400">Usuario</label>
                     <input type="text" name="username" id="login-username" required
-                        class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white">
+                        class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:border-primary focus:ring-primary">
                 </div>
                 <div class="mb-6">
                     <label for="login-password" class="block text-sm font-medium text-gray-400">Contraseña</label>
                     <input type="password" name="password" id="login-password" required
-                        class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white">
+                        class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:border-primary focus:ring-primary">
                 </div>
+                {{-- MEJORA: Botón con gradiente, sombra y efecto hover --}}
                 <button type="submit"
-                    class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition w-full mb-3">
+                    class="bg-gradient-to-r from-primary to-emerald-600 hover:from-primary/90 hover:to-emerald-600/90 text-white font-bold py-2 px-4 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-glow mb-3 w-full">
                     Iniciar Sesión
                 </button>
             </form>
+            {{-- MEJORA: Botón de cancelar más sutil --}}
             <button onclick="document.getElementById('login-modal').classList.add('hidden')"
-                class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg transition w-full">Cancelar</button>
+                class="bg-gray-700 hover:bg-gray-600 text-gray-300 font-bold py-2 px-4 rounded-lg transition w-full">Cancelar</button>
         </div>
     </div>
 
     {{-- MODAL GENÉRICO DE EDICIÓN (Placeholder) --}}
-    <div id="edit-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 z-50 hidden items-center justify-center">
+    <div id="edit-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
     </div>
 
     {{-- ⬇️ MODAL LIGHTBOX PARA VISUALIZACIÓN DE IMAGEN ⬇️ --}}
-    <div id="lightbox-modal"
-        class="fixed inset-0 bg-black/90 z-[10000] hidden items-center justify-center cursor-pointer"
+    {{-- MEJORA: Fondo del lightbox con más blur --}}
+    <!-- <div id="lightbox-modal"
+        class="fixed inset-0 bg-black/80 backdrop-blur-md z-[10000] hidden items-center justify-center cursor-pointer p-4"
         onclick="closeLightbox()">
         <div class="relative max-w-full max-h-full">
             <img id="lightbox-image" src="" alt="Imagen Ampliada"
-                class="max-w-full max-h-screen object-contain">
+                class="max-w-full max-h-screen object-contain rounded-lg shadow-2xl">
             <div id="lightbox-caption" class="text-white text-center p-3 absolute bottom-0 w-full bg-black/50"></div>
         </div>
-    </div>
+    </div> -->
 
 
     {{-- 4. SCRIPTS FINALES (Toggle de Sidebar y Manejo de Loader) --}}
+    <script src="https://cdn.jsdelivr.net/npm/glightbox/dist/js/glightbox.min.js"></script>
+    <script>
+        // Espera a que el documento esté listo
+        document.addEventListener('DOMContentLoaded', (event) => {
+            // Inicializa GLightbox
+            const lightbox = GLightbox({
+                selector: '.glightbox',
+                touchNavigation: true,
+                loop: true,
+                zoomable: true,
+                download: true,
+                openEffect: 'zoom',
+                closeEffect: 'fade',
+                description: {
+                    position: 'bottom',
+                    moreText: false 
+                }
+            });
+        });
+    </script>
     <script>
         // Lógica del Loader
         document.addEventListener('DOMContentLoaded', function() {
@@ -496,26 +571,47 @@
         });
 
         // ⬇️ FUNCIONES DE LIGHTBOX ⬇️
-        function openLightbox(imageUrl, title) {
-            document.getElementById('lightbox-image').src = imageUrl;
-            document.getElementById('lightbox-caption').textContent = title;
-            document.getElementById('lightbox-modal').classList.add('flex');
-            document.getElementById('lightbox-modal').classList.remove('hidden');
-            document.body.classList.add('overflow-hidden'); // Bloquear scroll
+        // function openLightbox(imageUrl, title) {
+        //     document.getElementById('lightbox-image').src = imageUrl;
+        //     document.getElementById('lightbox-caption').textContent = title;
+        //     document.getElementById('lightbox-modal').classList.add('flex');
+        //     document.getElementById('lightbox-modal').classList.remove('hidden');
+        //     document.body.classList.add('overflow-hidden'); // Bloquear scroll
+        // }
+
+        // function closeLightbox() {
+        //     document.getElementById('lightbox-modal').classList.add('hidden');
+        //     document.getElementById('lightbox-modal').classList.remove('flex');
+        //     document.body.classList.remove('overflow-hidden'); // Restaurar scroll
+        // }
+
+        // // Escucha la tecla ESC para cerrar
+        // document.addEventListener('keydown', function(e) {
+        //     if (e.key === "Escape") {
+        //         closeLightbox();
+        //     }
+        // });
+
+        // ⬇️ FUNCIONES PARA EL MODAL DE BORRADO ⬇️
+        function openDeleteModal(button) {
+            // 1. Obtenemos la URL del botón que fue presionado
+            const url = button.getAttribute('data-url');
+            
+            // 2. Asignamos esa URL al 'action' del formulario en el modal
+            document.getElementById('delete-form').action = url;
+            
+            // 3. Mostramos el modal
+            const modal = document.getElementById('delete-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
         }
 
-        function closeLightbox() {
-            document.getElementById('lightbox-modal').classList.add('hidden');
-            document.getElementById('lightbox-modal').classList.remove('flex');
-            document.body.classList.remove('overflow-hidden'); // Restaurar scroll
+        function closeDeleteModal() {
+            // Ocultamos el modal
+            const modal = document.getElementById('delete-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
         }
-
-        // Escucha la tecla ESC para cerrar
-        document.addEventListener('keydown', function(e) {
-            if (e.key === "Escape") {
-                closeLightbox();
-            }
-        });
     </script>
 
 </body>

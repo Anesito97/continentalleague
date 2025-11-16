@@ -14,7 +14,10 @@
 
 @include('partials.news_slider', ['newsItems' => $newsItems])
 
-<h2 class="text-3xl font-bold mb-6">Resumen de la Liga</h2>
+{{-- MEJORA: Título con gradiente --}}
+<h2 class="text-3xl font-bold mb-6 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+    Resumen de la Liga
+</h2>
 
 @if ($nextMatch)
     @php
@@ -45,7 +48,9 @@
     <h3 class="text-2xl font-bold mb-4 mt-8">Próximo Gran Duelo | Jornada {{ $nextMatch->jornada }}</h3>
 
     <div class="flex justify-center">
-        <div class="card max-w-4xl w-full p-4 sm:p-6 shadow-2xl transition duration-500 hover:translate-y-0">
+        {{-- MEJORA: "Glassmorphism" y "glow" para la tarjeta principal --}}
+        <div
+            class="card bg-card-bg/80 backdrop-blur-lg border border-white/10 max-w-4xl w-full p-4 sm:p-6 shadow-2xl transition duration-500 hover:translate-y-0 hover:shadow-glow">
 
             {{-- ⬇️ 1. CONTENEDOR PRINCIPAL DEL DUELO (FLEX-ROW) ⬇️ --}}
             <div class="flex flex-row items-start justify-between space-x-2">
@@ -54,9 +59,10 @@
                 <div class="flex flex-col items-center w-5/12 text-center flex-shrink-0">
                     <a href="{{ route('team.profile', $nextMatch->localTeam->id) }}"
                         class="flex flex-col items-center hover:opacity-90 transition">
+                        {{-- MEJORA: Borde y sombra más nítidos --}}
                         <img src="{{ $nextMatch->localTeam->escudo_url ?? 'https://placehold.co/100x100/1f2937/FFFFFF?text=LOCAL' }}"
                             alt="Logo Local"
-                            class="w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover border-4 border-primary/50 mb-1" />
+                            class="w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover border-4 border-primary shadow-md shadow-primary/50 mb-1" />
                         <span
                             class="text-sm sm:text-xl font-extrabold text-white overflow-hidden whitespace-nowrap max-w-full">{{ $nextMatch->localTeam->nombre }}</span>
                         <span class="text-[10px] text-gray-400">Local</span>
@@ -74,9 +80,10 @@
                 <div class="flex flex-col items-center w-5/12 text-center flex-shrink-0">
                     <a href="{{ route('team.profile', $nextMatch->visitorTeam->id) }}"
                         class="flex flex-col items-center hover:opacity-90 transition">
+                        {{-- MEJORA: Borde y sombra más nítidos --}}
                         <img src="{{ $nextMatch->visitorTeam->escudo_url ?? 'https://placehold.co/100x100/1f2937/FFFFFF?text=VISIT' }}"
                             alt="Logo Visitante"
-                            class="w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover border-4 border-secondary/50 mb-1" />
+                            class="w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover border-4 border-secondary shadow-md shadow-secondary/50 mb-1" />
                         <span
                             class="text-sm sm:text-xl font-extrabold text-white overflow-hidden whitespace-nowrap max-w-full">{{ $nextMatch->visitorTeam->nombre }}</span>
                         <span class="text-[10px] text-gray-400">Visitante</span>
@@ -208,11 +215,14 @@
 {{-- 2. TABLA DE CLASIFICACIÓN RÁPIDA (Adaptada) --}}
 {{-- ---------------------------------------------------- --}}
 <h3 class="text-2xl font-bold mb-4">Clasificación</h3>
-<div class="bg-card-bg rounded-lg shadow-xl overflow-hidden mb-8">
+{{-- MEJORA: "Glassmorphism" para la tabla --}}
+<div
+    class="bg-card-bg/80 backdrop-blur-lg rounded-lg shadow-xl overflow-hidden mb-8 border border-white/10">
     <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-700">
+        <table class="min-w-full divide-y divide-white/5">
             <thead>
-                <tr class="text-left text-xs font-semibold uppercase tracking-wider text-gray-400 bg-gray-800">
+                {{-- MEJORA: Header de tabla translúcido --}}
+                <tr class="text-left text-xs font-semibold uppercase tracking-wider text-gray-400 bg-gray-900/50">
                     <th class="py-3 px-2">#</th>
                     <th class="py-3 px-2">Equipo</th>
                     <th class="py-3 px-2 text-center">Ptos</th>
@@ -226,7 +236,7 @@
                     <th class="py-3 px-2 text-center">Forma</th>
                 </tr>
             </thead>
-            <tbody id="standings-body" class="divide-y divide-gray-800 text-sm">
+            <tbody id="standings-body" class="divide-y divide-white/5 text-sm">
                 @forelse($teams as $index => $team)
                     @php
                         $positionClass = '';
@@ -249,7 +259,8 @@
                         $goalDiff = $team->goles_a_favor - $team->goles_en_contra;
                     @endphp
 
-                    <tr class="hover:bg-gray-700 transition {{ $positionClass }}">
+                    {{-- MEJORA: Hover más sutil --}}
+                    <tr class="hover:bg-white/10 transition {{ $positionClass }}">
                         <td class="py-3 px-2 font-bold">{{ $index + 1 }}</td>
                         <td class="py-3 px-2">
                             <a href="{{ route('team.profile', $team->id) }}"
@@ -297,35 +308,36 @@
 {{-- ---------------------------------------------------- --}}
 <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
 
-    {{-- Equipos Participantes --}}
-    <div class="bg-card-bg rounded-lg p-6 flex flex-col items-center justify-center text-center shadow-lg">
+    {{-- MEJORA: Aplicada la clase .card global --}}
+    <div class="card p-6 flex flex-col items-center justify-center text-center">
         <span class="material-symbols-outlined text-secondary text-5xl mb-2">group</span>
         <p class="text-white/70 text-sm">Equipos</p>
         <p class="text-3xl font-bold">{{ $totalTeams }}</p>
     </div>
 
-    {{-- Partidos Jugados --}}
-    <div class="bg-card-bg rounded-lg p-6 flex flex-col items-center justify-center text-center shadow-lg">
+    {{-- MEJORA: Aplicada la clase .card global --}}
+    <div class="card p-6 flex flex-col items-center justify-center text-center">
         <span class="material-symbols-outlined text-primary text-5xl mb-2">sports_soccer</span>
         <p class="text-white/70 text-sm">Partidos Jugados</p>
         <p class="text-3xl font-bold">{{ round($totalMatches) }}</p>
     </div>
 
-    {{-- Goles Totales --}}
-    <div class="bg-card-bg rounded-lg p-6 flex flex-col items-center justify-center text-center shadow-lg">
+    {{-- MEJORA: Aplicada la clase .card global --}}
+    <div class="card p-6 flex flex-col items-center justify-center text-center">
         <span class="material-symbols-outlined text-red-500 text-5xl mb-2">flare</span>
         <p class="text-white/70 text-sm">Goles Totales</p>
         <p class="text-3xl font-bold">{{ $totalGoals }}</p>
     </div>
 
-    {{-- Goles por partido --}}
-    <div class="bg-card-bg rounded-lg p-6 flex flex-col items-center justify-center text-center shadow-lg">
+    {{-- MEJORA: Aplicada la clase .card global --}}
+    <div class="card p-6 flex flex-col items-center justify-center text-center">
         <span class="material-symbols-outlined text-yellow-500 text-5xl mb-2">trending_up</span>
         <p class="text-white/70 text-sm">Goles Promedio<br>por Partido</p>
         <p class="text-3xl font-bold">{{ $avgGoals ?? 0 }}</p>
     </div>
 
-    <div class="bg-card-bg rounded-lg p-6 flex flex-col items-center justify-center text-center shadow-lg">
+    {{-- MEJORA: Aplicada la clase .card global --}}
+    <div class="card p-6 flex flex-col items-center justify-center text-center">
         <span class="material-symbols-outlined text-purple-400 text-5xl mb-2">star_rate</span>
         <p class="text-white/70 text-sm">Jugador Más Influyente</p>
 
@@ -345,7 +357,8 @@
         @endif
     </div>
 
-    <div class="bg-card-bg rounded-lg p-6 flex flex-col items-center justify-center text-center shadow-lg">
+    {{-- MEJORA: Aplicada la clase .card global --}}
+    <div class="card p-6 flex flex-col items-center justify-center text-center">
         <span class="material-symbols-outlined text-blue-400 text-5xl mb-2">handshake</span>
         <p class="text-white/70 text-sm">Equipo Más Limpio</p>
         @php
@@ -358,7 +371,8 @@
         @endif
     </div>
 
-    <div class="bg-card-bg rounded-lg p-6 flex flex-col items-center justify-center text-center shadow-lg">
+    {{-- MEJORA: Aplicada la clase .card global --}}
+    <div class="card p-6 flex flex-col items-center justify-center text-center">
         <span class="material-symbols-outlined text-primary text-5xl mb-2">shield</span>
         <p class="text-white/70 text-sm">Muro Defensivo</p>
         @if ($bestDefenseTeam)
@@ -369,7 +383,8 @@
         @endif
     </div>
 
-    <div class="bg-card-bg rounded-lg p-6 flex flex-col items-center justify-center text-center shadow-lg">
+    {{-- MEJORA: Aplicada la clase .card global --}}
+    <div class="card p-6 flex flex-col items-center justify-center text-center">
         <span class="material-symbols-outlined text-red-500 text-5xl mb-2">rocket_launch</span>
         <p class="text-white/70 text-sm">Ataque Más Potente</p>
         @if ($mostOffensiveTeam)
@@ -402,8 +417,9 @@
         @endphp
 
         <a href="{{ route('team.profile', $team->id) }}" class="block">
+            {{-- MEJORA: "Glassmorphism" para las tarjetas de análisis --}}
             <div
-                class="bg-card-bg rounded-lg p-5 flex flex-col shadow-xl border border-primary/20 
+                class="bg-card-bg/80 backdrop-blur-lg rounded-lg p-5 flex flex-col shadow-xl border border-primary/20 
                         transform hover:scale-[1.03] transition duration-200 relative overflow-hidden">
 
                 {{-- ⬇️ 1. CABECERA PRINCIPAL (Nombre, Logo y Rank) ⬇️ --}}
@@ -520,7 +536,8 @@
             </span>
             <span>Jugadores Lesionados</span>
         </h3>
-        <div class="bg-card-bg rounded-lg shadow-xl p-4 border border-red-500/30">
+        {{-- MEJORA: "Glassmorphism" para la tarjeta de lesionados --}}
+        <div class="bg-card-bg/80 backdrop-blur-lg rounded-lg shadow-xl p-4 border border-red-500/30">
             {{-- ✨ MEJORA: Se convierte en una cuadrícula para mejor visualización --}}
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-[450px] overflow-y-auto pr-2">
                 @foreach ($injuredPlayers as $player)
@@ -556,14 +573,15 @@
             <i class="fa-solid fa-shield-heart text-green-500"></i>
             <span>Estado de la Plantilla</span>
         </h3>
-        <div class="bg-card-bg rounded-lg shadow-xl p-8 border border-green-500/30 text-center">
+        {{-- MEJORA: "Glassmorphism" para la tarjeta de "enfermería vacía" --}}
+        <div class="bg-card-bg/80 backdrop-blur-lg rounded-lg shadow-xl p-8 border border-green-500/30 text-center">
             <div class="flex flex-col items-center">
                 <i class="fa-solid fa-shield-heart text-green-400 text-6xl mb-4 animate-pulse"></i>
                 <h4 class="text-xl font-bold text-white">¡Enfermería Vacía!</h4>
                 <p class="text-gray-400 mt-2">
                     ¡Buenas noticias! El fisio está de vacaciones. <br class="hidden sm:block">
                     Todos los jugadores están en plena forma y listos para jugar.
-                </p>
+                </abp>
             </div>
         </div>
     @endif

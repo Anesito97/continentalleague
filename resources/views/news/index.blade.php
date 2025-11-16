@@ -2,20 +2,23 @@
 
 @section('content')
     <div class="max-w-7xl mx-auto py-8 w-full">
-        <h2 class="text-3xl font-bold text-white mb-6 border-b border-primary pb-2 flex items-center">
+        {{-- MEJORA: Título con gradiente --}}
+        <h2 class="text-3xl font-bold text-white mb-6 border-b border-primary pb-2 flex items-center bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
             <span class="material-symbols-outlined mr-3 text-3xl text-primary">newspaper</span>
             Noticias de la Liga
         </h2>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             @forelse($news as $article)
-                <div class="card overflow-hidden shadow-xl hover:scale-[1.01] transition duration-300 flex flex-col">
+                {{-- MEJORA: "Glassmorphism" para la tarjeta y efecto "group-hover" --}}
+                <div class="group bg-card-bg/80 backdrop-blur-lg border border-white/10 rounded-lg shadow-xl hover:border-primary/50 transition duration-300 flex flex-col overflow-hidden">
                     
                     {{-- IMAGEN --}}
                     <div class="h-40 overflow-hidden">
                         <img src="{{ $article->imagen_url ?? asset('images/default_news.jpg') }}" 
                              alt="{{ $article->titulo }}" 
-                             class="w-full h-full object-cover">
+                             {{-- MEJORA: Zoom en hover de la tarjeta --}}
+                             class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110">
                     </div>
 
                     {{-- CONTENIDO --}}
@@ -34,13 +37,14 @@
                     </div>
                 </div>
             @empty
-                <div class="md:col-span-3 card p-8 text-center bg-gray-800 shadow-xl">
+                {{-- MEJORA: "Glassmorphism" para el estado vacío --}}
+                <div class="md:col-span-3 bg-card-bg/80 backdrop-blur-lg border border-white/10 rounded-lg p-8 text-center shadow-xl">
                     <h4 class="text-xl text-white/80">No hay noticias publicadas actualmente.</h4>
                 </div>
             @endforelse
         </div>
         
-        {{-- Paginación de Laravel --}}
+        {{-- Paginación de Laravel (Ahora con estilos "premium" desde index.html) --}}
         <div class="mt-8">
             {{ $news->links('pagination::tailwind') }} 
         </div>

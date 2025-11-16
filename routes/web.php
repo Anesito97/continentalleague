@@ -8,6 +8,7 @@ use App\Http\Controllers\MatchController;
 use App\Http\Controllers\PublicController;
 use App\Http\Controllers\NewsAdminController;
 use App\Http\Controllers\VoteController;
+use App\Http\Controllers\GalleryController;
 
 // --- RUTA PÚBLICA / HOME ---
 // Esta ruta carga la vista principal, incluyendo clasificación y estadísticas.
@@ -29,7 +30,7 @@ Route::get('player/{jugador}', [PublicController::class, 'showPlayerProfile'])->
 
 Route::post('vote/{match_id}', [VoteController::class, 'handleVote'])->name('community.vote');
 
-Route::get('gallery', [PublicController::class, 'showGallery'])->name('gallery.index');
+Route::get('images', [GalleryController::class, 'index'])->name('gallery.index');
 
 // --- AUTENTICACIÓN ---
 Route::post('login', [AuthController::class, 'login'])->name('login');
@@ -40,6 +41,11 @@ Route::get('logout', [AuthController::class, 'logout'])->name('logout');
 Route::middleware(\App\Http\Middleware\AdminCheck::class)
     ->prefix('admin') // ⬅️ AÑADIR ESTE PREFIJO
     ->group(function () {
+
+        //SUBIR IMAGENES
+        Route::post('/gallery/upload', [GalleryController::class, 'upload'])->name('gallery.upload');
+        //ELIMINAR IMAGENES
+        Route::delete('/gallery/{item}', [GalleryController::class, 'destroy'])->name('gallery.destroy');
 
         // VISTAS DE RENDERIZADO PRINCIPAL (Para la navegación Admin)
         Route::get('teams', [DashboardController::class, 'adminTeams'])->name('admin.teams');

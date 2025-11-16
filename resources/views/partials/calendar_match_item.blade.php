@@ -1,18 +1,25 @@
 @php
-    $statusColor = $match->estado === 'finalizado' ? 'bg-blue-600' : 'bg-primary';
+    // MEJORA: Lógica de gradientes para el estado
+    $statusGradient = $match->estado === 'finalizado' 
+        ? 'bg-gradient-to-r from-blue-600 to-indigo-700' 
+        : 'bg-gradient-to-r from-primary to-emerald-600';
+
     $score =
         $match->estado === 'finalizado'
             ? "{$match->goles_local} - {$match->goles_visitante}"
             : $match->fecha_hora->format('H:i');
 @endphp
 
-<div class="p-3 bg-gray-800 rounded-lg shadow-md">
+{{-- MEJORA: "Glassmorphism" aplicado a la tarjeta, con borde y hover sutil --}}
+<div
+    class="p-3 bg-card-bg/80 backdrop-blur-lg rounded-lg shadow-xl border border-white/10 transition-colors duration-200 hover:bg-card-bg/90">
 
     {{-- ENCABEZADO DE RESULTADO Y ESTADO --}}
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-2">
 
         {{-- Equipos --}}
-        <span class="font-medium text-white mb-2 sm:mb-0 w-full sm:w-1/2">
+        {{-- MEJORA: Fuente más grande y en negrita para los equipos --}}
+        <span class="font-bold text-lg text-white mb-2 sm:mb-0 w-full sm:w-1/2">
             <img src="{{ $match->localTeam->escudo_url ?? asset('images/placeholder.png') }}"
                 class="w-6 h-6 inline-block rounded-full mr-2">
             {{ $match->localTeam->nombre ?? 'N/A' }} <span class="text-gray-400 font-normal">vs</span>
@@ -23,28 +30,34 @@
 
         {{-- Resultado / Hora / Estado --}}
         <div class="flex items-center space-x-3 text-right">
-            <span class="text-xs font-semibold px-3 py-1 rounded-full {{ $statusColor }} text-white">
+            {{-- MEJORA: Etiqueta con gradiente y sombra --}}
+            <span class="text-xs font-semibold px-3 py-1 rounded-full {{ $statusGradient }} text-white shadow-md">
                 {{ ucfirst($match->estado) }}
             </span>
-            <span class="text-lg font-bold text-yellow-400">
+            {{-- MEJORA: Marcador/Hora más grande y con color condicional --}}
+            <span
+                class="text-2xl font-extrabold {{ $match->estado === 'finalizado' ? 'text-yellow-400' : 'text-primary' }}">
                 {{ $score }}
             </span>
 
             {{-- Botón de Acción (Admin) --}}
             @if ($match->estado === 'pendiente' && session('is_admin'))
+                {{-- MEJORA: Botón con estética "glassmorphism" --}}
                 <a href="{{ route('admin.finalize-match', ['match_id' => $match->id]) }}"
-                    class="bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded-md text-xs">Finalizar</a>
+                    class="bg-red-600/80 hover:bg-red-600 text-white px-2 py-1 rounded-md text-xs backdrop-blur-sm border border-red-500/50 transition-all">Finalizar</a>
             @endif
         </div>
     </div>
 
     {{-- CUERPO DE EVENTOS DETALLADOS (SOLO SI FINALIZADO) --}}
     @if ($match->estado === 'finalizado')
-        <div class="pt-3 mt-3 border-t border-gray-700">
+        {{-- MEJORA: Borde superior con el color del nuevo tema --}}
+        <div class="pt-3 mt-3 border-t border-white/10">
             <h5 class="text-sm font-semibold text-gray-400 mb-2">Detalle de Eventos</h5>
             <div class="flex text-xs text-gray-400">
                 {{-- Columna Local --}}
-                <div class="w-1/2 pr-2 space-y-1 border-r border-gray-600">
+                {{-- MEJORA: Borde derecho con el color del nuevo tema --}}
+                <div class="w-1/2 pr-2 space-y-1 border-r border-white/10">
                     @php
                         // Un evento es del equipo LOCAL si:
                         // 1. Lo hizo un jugador local Y NO es un gol en contra.
