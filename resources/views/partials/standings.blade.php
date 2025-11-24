@@ -20,7 +20,7 @@
 </h2>
 
 @if ($nextMatch)
-    @php
+    <!-- @php
         // Usamos el historial H2H para la probabilidad simple
         $localTeamId = $nextMatch->localTeam->id;
         $h2hLocalWins = $h2hRecord['G'] ?? 0;
@@ -39,176 +39,165 @@
         $hasVoted = request()->cookie($votedCookieName);
         $votingStartTime = \Carbon\Carbon::parse($nextMatch->fecha_hora)->subHour();
         $isVotingActive = Carbon\Carbon::now()->lt($votingStartTime);
-    @endphp
+    @endphp -->
 
-    {{-- ---------------------------------------------------- --}}
-    {{-- 1. TARJETA DE DUELO DESTACADA (ANALÍTICA Y COMPACTA) --}}
-    {{-- ---------------------------------------------------- --}}
+{{-- ---------------------------------------------------- --}}
+{{-- SLIDER DE PRÓXIMOS DUELOS (3 PARTIDOS)              --}}
+{{-- ---------------------------------------------------- --}}
 
-    <h3 class="text-2xl font-bold mb-4 mt-8">Próximo Gran Duelo | Jornada {{ $nextMatch->jornada }}</h3>
+<h3 class="text-2xl font-bold mb-4 mt-8">Próximos Grandes Duelos</h3>
 
-    <div class="flex justify-center">
-        {{-- MEJORA: "Glassmorphism" y "glow" para la tarjeta principal --}}
-        <div
-            class="card bg-card-bg/80 backdrop-blur-lg border border-white/10 max-w-4xl w-full p-4 sm:p-6 shadow-2xl transition duration-500 hover:translate-y-0 hover:shadow-glow">
+{{-- Contenedor Principal del Slider --}}
+<div class="relative group w-full max-w-4xl mx-auto">
 
-            {{-- ⬇️ 1. CONTENEDOR PRINCIPAL DEL DUELO (FLEX-ROW) ⬇️ --}}
-            <div class="flex flex-row items-start justify-between space-x-2">
+    {{-- Botón Anterior (Izquierda) --}}
+    <button onclick="document.getElementById('match-slider').scrollBy({left: -300, behavior: 'smooth'})"
+        class="absolute left-0 top-1/2 -translate-y-1/2 -ml-4 z-10 bg-gray-800/80 text-white p-2 rounded-full shadow-lg hover:bg-primary transition opacity-0 group-hover:opacity-100 focus:opacity-100 hidden sm:block">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+    </button>
 
-                {{-- 1. EQUIPO LOCAL --}}
-                <div class="flex flex-col items-center w-5/12 text-center flex-shrink-0">
-                    <a href="{{ route('team.profile', $nextMatch->localTeam->id) }}"
-                        class="flex flex-col items-center hover:opacity-90 transition">
-                        {{-- MEJORA: Borde y sombra más nítidos --}}
-                        <img src="{{ $nextMatch->localTeam->escudo_url ?? 'https://placehold.co/100x100/1f2937/FFFFFF?text=LOCAL' }}"
-                            alt="Logo Local"
-                            class="w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover border-4 border-primary shadow-md shadow-primary/50 mb-1" />
-                        <span
-                            class="text-sm sm:text-xl font-extrabold text-white overflow-hidden whitespace-nowrap max-w-full">{{ $nextMatch->localTeam->nombre }}</span>
-                        <span class="text-[10px] text-gray-400">Local</span>
-                    </a>
+    {{-- Área de Scroll (Slider) --}}
+    <div id="match-slider" class="flex overflow-x-auto snap-x snap-mandatory space-x-4 pb-4 no-scrollbar scroll-smooth">
+
+        @foreach($sliderMatches as $item)
+            {{-- Extraemos variables para facilitar la lectura y mantener tu código original casi intacto --}}
+            @php
+                $nextMatch = $item->match;
+                $localProb = $item->prediction['localProb'];
+                $drawProb = $item->prediction['drawProb'];
+                $visitorProb = $item->prediction['visitorProb'];
+                $probTitle = $item->probTitle;
+                $h2hRecord = $item->h2hRecord;
+                $h2hTotal = $h2hRecord['total'];
+                
+                // Variables placeholder para la comunidad (puedes ajustar lógica si la tienes)
+                $isVotingActive = false; 
+                $hasVoted = false;
+                $communityLocalProb = 0; $communityDrawProb = 0; $communityVisitorProb = 0;
+            @endphp
+
+            {{-- TARJETA INDIVIDUAL (SNAP-CENTER) --}}
+            <div class="snap-center flex-shrink-0 w-full relative">
+                
+                {{-- TITULO JORNADA (Dentro del slide) --}}
+                <div class="text-center mb-2 text-gray-400 text-sm uppercase tracking-wider">
+                    Jornada {{ $nextMatch->jornada }}
                 </div>
 
-                {{-- ⬇️ 2. CENTRO: VS Y JORNADA (Limpiado y Centrado) ⬇️ --}}
-                <div class="w-2/12 flex flex-col items-center justify-start flex-shrink-0 pt-4 sm:pt-6">
-                    <div class="py-1 mx-auto max-w-full">
-                        <span class="text-5xl font-black text-red-500 block leading-none">VS</span>
-                    </div>
-                </div>
+                {{-- INICIO DE TU CÓDIGO ORIGINAL (Ligeramente ajustado para el ancho) --}}
+                <div class="card bg-card-bg/80 backdrop-blur-lg border border-white/10 w-full p-4 sm:p-6 shadow-2xl transition duration-500 hover:shadow-glow rounded-xl">
 
-                {{-- 3. EQUIPO VISITANTE --}}
-                <div class="flex flex-col items-center w-5/12 text-center flex-shrink-0">
-                    <a href="{{ route('team.profile', $nextMatch->visitorTeam->id) }}"
-                        class="flex flex-col items-center hover:opacity-90 transition">
-                        {{-- MEJORA: Borde y sombra más nítidos --}}
-                        <img src="{{ $nextMatch->visitorTeam->escudo_url ?? 'https://placehold.co/100x100/1f2937/FFFFFF?text=VISIT' }}"
-                            alt="Logo Visitante"
-                            class="w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover border-4 border-secondary shadow-md shadow-secondary/50 mb-1" />
-                        <span
-                            class="text-sm sm:text-xl font-extrabold text-white overflow-hidden whitespace-nowrap max-w-full">{{ $nextMatch->visitorTeam->nombre }}</span>
-                        <span class="text-[10px] text-gray-400">Visitante</span>
-                    </a>
-                </div>
-            </div>
+                    {{-- ⬇️ 1. CONTENEDOR PRINCIPAL DEL DUELO (FLEX-ROW) ⬇️ --}}
+                    <div class="flex flex-row items-start justify-between space-x-2">
 
-            {{-- ⬇️ 2. SECCIÓN DE DATOS DE TIEMPO Y PROBABILIDAD (FILA COMPLETA) ⬇️ --}}
-            <div class="w-full text-center mt-4 pt-4 border-t border-gray-700">
+                        {{-- 1. EQUIPO LOCAL --}}
+                        <div class="flex flex-col items-center w-5/12 text-center flex-shrink-0">
+                            <a href="{{ route('team.profile', $nextMatch->localTeam->id) }}"
+                                class="flex flex-col items-center hover:opacity-90 transition">
+                                <img src="{{ $nextMatch->localTeam->escudo_url ?? 'https://placehold.co/100x100/1f2937/FFFFFF?text=LOCAL' }}"
+                                    alt="Logo Local"
+                                    class="w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover border-4 border-primary shadow-md shadow-primary/50 mb-1" />
+                                <span class="text-sm sm:text-xl font-extrabold text-white overflow-hidden whitespace-nowrap max-w-full">{{ $nextMatch->localTeam->nombre }}</span>
+                                <span class="text-[10px] text-gray-400">Local</span>
+                            </a>
+                        </div>
 
-                {{-- Fecha y Hora (Jerarquía) --}}
-                <div class="mb-4">
-                    <span class="text-lg font-semibold text-white block mb-1">
-                        {{ \Carbon\Carbon::parse($nextMatch->fecha_hora)->locale('es')->isoFormat('dddd, D [de] MMMM') }}
-                    </span>
-                    <span class="text-sm text-gray-400 font-normal">
-                        A las <span
-                            class="font-bold text-white">{{ \Carbon\Carbon::parse($nextMatch->fecha_hora)->format('h:i A') }}</span>
-                    </span>
-                </div>
-
-                {{-- ⬇️ CONTENEDOR DE ANÁLISIS Y ACCIÓN (GRID CONSOLIDADO) ⬇️ --}}
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full mx-auto">
-
-                    {{-- COLUMNA 1: PROBABILIDAD H2H (Análisis Estático) --}}
-                    <div class="flex flex-col items-center p-3 border border-gray-700 rounded-lg">
-                        <span class="text-sm font-semibold text-gray-400 block mb-2">{{ $probTitle }}</span>
-
-                        {{-- Barra de Probabilidad H2H --}}
-                        <div
-                            class="flex w-full max-w-xs h-3 rounded-full overflow-hidden text-xs font-bold shadow-inner">
-                            <div class="bg-green-500 flex items-center justify-center text-[10px]"
-                                style="width: {{ $localProb }}%;">
-                                @if ($localProb > 15)
-                                    {{ $localProb }}%
-                                @endif
-                            </div>
-                            <div class="bg-yellow-500 flex items-center justify-center text-[10px] text-gray-900"
-                                style="width: {{ $drawProb }}%;">
-                                @if ($drawProb > 5)
-                                    {{ $drawProb }}%
-                                @endif
-                            </div>
-                            <div class="bg-red-500 flex items-center justify-center text-[10px]"
-                                style="width: {{ $visitorProb }}%;">
-                                @if ($visitorProb > 15)
-                                    {{ $visitorProb }}%
-                                @endif
+                        {{-- ⬇️ 2. CENTRO: VS ⬇️ --}}
+                        <div class="w-2/12 flex flex-col items-center justify-start flex-shrink-0 pt-4 sm:pt-6">
+                            <div class="py-1 mx-auto max-w-full">
+                                <span class="text-4xl sm:text-5xl font-black text-red-500 block leading-none">VS</span>
                             </div>
                         </div>
 
-                        {{-- Detalle H2H --}}
-                        @if ($h2hTotal > 0)
-                            <p class="text-xs text-gray-400 pt-2">
-                                Historial H2H: {{ $h2hTotal }} encuentros (G: {{ $h2hRecord['G'] }}, E:
-                                {{ $h2hRecord['E'] }}, P: {{ $h2hRecord['P'] }})
-                            </p>
-                        @endif
+                        {{-- 3. EQUIPO VISITANTE --}}
+                        <div class="flex flex-col items-center w-5/12 text-center flex-shrink-0">
+                            <a href="{{ route('team.profile', $nextMatch->visitorTeam->id) }}"
+                                class="flex flex-col items-center hover:opacity-90 transition">
+                                <img src="{{ $nextMatch->visitorTeam->escudo_url ?? 'https://placehold.co/100x100/1f2937/FFFFFF?text=VISIT' }}"
+                                    alt="Logo Visitante"
+                                    class="w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover border-4 border-secondary shadow-md shadow-secondary/50 mb-1" />
+                                <span class="text-sm sm:text-xl font-extrabold text-white overflow-hidden whitespace-nowrap max-w-full">{{ $nextMatch->visitorTeam->nombre }}</span>
+                                <span class="text-[10px] text-gray-400">Visitante</span>
+                            </a>
+                        </div>
                     </div>
 
-                    {{-- COLUMNA 2: VOTACIÓN COMUNITARIA (Acción y Resultado Dinámico) --}}
-                    <div
-                        class="flex flex-col items-center justify-center border-t md:border-t-0 md:border-l border-gray-700 pt-4 md:pt-0 md:pl-4">
-                        <p class="text-sm font-semibold text-gray-400 mb-2">( Reajustando sistema de votación )</p>
-                        {{--
-                        @if ($isVotingActive && !$hasVoted)
-                            <form method="POST" action="{{ route('community.vote', $nextMatch->id) }}"
-                                class="w-full max-w-sm">
-                                @csrf
-                                <input type="hidden" name="match_id" value="{{ $nextMatch->id }}">
+                    {{-- ⬇️ 2. SECCIÓN DE DATOS DE TIEMPO Y PROBABILIDAD ⬇️ --}}
+                    <div class="w-full text-center mt-4 pt-4 border-t border-gray-700">
 
-                                <p class="text-sm font-semibold text-primary mb-3">¿Quién crees que ganará? (Vota)</p>
-                                <div class="flex justify-center space-x-2 w-full">
-                                    <button type="submit" name="voto" value="local"
-                                        class="bg-primary hover:bg-green-600 px-2 py-1 rounded-full text-white text-xs flex-grow">{{ $nextMatch->localTeam->nombre }}</button>
-                                    <button type="submit" name="voto" value="draw"
-                                        class="bg-yellow-500 hover:bg-yellow-600 px-2 py-1 rounded-full text-gray-900 text-xs flex-shrink-0">E</button>
-                                    <button type="submit" name="voto" value="visitor"
-                                        class="bg-red-500 hover:bg-red-600 px-2 py-1 rounded-full text-white text-xs flex-grow">{{ $nextMatch->visitorTeam->nombre }}</button>
-                                </div>
-                            </form>
-                        @else
-                            <p class="text-sm font-semibold text-gray-400 mb-2">Voto Comunitario Actual:</p>
+                        {{-- Fecha y Hora --}}
+                        <div class="mb-4">
+                            <span class="text-lg font-semibold text-white block mb-1">
+                                {{ \Carbon\Carbon::parse($nextMatch->fecha_hora)->locale('es')->isoFormat('dddd, D [de] MMMM') }}
+                            </span>
+                            <span class="text-sm text-gray-400 font-normal">
+                                A las <span class="font-bold text-white">{{ \Carbon\Carbon::parse($nextMatch->fecha_hora)->format('h:i A') }}</span>
+                            </span>
+                        </div>
 
-                            @if (!$isVotingActive)
-                                <p class="text-xs text-red-400 mb-2">¡Votación cerrada!</p>
-                            @endif
+                        {{-- ⬇️ CONTENEDOR DE ANÁLISIS Y ACCIÓN ⬇️ --}}
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full mx-auto">
 
-                            @if ($hasVoted)
-                                <p class="text-xs font-semibold text-green-400 mb-2">¡Gracias por tu predicción!</p>
-                            @endif
+                            {{-- COLUMNA 1: PROBABILIDAD H2H --}}
+                            <div class="flex flex-col items-center p-3 border border-gray-700 rounded-lg">
+                                <span class="text-sm font-semibold text-gray-400 block mb-2">{{ $probTitle }}</span>
 
-                            <div class="flex flex-col items-center w-full">
-
-                                <div class="flex justify-between w-full max-w-xs text-xs font-semibold mb-1">
-                                    <span class="text-green-400">
-                                        {{ $communityLocalProb }}% ({{ $communityVotes['local'] ?? 0 }} votos)
-                                    </span>
-                                    <span class="text-yellow-400">
-                                        {{ $communityDrawProb }}% ({{ $communityVotes['draw'] ?? 0 }} votos)
-                                    </span>
-                                    <span class="text-red-400">
-                                        {{ $communityVisitorProb }}% ({{ $communityVotes['visitor'] ?? 0 }} votos)
-                                    </span>
+                                <div class="flex w-full max-w-xs h-3 rounded-full overflow-hidden text-xs font-bold shadow-inner">
+                                    <div class="bg-green-500 flex items-center justify-center text-[10px]" style="width: {{ $localProb }}%;">
+                                        @if ($localProb > 15) {{ $localProb }}% @endif
+                                    </div>
+                                    <div class="bg-yellow-500 flex items-center justify-center text-[10px] text-gray-900" style="width: {{ $drawProb }}%;">
+                                        @if ($drawProb > 5) {{ $drawProb }}% @endif
+                                    </div>
+                                    <div class="bg-red-500 flex items-center justify-center text-[10px]" style="width: {{ $visitorProb }}%;">
+                                        @if ($visitorProb > 15) {{ $visitorProb }}% @endif
+                                    </div>
                                 </div>
 
-                                <div
-                                    class="flex w-full max-w-xs h-3 rounded-full overflow-hidden text-xs font-bold shadow-inner mt-2">
-                                    <div class="bg-green-500 flex items-center justify-center"
-                                        style="width: {{ $communityLocalProb }}%;"></div>
-                                    <div class="bg-yellow-500 flex items-center justify-center"
-                                        style="width: {{ $communityDrawProb }}%;"></div>
-                                    <div class="bg-red-500 flex items-center justify-center"
-                                        style="width: {{ $communityVisitorProb }}%;"></div>
-                                </div>
-
-                                <p class="text-xs text-gray-500 mt-2">Total de votos: {{ $communityTotal ?? 0 }}</p>
+                                @if ($h2hTotal > 0)
+                                    <p class="text-xs text-gray-400 pt-2">
+                                        Historial H2H: {{ $h2hTotal }} part. (G: {{ $h2hRecord['G'] }}, E: {{ $h2hRecord['E'] }}, P: {{ $h2hRecord['P'] }})
+                                    </p>
+                                @endif
                             </div>
-                        @endif --}}
-                    </div>
-                </div>
-            </div>
 
-        </div>
+                            {{-- COLUMNA 2: VOTACIÓN (Placeholder) --}}
+                            <div class="flex flex-col items-center justify-center border-t md:border-t-0 md:border-l border-gray-700 pt-4 md:pt-0 md:pl-4">
+                                <p class="text-sm font-semibold text-gray-400 mb-2">( Reajustando sistema de votación )</p>
+                            </div>
+                        </div>
+                    </div>
+                </div> 
+                {{-- FIN DE TU CÓDIGO ORIGINAL --}}
+            </div>
+        @endforeach
+
     </div>
+
+    {{-- Botón Siguiente (Derecha) --}}
+    <button onclick="document.getElementById('match-slider').scrollBy({left: 300, behavior: 'smooth'})"
+        class="absolute right-0 top-1/2 -translate-y-1/2 -mr-4 z-10 bg-gray-800/80 text-white p-2 rounded-full shadow-lg hover:bg-primary transition opacity-0 group-hover:opacity-100 focus:opacity-100 hidden sm:block">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+    </button>
+
+    {{-- Indicadores (Puntos opcionales) --}}
+    <div class="flex justify-center mt-4 space-x-2">
+        @foreach($sliderMatches as $index => $item)
+            <div class="w-2 h-2 rounded-full bg-white/20"></div>
+        @endforeach
+    </div>
+</div>
+
+{{-- Estilo CSS extra para ocultar la barra de scroll (poner en tu CSS o style tag) --}}
+<style>
+    .no-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
+    .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+</style>
 @endif
 
 {{-- ---------------------------------------------------- --}}

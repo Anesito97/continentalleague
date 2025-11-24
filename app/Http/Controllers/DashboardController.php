@@ -131,11 +131,21 @@ class DashboardController extends Controller
         $h2hRecord = ['G' => 0, 'E' => 0, 'P' => 0, 'total' => 0]; // Inicializamos por si no hay partido
 
         if ($nextMatch) {
-            // ⬇️ NUEVO CÁLCULO DE PREDICCIÓN COMBINADO ⬇️
-            $prediction = $this->getMatchPrediction($nextMatch->localTeam, $nextMatch->visitorTeam);
+            $upcomingMatches = $pendingMatches->take(3);
 
-            // También obtenemos el H2H para mostrarlo en la vista, aunque ya se usa dentro de la predicción
-            $h2hRecord = $this->calculateH2H($nextMatch->localTeam, $nextMatch->visitorTeam);
+            // 2. Preparamos una colección con el partido Y sus datos calculados individualmente
+            $sliderMatches = $upcomingMatches->map(function($match) {
+                // Calculamos la predicción para ESTE partido específico
+                $prediction = $this->getMatchPrediction($match->localTeam, $match->visitorTeam);
+                $h2hRecord = $this->calculateH2H($match->localTeam, $match->visitorTeam);
+
+                return (object) [
+                    'match' => $match,
+                    'prediction' => $prediction,
+                    'h2hRecord' => $h2hRecord,
+                    'probTitle' => $prediction['title'] // Usualmente 'Probabilidad (Estimada)'
+                ];
+            });
         }
 
         $communityVotes = VoteController::getVotes($nextMatch->id ?? null);
@@ -176,6 +186,7 @@ class DashboardController extends Controller
             'communityTotal',
             'positions',
             'injuredPlayers',
+            'sliderMatches',
         );
     }
 
