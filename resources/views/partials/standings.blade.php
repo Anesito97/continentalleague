@@ -142,8 +142,7 @@
                                 <div class="text-center mb-5">
                                     <span class="text-base text-gray-200 font-medium">
                                         {{ \Carbon\Carbon::parse($nextMatch->fecha_hora)->locale('es')->isoFormat('dddd, D [de] MMMM') }}
-                                    </span>
-                                    <span class="text-sm text-gray-500 mx-2">•</span>
+                                    </span><br>
                                     <span class="text-base text-primary font-bold">
                                         {{ \Carbon\Carbon::parse($nextMatch->fecha_hora)->format('h:i A') }}
                                     </span>
