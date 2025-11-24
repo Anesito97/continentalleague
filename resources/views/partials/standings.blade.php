@@ -42,160 +42,197 @@
     @endphp -->
 
 {{-- ---------------------------------------------------- --}}
-{{-- SLIDER DE PRÓXIMOS DUELOS (3 PARTIDOS)              --}}
+{{-- SLIDER "MODERNO" CON BARRA CLÁSICA DE PROBABILIDAD   --}}
 {{-- ---------------------------------------------------- --}}
 
-<h3 class="text-2xl font-bold mb-4 mt-8">Próximos Grandes Duelos</h3>
+<div class="relative w-full max-w-5xl mx-auto py-8">
 
-{{-- Contenedor Principal del Slider --}}
-<div class="relative group w-full max-w-4xl mx-auto">
+    {{-- Título con estilo neón sutil --}}
+    <div class="flex items-center justify-between mb-6 px-4">
+        <h3 class="text-2xl font-bold text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.3)]">
+            <span class="text-primary">Próximos</span> Grandes Duelos
+        </h3>
+        
+        {{-- Indicador visual de "Deslizar" (Solo móvil) --}}
+        <div class="flex items-center gap-1 text-xs text-gray-400 sm:hidden animate-pulse">
+            <span>Desliza</span>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+        </div>
+    </div>
 
-    {{-- Botón Anterior (Izquierda) --}}
-    <button onclick="document.getElementById('match-slider').scrollBy({left: -300, behavior: 'smooth'})"
-        class="absolute left-0 top-1/2 -translate-y-1/2 -ml-4 z-10 bg-gray-800/80 text-white p-2 rounded-full shadow-lg hover:bg-primary transition opacity-0 group-hover:opacity-100 focus:opacity-100 hidden sm:block">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
-    </button>
+    {{-- CONTENEDOR PRINCIPAL --}}
+    <div class="relative group">
 
-    {{-- Área de Scroll (Slider) --}}
-    <div id="match-slider" class="flex overflow-x-auto snap-x snap-mandatory space-x-4 pb-4 no-scrollbar scroll-smooth">
+        {{-- Botón Anterior (Flotante y con Blur) --}}
+        <button id="btn-prev" class="absolute left-2 top-1/2 -translate-y-1/2 z-20 bg-black/40 backdrop-blur-md border border-white/10 text-white p-3 rounded-full hover:bg-primary hover:border-primary transition-all duration-300 transform hover:scale-110 opacity-0 group-hover:opacity-100 hidden sm:flex items-center justify-center shadow-lg shadow-black/50">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+        </button>
 
-        @foreach($sliderMatches as $item)
-            {{-- Extraemos variables para facilitar la lectura y mantener tu código original casi intacto --}}
-            @php
-                $nextMatch = $item->match;
-                $localProb = $item->prediction['localProb'];
-                $drawProb = $item->prediction['drawProb'];
-                $visitorProb = $item->prediction['visitorProb'];
-                $probTitle = $item->probTitle;
-                $h2hRecord = $item->h2hRecord;
-                $h2hTotal = $h2hRecord['total'];
-                
-                // Variables placeholder para la comunidad (puedes ajustar lógica si la tienes)
-                $isVotingActive = false; 
-                $hasVoted = false;
-                $communityLocalProb = 0; $communityDrawProb = 0; $communityVisitorProb = 0;
-            @endphp
+        {{-- SLIDER (Scroll Snap con Padding para efecto "Peek") --}}
+        <div id="modern-slider" 
+             class="flex overflow-x-auto snap-x snap-mandatory scroll-smooth pb-8 pt-2 no-scrollbar px-4 sm:px-0 gap-4"
+             style="scroll-padding-left: 1rem;">
 
-            {{-- TARJETA INDIVIDUAL (SNAP-CENTER) --}}
-            <div class="snap-center flex-shrink-0 w-full relative">
-                
-                {{-- TITULO JORNADA (Dentro del slide) --}}
-                <div class="text-center mb-2 text-gray-400 text-sm uppercase tracking-wider">
-                    Jornada {{ $nextMatch->jornada }}
-                </div>
+            @foreach($sliderMatches as $index => $item)
+                @php
+                    $nextMatch = $item->match;
+                    $localProb = $item->prediction['localProb'];
+                    $drawProb = $item->prediction['drawProb'];
+                    $visitorProb = $item->prediction['visitorProb'];
+                    $probTitle = $item->probTitle;
+                    $h2hRecord = $item->h2hRecord;
+                    $h2hTotal = $h2hRecord['total'];
+                @endphp
 
-                {{-- INICIO DE TU CÓDIGO ORIGINAL (Ligeramente ajustado para el ancho) --}}
-                <div class="card bg-card-bg/80 backdrop-blur-lg border border-white/10 w-full p-4 sm:p-6 shadow-2xl transition duration-500 hover:shadow-glow rounded-xl">
-
-                    {{-- ⬇️ 1. CONTENEDOR PRINCIPAL DEL DUELO (FLEX-ROW) ⬇️ --}}
-                    <div class="flex flex-row items-start justify-between space-x-2">
-
-                        {{-- 1. EQUIPO LOCAL --}}
-                        <div class="flex flex-col items-center w-5/12 text-center flex-shrink-0">
-                            <a href="{{ route('team.profile', $nextMatch->localTeam->id) }}"
-                                class="flex flex-col items-center hover:opacity-90 transition">
-                                <img src="{{ $nextMatch->localTeam->escudo_url ?? 'https://placehold.co/100x100/1f2937/FFFFFF?text=LOCAL' }}"
-                                    alt="Logo Local"
-                                    class="w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover border-4 border-primary shadow-md shadow-primary/50 mb-1" />
-                                <span class="text-sm sm:text-xl font-extrabold text-white overflow-hidden whitespace-nowrap max-w-full">{{ $nextMatch->localTeam->nombre }}</span>
-                                <span class="text-[10px] text-gray-400">Local</span>
-                            </a>
-                        </div>
-
-                        {{-- ⬇️ 2. CENTRO: VS ⬇️ --}}
-                        <div class="w-2/12 flex flex-col items-center justify-start flex-shrink-0 pt-4 sm:pt-6">
-                            <div class="py-1 mx-auto max-w-full">
-                                <span class="text-4xl sm:text-5xl font-black text-red-500 block leading-none">VS</span>
-                            </div>
-                        </div>
-
-                        {{-- 3. EQUIPO VISITANTE --}}
-                        <div class="flex flex-col items-center w-5/12 text-center flex-shrink-0">
-                            <a href="{{ route('team.profile', $nextMatch->visitorTeam->id) }}"
-                                class="flex flex-col items-center hover:opacity-90 transition">
-                                <img src="{{ $nextMatch->visitorTeam->escudo_url ?? 'https://placehold.co/100x100/1f2937/FFFFFF?text=VISIT' }}"
-                                    alt="Logo Visitante"
-                                    class="w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover border-4 border-secondary shadow-md shadow-secondary/50 mb-1" />
-                                <span class="text-sm sm:text-xl font-extrabold text-white overflow-hidden whitespace-nowrap max-w-full">{{ $nextMatch->visitorTeam->nombre }}</span>
-                                <span class="text-[10px] text-gray-400">Visitante</span>
-                            </a>
-                        </div>
+                {{-- ITEM INDIVIDUAL --}}
+                {{-- w-[90%] permite ver el 10% de la siguiente tarjeta en móviles --}}
+                <div class="slider-item snap-center shrink-0 w-[90%] sm:w-[600px] md:w-[700px] transition-all duration-500 ease-out opacity-50 scale-95" 
+                     data-index="{{ $index }}">
+                    
+                    {{-- Etiqueta Flotante de Jornada --}}
+                    <div class="text-center -mb-3 relative z-10">
+                        <span class="bg-gray-900/90 border border-gray-700 text-gray-300 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-widest shadow-lg">
+                            Jornada {{ $nextMatch->jornada }}
+                        </span>
                     </div>
 
-                    {{-- ⬇️ 2. SECCIÓN DE DATOS DE TIEMPO Y PROBABILIDAD ⬇️ --}}
-                    <div class="w-full text-center mt-4 pt-4 border-t border-gray-700">
+                    {{-- TARJETA GLASSSMORPHISM --}}
+                    <div class="card relative overflow-hidden bg-[#1a1f2e]/90 backdrop-blur-xl border border-white/10 w-full p-4 sm:p-6 shadow-[0_10px_40px_-10px_rgba(0,0,0,0.5)] rounded-2xl group-hover/card:border-primary/30 transition-all">
+                        
+                        {{-- Efecto de brillo de fondo (Glow) --}}
+                        <div class="absolute top-0 right-0 -mr-16 -mt-16 w-32 h-32 bg-primary/20 blur-[60px] rounded-full pointer-events-none"></div>
+                        <div class="absolute bottom-0 left-0 -ml-16 -mb-16 w-32 h-32 bg-secondary/20 blur-[60px] rounded-full pointer-events-none"></div>
 
-                        {{-- Fecha y Hora --}}
-                        <div class="mb-4">
-                            <span class="text-lg font-semibold text-white block mb-1">
-                                {{ \Carbon\Carbon::parse($nextMatch->fecha_hora)->locale('es')->isoFormat('dddd, D [de] MMMM') }}
-                            </span>
-                            <span class="text-sm text-gray-400 font-normal">
-                                A las <span class="font-bold text-white">{{ \Carbon\Carbon::parse($nextMatch->fecha_hora)->format('h:i A') }}</span>
-                            </span>
-                        </div>
-
-                        {{-- ⬇️ CONTENEDOR DE ANÁLISIS Y ACCIÓN ⬇️ --}}
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full mx-auto">
-
-                            {{-- COLUMNA 1: PROBABILIDAD H2H --}}
-                            <div class="flex flex-col items-center p-3 border border-gray-700 rounded-lg">
-                                <span class="text-sm font-semibold text-gray-400 block mb-2">{{ $probTitle }}</span>
-
-                                <div class="flex w-full max-w-xs h-3 rounded-full overflow-hidden text-xs font-bold shadow-inner">
-                                    <div class="bg-green-500 flex items-center justify-center text-[10px]" style="width: {{ $localProb }}%;">
-                                        @if ($localProb > 15) {{ $localProb }}% @endif
-                                    </div>
-                                    <div class="bg-yellow-500 flex items-center justify-center text-[10px] text-gray-900" style="width: {{ $drawProb }}%;">
-                                        @if ($drawProb > 5) {{ $drawProb }}% @endif
-                                    </div>
-                                    <div class="bg-red-500 flex items-center justify-center text-[10px]" style="width: {{ $visitorProb }}%;">
-                                        @if ($visitorProb > 15) {{ $visitorProb }}% @endif
-                                    </div>
+                        {{-- CONTENIDO DE LA TARJETA --}}
+                        <div class="relative z-10">
+                            {{-- 1. CABECERA EQUIPOS --}}
+                            <div class="flex flex-row items-start justify-between space-x-2">
+                                {{-- LOCAL --}}
+                                <div class="flex flex-col items-center w-5/12 text-center flex-shrink-0">
+                                    <a href="{{ route('team.profile', $nextMatch->localTeam->id) }}" class="flex flex-col items-center hover:scale-105 transition transform duration-300">
+                                        <div class="relative">
+                                            <div class="absolute inset-0 bg-primary/30 blur-md rounded-full"></div>
+                                            <img src="{{ $nextMatch->localTeam->escudo_url ?? 'https://placehold.co/100x100' }}" alt="Local" class="relative w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover border-2 border-primary/80 shadow-lg z-10" />
+                                        </div>
+                                        <span class="mt-2 text-sm sm:text-lg font-bold text-white leading-tight">{{ $nextMatch->localTeam->nombre }}</span>
+                                    </a>
                                 </div>
 
-                                @if ($h2hTotal > 0)
-                                    <p class="text-xs text-gray-400 pt-2">
-                                        Historial H2H: {{ $h2hTotal }} part. (G: {{ $h2hRecord['G'] }}, E: {{ $h2hRecord['E'] }}, P: {{ $h2hRecord['P'] }})
-                                    </p>
-                                @endif
+                                {{-- VS --}}
+                                <div class="w-2/12 flex flex-col items-center justify-center pt-4">
+                                    <span class="text-3xl sm:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-b from-red-500 to-red-700 drop-shadow-sm italic">VS</span>
+                                </div>
+
+                                {{-- VISITANTE --}}
+                                <div class="flex flex-col items-center w-5/12 text-center flex-shrink-0">
+                                    <a href="{{ route('team.profile', $nextMatch->visitorTeam->id) }}" class="flex flex-col items-center hover:scale-105 transition transform duration-300">
+                                        <div class="relative">
+                                            <div class="absolute inset-0 bg-secondary/30 blur-md rounded-full"></div>
+                                            <img src="{{ $nextMatch->visitorTeam->escudo_url ?? 'https://placehold.co/100x100' }}" alt="Visitante" class="relative w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover border-2 border-secondary/80 shadow-lg z-10" />
+                                        </div>
+                                        <span class="mt-2 text-sm sm:text-lg font-bold text-white leading-tight">{{ $nextMatch->visitorTeam->nombre }}</span>
+                                    </a>
+                                </div>
                             </div>
 
-                            {{-- COLUMNA 2: VOTACIÓN (Placeholder) --}}
-                            <div class="flex flex-col items-center justify-center border-t md:border-t-0 md:border-l border-gray-700 pt-4 md:pt-0 md:pl-4">
-                                <p class="text-sm font-semibold text-gray-400 mb-2">( Reajustando sistema de votación )</p>
+                            {{-- 2. DATOS CON BARRA UNIFICADA (Aquí está la corrección) --}}
+                            <div class="mt-5 pt-4 border-t border-white/5">
+                                
+                                {{-- Fecha y Hora --}}
+                                <div class="text-center mb-5">
+                                    <span class="text-base text-gray-200 font-medium">
+                                        {{ \Carbon\Carbon::parse($nextMatch->fecha_hora)->locale('es')->isoFormat('dddd, D [de] MMMM') }}
+                                    </span>
+                                    <span class="text-sm text-gray-500 mx-2">•</span>
+                                    <span class="text-base text-primary font-bold">
+                                        {{ \Carbon\Carbon::parse($nextMatch->fecha_hora)->format('h:i A') }}
+                                    </span>
+                                </div>
+
+                                {{-- ⬇️ AQUÍ ESTÁ EL CAMBIO: BARRA DE PROBABILIDAD UNIFICADA ⬇️ --}}
+                                <div class="w-full max-w-lg mx-auto px-2">
+                                    <span class="text-xs font-semibold text-gray-400 block mb-2 text-center uppercase tracking-wider">
+                                        {{ $probTitle }}
+                                    </span>
+
+                                    {{-- La Barra: Flex container con 3 colores --}}
+                                    <div class="flex w-full h-5 rounded-full overflow-hidden text-[10px] sm:text-xs font-bold shadow-inner border border-white/10">
+                                        
+                                        {{-- 1. LOCAL (Verde) --}}
+                                        <div class="bg-green-600 flex items-center justify-center text-white relative group/segment" style="width: {{ $localProb }}%;">
+                                            @if ($localProb > 10) 
+                                                <span>{{ $localProb }}%</span>
+                                            @endif
+                                            <div class="absolute -top-8 bg-gray-900 text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover/segment:opacity-100 transition z-20">Victoria Local</div>
+                                        </div>
+
+                                        {{-- 2. EMPATE (Amarillo) --}}
+                                        <div class="bg-yellow-500 flex items-center justify-center text-gray-900 relative group/segment" style="width: {{ $drawProb }}%;">
+                                            @if ($drawProb > 5) 
+                                                <span>{{ $drawProb }}%</span>
+                                            @endif
+                                            <div class="absolute -top-8 bg-gray-900 text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover/segment:opacity-100 transition z-20">Empate</div>
+                                        </div>
+
+                                        {{-- 3. VISITANTE (Rojo) --}}
+                                        <div class="bg-red-600 flex items-center justify-center text-white relative group/segment" style="width: {{ $visitorProb }}%;">
+                                            @if ($visitorProb > 10) 
+                                                <span>{{ $visitorProb }}%</span>
+                                            @endif
+                                            <div class="absolute -top-8 bg-gray-900 text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover/segment:opacity-100 transition z-20">Victoria Visitante</div>
+                                        </div>
+                                    </div>
+
+                                    {{-- Texto H2H Debajo de la barra --}}
+                                    @if ($h2hTotal > 0)
+                                        <p class="text-[10px] sm:text-xs text-gray-400 mt-3 text-center">
+                                            Historial: <span class="text-gray-300">{{ $h2hTotal }}</span> encuentros 
+                                            (L: <span class="text-green-400">{{ $h2hRecord['G'] }}</span> - 
+                                             E: <span class="text-yellow-400">{{ $h2hRecord['E'] }}</span> - 
+                                             V: <span class="text-red-400">{{ $h2hRecord['P'] }}</span>)
+                                        </p>
+                                    @endif
+                                </div>
+                                {{-- ⬆️ FIN DEL CAMBIO ⬆️ --}}
+
                             </div>
                         </div>
-                    </div>
-                </div> 
-                {{-- FIN DE TU CÓDIGO ORIGINAL --}}
-            </div>
-        @endforeach
+                    </div> 
+                    {{-- FIN TARJETA --}}
+                </div>
+            @endforeach
 
+            {{-- ELEMENTO FANTASMA AL FINAL --}}
+            <div class="shrink-0 w-4 sm:w-0"></div>
+
+        </div>
+
+        {{-- Botón Siguiente (Flotante) --}}
+        <button id="btn-next" class="absolute right-2 top-1/2 -translate-y-1/2 z-20 bg-black/40 backdrop-blur-md border border-white/10 text-white p-3 rounded-full hover:bg-primary hover:border-primary transition-all duration-300 transform hover:scale-110 opacity-0 group-hover:opacity-100 hidden sm:flex items-center justify-center shadow-lg shadow-black/50">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+        </button>
     </div>
 
-    {{-- Botón Siguiente (Derecha) --}}
-    <button onclick="document.getElementById('match-slider').scrollBy({left: 300, behavior: 'smooth'})"
-        class="absolute right-0 top-1/2 -translate-y-1/2 -mr-4 z-10 bg-gray-800/80 text-white p-2 rounded-full shadow-lg hover:bg-primary transition opacity-0 group-hover:opacity-100 focus:opacity-100 hidden sm:block">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
-    </button>
-
-    {{-- Indicadores (Puntos opcionales) --}}
-    <div class="flex justify-center mt-4 space-x-2">
+    {{-- PAGINACIÓN / INDICADORES --}}
+    <div class="flex justify-center mt-2 space-x-2" id="slider-dots">
         @foreach($sliderMatches as $index => $item)
-            <div class="w-2 h-2 rounded-full bg-white/20"></div>
+            <button class="dot transition-all duration-300 h-1.5 rounded-full bg-gray-600 hover:bg-gray-400 {{ $index === 0 ? 'w-8 bg-primary' : 'w-2' }}" 
+                    onclick="scrollToSlide({{ $index }})">
+            </button>
         @endforeach
     </div>
+
 </div>
 
-{{-- Estilo CSS extra para ocultar la barra de scroll (poner en tu CSS o style tag) --}}
+{{-- ESTILOS NECESARIOS --}}
 <style>
-    .no-scrollbar::-webkit-scrollbar {
-        display: none;
-    }
-    .no-scrollbar {
-        -ms-overflow-style: none;
-        scrollbar-width: none;
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    /* Clase para cuando el item está activo (enfocado) */
+    .slider-active {
+        opacity: 1 !important;
+        transform: scale(1) !important;
+        z-index: 10;
     }
 </style>
 @endif
@@ -575,3 +612,73 @@
         </div>
     @endif
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const slider = document.getElementById('modern-slider');
+        const items = document.querySelectorAll('.slider-item');
+        const dots = document.querySelectorAll('.dot');
+        const btnPrev = document.getElementById('btn-prev');
+        const btnNext = document.getElementById('btn-next');
+
+        // Configuración para detectar qué tarjeta está centrada
+        const observerOptions = {
+            root: slider,
+            threshold: 0.5 // Se activa cuando el 50% de la tarjeta es visible
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    // Quitamos estilo activo a todos
+                    items.forEach(i => {
+                        i.classList.remove('slider-active');
+                        i.classList.add('opacity-50', 'scale-95');
+                    });
+                    
+                    // Activamos el actual (Efecto POP)
+                    entry.target.classList.add('slider-active');
+                    entry.target.classList.remove('opacity-50', 'scale-95');
+
+                    // Actualizamos los puntos de abajo
+                    const index = entry.target.getAttribute('data-index');
+                    updateDots(index);
+                }
+            });
+        }, observerOptions);
+
+        items.forEach(item => observer.observe(item));
+
+        // Función para actualizar los puntos (Dots)
+        function updateDots(activeIndex) {
+            dots.forEach((dot, idx) => {
+                if (idx == activeIndex) {
+                    dot.classList.remove('w-2', 'bg-gray-600');
+                    dot.classList.add('w-8', 'bg-primary'); // Alargar el activo
+                } else {
+                    dot.classList.add('w-2', 'bg-gray-600');
+                    dot.classList.remove('w-8', 'bg-primary');
+                }
+            });
+        }
+
+        // Lógica de Botones
+        btnPrev.addEventListener('click', () => {
+            slider.scrollBy({ left: -300, behavior: 'smooth' });
+        });
+
+        btnNext.addEventListener('click', () => {
+            slider.scrollBy({ left: 300, behavior: 'smooth' });
+        });
+
+        // Función global para click en los dots
+        window.scrollToSlide = (index) => {
+            const target = items[index];
+            if(target) {
+                // Cálculo simple para centrar el elemento
+                const left = target.offsetLeft - (slider.clientWidth - target.clientWidth) / 2;
+                slider.scrollTo({ left: left, behavior: 'smooth' });
+            }
+        };
+    });
+</script>
