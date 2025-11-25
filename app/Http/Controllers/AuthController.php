@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
@@ -18,18 +19,18 @@ class AuthController extends Controller
         // Intentamos autenticar usando el proveedor de la BD
         // OJO: Esto asume que has configurado un provider en config/auth.php para tu tabla 'usuarios'
         // Y que estás usando la columna 'password_hash' (si NO está hasheada) o 'password' (si usas Hash::make)
-        
+
         // Dado que en tu API no usas hash, simularemos la verificación
         $user = DB::table('usuarios')
-                    ->where('username', $credentials['username'])
-                    ->where('password_hash', $credentials['password'])
-                    ->first();
-        
+            ->where('username', $credentials['username'])
+            ->where('password_hash', $credentials['password'])
+            ->first();
+
         if ($user && $user->rol === 'admin') {
             // Laravel no puede autenticar un usuario que no usa hash.
             // Para fines de esta migración, si las credenciales son correctas, simulamos la sesión:
             session(['is_admin' => true, 'admin_username' => $user->username]);
-            
+
             return redirect()->route('admin.panel')->with('success', 'Acceso concedido al panel de administración.');
         }
 
@@ -40,6 +41,7 @@ class AuthController extends Controller
     public function logout(Request $request)
     {
         $request->session()->forget(['is_admin', 'admin_username']);
+
         return redirect('/')->with('success', 'Sesión cerrada correctamente.');
     }
 }

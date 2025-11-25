@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         // Verifica si la columna 'jornada' ya existe antes de intentar añadirla
-        if (!Schema::hasColumn('partidos', 'jornada')) {
+        if (! Schema::hasColumn('partidos', 'jornada')) {
             Schema::table('partidos', function (Blueprint $table) {
                 // Añadir la columna 'jornada' después de 'equipo_visitante_id'
                 $table->integer('jornada')->default(1)->after('equipo_visitante_id');

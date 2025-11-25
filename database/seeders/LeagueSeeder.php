@@ -2,13 +2,13 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 use App\Models\Equipo;
+use App\Models\EventoPartido;
 use App\Models\Jugador;
 use App\Models\Partido;
-use App\Models\EventoPartido;
 use Carbon\Carbon;
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class LeagueSeeder extends Seeder
 {
@@ -30,25 +30,25 @@ class LeagueSeeder extends Seeder
             [
                 'nombre' => 'Titanes FC',
                 'escudo_url' => asset('uploads/logos/logo_titanes.png'),
-                'puntos' => 7, 'partidos_jugados' => 3, 'ganados' => 2, 'empatados' => 1, 'perdidos' => 0, 
+                'puntos' => 7, 'partidos_jugados' => 3, 'ganados' => 2, 'empatados' => 1, 'perdidos' => 0,
                 'goles_a_favor' => 8, 'goles_en_contra' => 3, // 'clean_sheets' ELIMINADO
             ],
             [
                 'nombre' => 'Halcones Rojos',
                 'escudo_url' => asset('uploads/logos/logo_halcones.png'),
-                'puntos' => 4, 'partidos_jugados' => 3, 'ganados' => 1, 'empatados' => 1, 'perdidos' => 1, 
+                'puntos' => 4, 'partidos_jugados' => 3, 'ganados' => 1, 'empatados' => 1, 'perdidos' => 1,
                 'goles_a_favor' => 5, 'goles_en_contra' => 5, // 'clean_sheets' ELIMINADO
             ],
             [
                 'nombre' => 'Dragones Azules',
                 'escudo_url' => asset('uploads/logos/logo_dragones.png'),
-                'puntos' => 3, 'partidos_jugados' => 3, 'ganados' => 1, 'empatados' => 0, 'perdidos' => 2, 
+                'puntos' => 3, 'partidos_jugados' => 3, 'ganados' => 1, 'empatados' => 0, 'perdidos' => 2,
                 'goles_a_favor' => 5, 'goles_en_contra' => 7, // 'clean_sheets' ELIMINADO
             ],
             [
                 'nombre' => 'Lobos Plateados',
                 'escudo_url' => asset('uploads/logos/logo_lobos.png'),
-                'puntos' => 3, 'partidos_jugados' => 3, 'ganados' => 1, 'empatados' => 0, 'perdidos' => 2, 
+                'puntos' => 3, 'partidos_jugados' => 3, 'ganados' => 1, 'empatados' => 0, 'perdidos' => 2,
                 'goles_a_favor' => 3, 'goles_en_contra' => 6, // 'clean_sheets' ELIMINADO
             ],
         ];
@@ -63,17 +63,17 @@ class LeagueSeeder extends Seeder
         $equipoHalcones = $teams[1];
         $equipoDragones = $teams[2];
         $equipoLobos = $teams[3];
-        
-        $localUploadPath = 'uploads/player_photos/'; 
+
+        $localUploadPath = 'uploads/player_photos/';
 
         // 3. CREAR JUGADORES (Solo usando columnas válidas)
         $playersData = [
             // Titanes FC (Id: 1)
-            ['equipo_id' => $equipoTitanes->id, 'nombre' => 'Marco Goleador', 'numero' => 10, 'posicion' => 'delantero', 'goles' => 5, 'asistencias' => 1, 'foto_url' => asset($localUploadPath . 'player_marco.png')],
-            ['equipo_id' => $equipoTitanes->id, 'nombre' => 'Lucas Asistente', 'numero' => 7, 'posicion' => 'medio', 'goles' => 1, 'asistencias' => 3, 'foto_url' => asset($localUploadPath . 'player_lucas.png')],
+            ['equipo_id' => $equipoTitanes->id, 'nombre' => 'Marco Goleador', 'numero' => 10, 'posicion' => 'delantero', 'goles' => 5, 'asistencias' => 1, 'foto_url' => asset($localUploadPath.'player_marco.png')],
+            ['equipo_id' => $equipoTitanes->id, 'nombre' => 'Lucas Asistente', 'numero' => 7, 'posicion' => 'medio', 'goles' => 1, 'asistencias' => 3, 'foto_url' => asset($localUploadPath.'player_lucas.png')],
             ['equipo_id' => $equipoTitanes->id, 'nombre' => 'David Muro', 'numero' => 4, 'posicion' => 'defensa', 'goles' => 0, 'asistencias' => 0],
             ['equipo_id' => $equipoTitanes->id, 'nombre' => 'Alex Portero', 'numero' => 1, 'posicion' => 'portero', 'paradas' => 8], // paradas es válida
-            
+
             // Halcones Rojos (Id: 2)
             ['equipo_id' => $equipoHalcones->id, 'nombre' => 'Leo Máquina', 'numero' => 9, 'posicion' => 'delantero', 'goles' => 3, 'asistencias' => 0],
             ['equipo_id' => $equipoHalcones->id, 'nombre' => 'Sofía Veloz', 'numero' => 11, 'posicion' => 'medio', 'goles' => 1, 'asistencias' => 1],
@@ -85,7 +85,7 @@ class LeagueSeeder extends Seeder
             ['equipo_id' => $equipoDragones->id, 'nombre' => 'Eva Creadora', 'numero' => 8, 'posicion' => 'medio', 'goles' => 1, 'asistencias' => 1],
             ['equipo_id' => $equipoDragones->id, 'nombre' => 'Raúl Fuerte', 'numero' => 5, 'posicion' => 'defensa'],
             ['equipo_id' => $equipoDragones->id, 'nombre' => 'Marta Guardiana', 'numero' => 1, 'posicion' => 'portero', 'paradas' => 5],
-            
+
             // Lobos Plateados (Id: 4)
             ['equipo_id' => $equipoLobos->id, 'nombre' => 'Pablo Rápido', 'numero' => 15, 'posicion' => 'medio', 'goles' => 2, 'asistencias' => 1],
             ['equipo_id' => $equipoLobos->id, 'nombre' => 'Elena Fina', 'numero' => 2, 'posicion' => 'defensa', 'goles' => 1],
@@ -96,7 +96,7 @@ class LeagueSeeder extends Seeder
         foreach ($playersData as $data) {
             Jugador::create($data);
         }
-        
+
         // 4. CREAR PARTIDOS Y EVENTOS (Usando datos válidos)
         $jugadorMarco = Jugador::where('nombre', 'Marco Goleador')->first();
         $jugadorLucas = Jugador::where('nombre', 'Lucas Asistente')->first();
@@ -107,10 +107,10 @@ class LeagueSeeder extends Seeder
 
         // PARTIDO 1 (FINALIZADO: 3-3)
         $match1 = Partido::create([
-            'equipo_local_id' => $equipoTitanes->id, 
-            'equipo_visitante_id' => $equipoHalcones->id, 
+            'equipo_local_id' => $equipoTitanes->id,
+            'equipo_visitante_id' => $equipoHalcones->id,
             'fecha_hora' => Carbon::now()->subDays(7),
-            'estado' => 'finalizado', 'goles_local' => 3, 'goles_visitante' => 3
+            'estado' => 'finalizado', 'goles_local' => 3, 'goles_visitante' => 3,
         ]);
         EventoPartido::create(['partido_id' => $match1->id, 'jugador_id' => $jugadorLeo->id, 'equipo_id' => $equipoHalcones->id, 'tipo_evento' => 'gol', 'minuto' => 15]);
         EventoPartido::create(['partido_id' => $match1->id, 'jugador_id' => $jugadorMarco->id, 'equipo_id' => $equipoTitanes->id, 'tipo_evento' => 'gol', 'minuto' => 25]);
@@ -118,23 +118,23 @@ class LeagueSeeder extends Seeder
         EventoPartido::create(['partido_id' => $match1->id, 'jugador_id' => $jugadorLeo->id, 'equipo_id' => $equipoHalcones->id, 'tipo_evento' => 'gol', 'minuto' => 50]);
         EventoPartido::create(['partido_id' => $match1->id, 'jugador_id' => $jugadorLeo->id, 'equipo_id' => $equipoHalcones->id, 'tipo_evento' => 'asistencia', 'minuto' => 50]);
         EventoPartido::create(['partido_id' => $match1->id, 'jugador_id' => $jugadorLucas->id, 'equipo_id' => $equipoTitanes->id, 'tipo_evento' => 'gol', 'minuto' => 75]);
-        
+
         // PARTIDO 2 (FINALIZADO: 0-2)
         $match2 = Partido::create([
-            'equipo_local_id' => $equipoLobos->id, 
-            'equipo_visitante_id' => $equipoDragones->id, 
+            'equipo_local_id' => $equipoLobos->id,
+            'equipo_visitante_id' => $equipoDragones->id,
             'fecha_hora' => Carbon::now()->subDays(5),
-            'estado' => 'finalizado', 'goles_local' => 0, 'goles_visitante' => 2
+            'estado' => 'finalizado', 'goles_local' => 0, 'goles_visitante' => 2,
         ]);
         EventoPartido::create(['partido_id' => $match2->id, 'jugador_id' => $jugadorNico->id, 'equipo_id' => $equipoDragones->id, 'tipo_evento' => 'gol', 'minuto' => 40]);
         EventoPartido::create(['partido_id' => $match2->id, 'jugador_id' => $jugadorNico->id, 'equipo_id' => $equipoDragones->id, 'tipo_evento' => 'gol', 'minuto' => 60]);
-        
+
         // PARTIDO 3 (FINALIZADO: 5-0)
         $match3 = Partido::create([
-            'equipo_local_id' => $equipoTitanes->id, 
-            'equipo_visitante_id' => $equipoLobos->id, 
+            'equipo_local_id' => $equipoTitanes->id,
+            'equipo_visitante_id' => $equipoLobos->id,
             'fecha_hora' => Carbon::now()->subDays(2),
-            'estado' => 'finalizado', 'goles_local' => 5, 'goles_visitante' => 0
+            'estado' => 'finalizado', 'goles_local' => 5, 'goles_visitante' => 0,
         ]);
         EventoPartido::create(['partido_id' => $match3->id, 'jugador_id' => $jugadorMarco->id, 'equipo_id' => $equipoTitanes->id, 'tipo_evento' => 'gol', 'minuto' => 10]);
         EventoPartido::create(['partido_id' => $match3->id, 'jugador_id' => $jugadorMarco->id, 'equipo_id' => $equipoTitanes->id, 'tipo_evento' => 'asistencia', 'minuto' => 10]);
@@ -144,24 +144,24 @@ class LeagueSeeder extends Seeder
 
         // PARTIDO 4 (PENDIENTE)
         Partido::create([
-            'equipo_local_id' => $equipoHalcones->id, 
-            'equipo_visitante_id' => $equipoDragones->id, 
+            'equipo_local_id' => $equipoHalcones->id,
+            'equipo_visitante_id' => $equipoDragones->id,
             'fecha_hora' => Carbon::now()->addDays(2)->setTime(20, 0),
-            'estado' => 'pendiente'
+            'estado' => 'pendiente',
         ]);
 
         // PARTIDO 5 (PENDIENTE)
         Partido::create([
-            'equipo_local_id' => $equipoLobos->id, 
-            'equipo_visitante_id' => $equipoTitanes->id, 
+            'equipo_local_id' => $equipoLobos->id,
+            'equipo_visitante_id' => $equipoTitanes->id,
             'fecha_hora' => Carbon::now()->addDays(5)->setTime(18, 30),
-            'estado' => 'pendiente'
+            'estado' => 'pendiente',
         ]);
 
-                // 5. CREAR NOTICIAS (Para el Slider)
-        
+        // 5. CREAR NOTICIAS (Para el Slider)
+
         // Define una URL de imagen genérica para el banner
-        $newsImageUrl = asset('uploads/news/banner_default.jpg'); 
+        $newsImageUrl = asset('uploads/news/banner_default.jpg');
 
         DB::table('noticias')->insert([
             [

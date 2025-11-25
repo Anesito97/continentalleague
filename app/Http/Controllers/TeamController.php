@@ -1,13 +1,54 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Models\Equipo;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\File;
+
+use App\Traits\LoadsCommonData;
 
 class TeamController extends Controller
 {
+    use LoadsCommonData;
+
+    public function adminTeams()
+    {
+        session(['activeAdminContent' => 'teams']);
+        $data = $this->loadAllData();
+        // ⬇️ FIX: Inicializar $news para la vista, si no fue cargada ⬇️
+        $data['news'] = $this->getEmptyNewsPaginator();
+        $data['activeView'] = 'admin';
+
+        return view('index', $data);
+    }
+
+    public function editTeam(Equipo $equipo)
+    {
+        $data = $this->loadAllData();
+        $data['item'] = $equipo;
+        $data['type'] = 'team';
+
+        return view('edit', $data); // Usaremos una vista genérica 'edit.blade.php'
+    }
+
+    public function showTeamPlayers(Equipo $equipo)
+    {
+        // Asegúrate de cargar la relación 'jugadores' y ordenarlos por número de camiseta
+        $equipo->load([
+            'jugadores' => function ($query) {
+                $query->orderBy('numero', 'asc');
+            },
+        ]);
+
+        $data = $this->loadAllData(); // Carga todos los datos generales (teams, pending matches, etc.)
+        $data['equipoActual'] = $equipo;
+        $data['players'] = $equipo->jugadores; // Sobrescribimos 'players' con solo los de este equipo
+        $data['activeView'] = 'admin';
+        $data['activeAdminContent'] = 'teams'; // Mantenemos la navegación activa en 'teams'
+
+        return view('admin.team_players', $data);
+    }
     // Creado para la acción POST del formulario de creación
     public function store(Request $request)
     {

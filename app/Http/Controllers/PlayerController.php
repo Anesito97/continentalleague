@@ -1,13 +1,37 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Models\Jugador;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\File;
+
+use App\Traits\LoadsCommonData;
 
 class PlayerController extends Controller
 {
+    use LoadsCommonData;
+
+    public function adminPlayers()
+    {
+        session(['activeAdminContent' => 'players']);
+        $data = $this->loadAllData();
+        $data['positions'] = $this->getPositions();
+        $data['news'] = $this->getEmptyNewsPaginator();
+        $data['activeView'] = 'admin';
+
+        return view('index', $data);
+    }
+
+    public function editPlayer(Jugador $jugador)
+    {
+        $data = $this->loadAllData();
+        $data['item'] = $jugador;
+        $data['positions'] = $this->getPositions();
+        $data['type'] = 'player';
+
+        return view('edit', $data);
+    }
     // Creado para la acción POST del formulario de creación
     public function store(Request $request)
     {
@@ -77,6 +101,7 @@ class PlayerController extends Controller
     public function destroy(Jugador $jugador)
     {
         $jugador->delete();
+
         return redirect()->route('admin.players')->with('success', 'Jugador eliminado.');
     }
 }

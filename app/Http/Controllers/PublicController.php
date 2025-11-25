@@ -1,11 +1,11 @@
 <?php
+
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\Noticia;
-use App\Models\Equipo; // Necesario para loadAllData si lo mueves aquí
+use App\Models\Equipo;
+use App\Models\GalleryItem; // Necesario para loadAllData si lo mueves aquí
 use App\Models\Jugador;
-use App\Models\GalleryItem;
+use App\Models\Noticia;
 use Illuminate\Support\Collection;
 
 class PublicController extends Controller
@@ -35,9 +35,9 @@ class PublicController extends Controller
     {
         // 1. Cargar relaciones CRÍTICAS
         $equipo->load([
-            'jugadores' => fn($query) => $query->orderBy('numero', 'asc'),
-            'localMatches' => fn($query) => $query->where('estado', 'finalizado')->orderBy('fecha_hora', 'desc'),
-            'visitorMatches' => fn($query) => $query->where('estado', 'finalizado')->orderBy('fecha_hora', 'desc'),
+            'jugadores' => fn ($query) => $query->orderBy('numero', 'asc'),
+            'localMatches' => fn ($query) => $query->where('estado', 'finalizado')->orderBy('fecha_hora', 'desc'),
+            'visitorMatches' => fn ($query) => $query->where('estado', 'finalizado')->orderBy('fecha_hora', 'desc'),
         ]);
 
         // 2. Cálculo de métricas avanzadas
@@ -70,7 +70,7 @@ class PublicController extends Controller
 
         // --- ANALISIS POSICIONAL Y OFENSIVO ---
         $jugadoresPorPos = $equipo->jugadores->groupBy('posicion');
-        $delanteros = $jugadoresPorPos->get('delantero', new Collection());
+        $delanteros = $jugadoresPorPos->get('delantero', new Collection);
         $golesDelanteros = $delanteros->sum('goles');
 
         $golesNoDelanteros = $totalGoles - $golesDelanteros;
@@ -82,11 +82,11 @@ class PublicController extends Controller
         // --- TOP 3 JUGADORES CON MAYOR DISCIPLINA (Menos Tarjetas) ---
         $playersWithDiscipline = $equipo->jugadores->map(function ($p) {
             $p->discipline_score = ($p->rojas * 3) + ($p->amarillas * 1);
+
             return $p;
         });
         // Jugadores con menos de 3 puntos de disciplina (para destacar el fair play)
         $topCleanPlayers = $playersWithDiscipline->where('discipline_score', '<', 3)->sortBy('discipline_score')->take(3);
-
 
         // --- Racha y Goleadores (Existente) ---
         $allPlayedMatches = $equipo->localMatches->merge($equipo->visitorMatches)
@@ -146,13 +146,14 @@ class PublicController extends Controller
 
             if ($match->goles_local === $match->goles_visitante) {
                 $result = 'E';
-            } elseif (($isLocal && $match->goles_local > $match->goles_visitante) || (!$isLocal && $match->goles_visitante > $match->goles_local)) {
+            } elseif (($isLocal && $match->goles_local > $match->goles_visitante) || (! $isLocal && $match->goles_visitante > $match->goles_local)) {
                 $result = 'G';
             } else {
                 $result = 'P';
             }
             $streak .= $result;
         }
+
         return strrev($streak); // Retorna la racha en orden cronológico inverso (el último jugado es la primera letra)
     }
 
@@ -161,7 +162,7 @@ class PublicController extends Controller
         // 1. Cargar relaciones CRÍTICAS: Equipo y Eventos
         $jugador->load([
             'equipo',
-            'eventos' => fn($query) => $query->with('partido')->orderBy('minuto', 'asc'),
+            'eventos' => fn ($query) => $query->with('partido')->orderBy('minuto', 'asc'),
         ]);
 
         // 2. CÁLCULO DE MÉTRICAS INDIVIDUALES AVANZADAS
@@ -186,8 +187,7 @@ class PublicController extends Controller
         }
 
         // E. Historial de Eventos (Existente)
-        $recentEvents = $jugador->eventos->sortByDesc(fn($e) => $e->partido->fecha_hora)->take(10);
-
+        $recentEvents = $jugador->eventos->sortByDesc(fn ($e) => $e->partido->fecha_hora)->take(10);
 
         // ⬇️ 1. NUEVA MÉTRICA: Participación en Goles (G+A / Total Goles del Equipo) ⬇️
         $totalGoalContributions = $jugador->goles + $jugador->asistencias;
@@ -212,7 +212,7 @@ class PublicController extends Controller
             'hat_tricks' => 0,  // 3 goles
             'poker' => 0,       // 4 goles
             'manita' => 0,      // 5 goles
-            'mas_cinco' => 0    // > 5 goles
+            'mas_cinco' => 0,    // > 5 goles
         ];
 
         // 1. Agrupar los eventos por Partido ID
@@ -243,7 +243,6 @@ class PublicController extends Controller
             ->map(function ($group) {
                 return $group->count();
             });
-
 
         // 3. Preparar los datos para la vista
         $data = [
