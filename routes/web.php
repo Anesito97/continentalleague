@@ -44,9 +44,11 @@ Route::get('logout', [AuthController::class, 'logout'])->name('logout');
 Route::get('auth/google', [AuthController::class, 'redirectToGoogle'])->name('auth.google');
 Route::get('auth/google/callback', [AuthController::class, 'handleGoogleCallback']);
 
-// --- MINIJUEGO ---
+// --- MINIJUEGOS ---
 Route::middleware('auth')->group(function () {
-    Route::get('/game', [\App\Http\Controllers\GameController::class, 'index'])->name('game.index');
+    Route::get('/games', [\App\Http\Controllers\GameController::class, 'index'])->name('games.index');
+    Route::get('/games/keepy-uppy', [\App\Http\Controllers\GameController::class, 'keepyUppy'])->name('game.keepy-uppy');
+    Route::get('/games/penalty', [\App\Http\Controllers\GameController::class, 'penalty'])->name('game.penalty');
     Route::post('/game/save', [\App\Http\Controllers\GameController::class, 'store'])->name('game.save');
 });
 

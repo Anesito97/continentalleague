@@ -1,6 +1,6 @@
 <aside id="admin-sidebar" {{-- MEJORA: "Glassmorphism" aplicado al sidebar --}} class="w-3/4 sm:w-72 bg-gray-900/80 backdrop-blur-lg p-6 flex-col justify-between border-r border-white/10 shadow-2xl 
               {{-- ⬇️ CLASES DE VISIBILIDAD CRÍTICAS (NO TOCAR) ⬇️ --}}
-              fixed top-0 left-0 h-full z-30 sm:relative sm:flex hidden sm:flex">
+              fixed top-0 left-0 h-full z-50 sm:relative sm:flex hidden sm:flex">
     <div>
         {{-- Título y Logo --}}
         <div class="flex items-center gap-3 mb-8">
@@ -79,25 +79,22 @@
             </a>
 
             {{-- MINIJUEGO --}}
-            <a href="{{ route('game.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200
-                       @if (request()->routeIs('game.*')) 
-                           bg-gradient-to-r from-primary to-emerald-600 text-white shadow-lg shadow-primary/30 
-                       @else 
-                           text-gray-300 hover:text-white hover:bg-white/10 
-                       @endif">
-                <span class="material-symbols-outlined">sports_soccer</span>
-                <span class="font-medium">Minijuego</span>
+            <a href="{{ route('games.index') }}"
+                class="flex items-center px-4 py-3 text-gray-300 hover:bg-gray-800 hover:text-white transition-colors rounded-lg group">
+                <span
+                    class="material-symbols-outlined mr-3 group-hover:text-green-400 transition-colors">sports_esports</span>
+                <span class="font-medium">Minijuegos</span>
             </a>
 
             <br><br>
             {{-- Panel de Administración --}}
             @if (session('is_admin'))
                 <a href="{{ route('admin.panel') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200
-                               @if (isset($activeView) && $activeView === 'admin') 
-                                   bg-gradient-to-r from-primary to-emerald-600 text-white shadow-lg shadow-primary/30 
-                               @else 
-                                   text-gray-300 hover:text-white hover:bg-white/10 
-                               @endif">
+                                       @if (isset($activeView) && $activeView === 'admin') 
+                                           bg-gradient-to-r from-primary to-emerald-600 text-white shadow-lg shadow-primary/30 
+                                       @else 
+                                           text-gray-300 hover:text-white hover:bg-white/10 
+                                       @endif">
                     <span class="material-symbols-outlined">admin_panel_settings</span>
                     <span class="font-medium">Panel Admin</span>
                 </a>

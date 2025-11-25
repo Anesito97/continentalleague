@@ -10,36 +10,46 @@
         <div class="flex flex-col md:flex-row gap-8 w-full max-w-6xl px-4">
 
             <!-- GAME AREA -->
+            <!-- GAME AREA -->
             <div class="flex-1 flex flex-col items-center">
                 <div id="game-container"
-                    class="relative w-full max-w-md h-[600px] bg-gradient-to-b from-blue-900 to-green-900 rounded-xl border-4 border-gray-700 overflow-hidden shadow-2xl cursor-pointer select-none">
+                    class="relative w-full max-w-md h-[600px] rounded-xl border-4 border-gray-700 overflow-hidden shadow-2xl cursor-pointer select-none bg-cover bg-center"
+                    style="background-image: url('https://images.unsplash.com/photo-1522778119026-d647f0565c6a?q=80&w=2070&auto=format&fit=crop');">
+
+                    <!-- Overlay for better visibility -->
+                    <div class="absolute inset-0 bg-black/30"></div>
 
                     <!-- Score Display -->
                     <div class="absolute top-4 left-0 w-full text-center pointer-events-none z-10">
-                        <span id="current-score" class="text-6xl font-black text-white drop-shadow-lg">0</span>
+                        <span id="current-score"
+                            class="text-7xl font-black text-white drop-shadow-[0_4px_4px_rgba(0,0,0,0.8)] font-display">0</span>
                     </div>
 
                     <!-- Start Message -->
-                    <div id="start-message" class="absolute inset-0 flex items-center justify-center bg-black/50 z-20">
+                    <div id="start-message"
+                        class="absolute inset-0 flex items-center justify-center bg-black/60 z-20 backdrop-blur-sm">
                         <div class="text-center animate-pulse">
-                            <p class="text-2xl font-bold text-white">CLICK TO START</p>
+                            <span class="material-symbols-outlined text-6xl text-white mb-4">touch_app</span>
+                            <p class="text-3xl font-bold text-white font-display">TOCA PARA EMPEZAR</p>
                         </div>
                     </div>
 
                     <!-- Game Over Screen -->
                     <div id="game-over-screen"
-                        class="hidden absolute inset-0 flex flex-col items-center justify-center bg-black/80 z-30">
-                        <h2 class="text-4xl font-bold text-red-500 mb-2">GAME OVER</h2>
-                        <p class="text-xl mb-4">Score: <span id="final-score" class="font-bold text-yellow-400">0</span></p>
+                        class="hidden absolute inset-0 flex flex-col items-center justify-center bg-black/80 z-30 backdrop-blur-md">
+                        <h2 class="text-5xl font-black text-red-500 mb-2 font-display drop-shadow-lg">GAME OVER</h2>
+                        <p class="text-2xl mb-6 text-white">Puntuación: <span id="final-score"
+                                class="font-bold text-yellow-400">0</span></p>
                         <button id="restart-btn"
-                            class="px-6 py-3 bg-green-600 hover:bg-green-500 rounded-full font-bold text-white transition transform hover:scale-105">
+                            class="px-8 py-4 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-400 hover:to-emerald-500 rounded-full font-bold text-white text-xl transition transform hover:scale-105 shadow-lg hover:shadow-green-500/50 flex items-center gap-2">
+                            <span class="material-symbols-outlined">replay</span>
                             Jugar de Nuevo
                         </button>
                     </div>
 
                     <!-- The Ball -->
                     <div id="ball"
-                        class="absolute w-16 h-16 bg-white rounded-full shadow-lg flex items-center justify-center text-black font-bold hidden"
+                        class="absolute w-16 h-16 bg-white rounded-full shadow-[0_10px_20px_rgba(0,0,0,0.5)] flex items-center justify-center text-black font-bold hidden"
                         style="background-image: url('https://upload.wikimedia.org/wikipedia/commons/d/d3/Soccerball.svg'); background-size: cover;">
                     </div>
                 </div>

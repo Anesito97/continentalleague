@@ -12,6 +12,7 @@ class GameScore extends Model
     protected $fillable = [
         'user_id',
         'score',
+        'game_type',
     ];
 
     public function user()
