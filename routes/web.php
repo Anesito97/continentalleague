@@ -34,7 +34,10 @@ Route::post('vote/{match_id}', [VoteController::class, 'handleVote'])->name('com
 Route::get('images', [GalleryController::class, 'index'])->name('gallery.index');
 
 // --- AUTENTICACIÓN ---
-Route::post('login', [AuthController::class, 'login'])->name('login');
+Route::get('login', function () {
+    return redirect()->route('home', ['login' => 'true']);
+})->name('login');
+Route::post('login', [AuthController::class, 'login']);
 Route::get('logout', [AuthController::class, 'logout'])->name('logout');
 
 // Google Auth
