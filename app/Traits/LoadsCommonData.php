@@ -6,6 +6,8 @@ use App\Models\Equipo;
 use App\Models\Jugador;
 use App\Models\Partido;
 use App\Http\Controllers\VoteController;
+use Illuminate\Support\Facades\Auth;
+use App\Models\Vote;
 
 trait LoadsCommonData
 {
@@ -136,11 +138,31 @@ trait LoadsCommonData
                 $prediction = $this->getMatchPrediction($match->localTeam, $match->visitorTeam);
                 $h2hRecord = $this->calculateH2H($match->localTeam, $match->visitorTeam);
 
+                // Datos de votación
+                $votes = VoteController::getVotes($match->id);
+                $totalVotes = array_sum($votes);
+                $hasVoted = false;
+                $userVote = null;
+
+                if (Auth::check()) {
+                    $voteRecord = Vote::where('user_id', Auth::id())
+                        ->where('match_id', $match->id)
+                        ->first();
+                    if ($voteRecord) {
+                        $hasVoted = true;
+                        $userVote = $voteRecord->vote;
+                    }
+                }
+
                 return (object) [
                     'match' => $match,
                     'prediction' => $prediction,
                     'h2hRecord' => $h2hRecord,
-                    'probTitle' => $prediction['title'], // Usualmente 'Probabilidad (Estimada)'
+                    'probTitle' => $prediction['title'],
+                    'votes' => $votes,
+                    'totalVotes' => $totalVotes,
+                    'hasVoted' => $hasVoted,
+                    'userVote' => $userVote,
                 ];
             });
         }

@@ -420,6 +420,13 @@
                     Iniciar Sesión
                 </button>
             </form>
+
+            {{-- BOTÓN GOOGLE --}}
+            <a href="{{ route('auth.google') }}"
+                class="flex items-center justify-center gap-2 bg-white text-gray-700 font-bold py-2 px-4 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg mb-3 w-full hover:bg-gray-100">
+                <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-5 h-5" alt="Google Logo">
+                Iniciar con Google
+            </a>
             {{-- MEJORA: Botón de cancelar más sutil --}}
             <button onclick="document.getElementById('login-modal').classList.add('hidden')"
                 class="bg-gray-700 hover:bg-gray-600 text-gray-300 font-bold py-2 px-4 rounded-lg transition w-full">Cancelar</button>

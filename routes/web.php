@@ -37,6 +37,10 @@ Route::get('images', [GalleryController::class, 'index'])->name('gallery.index')
 Route::post('login', [AuthController::class, 'login'])->name('login');
 Route::get('logout', [AuthController::class, 'logout'])->name('logout');
 
+// Google Auth
+Route::get('auth/google', [AuthController::class, 'redirectToGoogle'])->name('auth.google');
+Route::get('auth/google/callback', [AuthController::class, 'handleGoogleCallback']);
+
 // --- RUTAS DE ADMINISTRACIÓN (Protegidas) ---
 // Usaremos un Middleware simple para simular 'is_admin'
 Route::middleware(\App\Http\Middleware\AdminCheck::class)
