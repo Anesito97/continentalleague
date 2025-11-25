@@ -67,7 +67,7 @@
                         <!-- Power Bar -->
                         <div
                             class="w-full h-4 bg-gray-700 rounded-full overflow-hidden relative border border-gray-500 mt-2">
-                            <div id="power-fill"
+                            <div id="power-fill" style="will-change: width, background-color;"
                                 class="h-full bg-gradient-to-r from-green-500 via-yellow-500 to-red-500 w-0"></div>
                             <div class="absolute top-0 bottom-0 left-[80%] w-1 h-full bg-white/50"></div>
                             <!-- Sweet spot marker -->
@@ -203,7 +203,10 @@
 
                 aimValue = 50;
                 powerValue = 0;
+                powerDirection = 1; // Ensure it always starts moving up
                 powerFill.style.width = '0%';
+                powerFill.style.backgroundColor = '#22c55e'; // Reset to green
+                powerFill.className = 'h-full'; // Keep base class only
 
                 state = 'AIMING';
             }
@@ -217,13 +220,20 @@
                     aimCursor.style.left = `${aimValue}%`;
                 } else if (state === 'POWER') {
                     powerValue += powerSpeed * powerDirection;
-                    if (powerValue >= 100 || powerValue <= 0) powerDirection *= -1;
-                    powerFill.style.width = `${powerValue}%`;
 
-                    // Color change based on power
-                    if (powerValue > 80) powerFill.className = 'h-full bg-red-500 w-0';
-                    else if (powerValue > 60) powerFill.className = 'h-full bg-yellow-500 w-0';
-                    else powerFill.className = 'h-full bg-green-500 w-0';
+                    // Clamp and bounce
+                    if (powerValue >= 100) {
+                        powerValue = 100;
+                        powerDirection = -1;
+                    } else if (powerValue <= 0) {
+                        powerValue = 0;
+                        powerDirection = 1;
+                    }
+
+                    // Color change based on power using inline styles for performance
+                    if (powerValue > 80) powerFill.style.backgroundColor = '#ef4444'; // red-500
+                    else if (powerValue > 60) powerFill.style.backgroundColor = '#eab308'; // yellow-500
+                    else powerFill.style.backgroundColor = '#22c55e'; // green-500
 
                     powerFill.style.width = `${powerValue}%`;
                 }
@@ -231,17 +241,26 @@
                 animationFrame = requestAnimationFrame(gameLoop);
             }
 
+            let lastInputTime = 0;
+            const INPUT_COOLDOWN = 250; // Reduced to 250ms for better responsiveness
+
             function handleInput(e) {
                 if (e.target.tagName === 'BUTTON') return;
                 e.preventDefault();
 
+                const now = Date.now();
+                if (now - lastInputTime < INPUT_COOLDOWN) return;
+
                 if (state === 'START') {
                     initGame();
+                    lastInputTime = now;
                 } else if (state === 'AIMING') {
                     state = 'POWER';
+                    lastInputTime = now;
                 } else if (state === 'POWER') {
                     state = 'SHOOTING';
                     shoot();
+                    lastInputTime = now;
                 }
             }
 
