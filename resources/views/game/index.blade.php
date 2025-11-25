@@ -96,7 +96,7 @@
             let velocityX = 0;
             let velocityY = 0;
             let rotation = 0;
-            
+
             // Difficulty Variables
             let currentGravity = 0.6;
             let ballScale = 1;
@@ -107,7 +107,7 @@
             const BASE_GRAVITY = 0.6;
             const BOUNCE = -14;
             const FRICTION = 0.99;
-            const FLOOR_Y = 530; 
+            const FLOOR_Y = 530;
 
             ball.style.willChange = 'transform';
 
@@ -117,21 +117,21 @@
                 currentGravity = BASE_GRAVITY;
                 ballScale = 1;
                 wind = 0;
-                
+
                 scoreDisplay.textContent = '0';
                 scoreDisplay.style.color = 'white';
-                
+
                 ballX = container.offsetWidth / 2 - 32;
                 ballY = 200;
                 velocityX = 0;
                 velocityY = 0;
                 rotation = 0;
-                
+
                 ball.style.transform = `translate3d(${ballX}px, ${ballY}px, 0) rotate(${rotation}deg) scale(${ballScale})`;
                 ball.classList.remove('hidden');
                 startMessage.classList.add('hidden');
                 gameOverScreen.classList.add('hidden');
-                
+
                 isPlaying = true;
                 requestAnimationFrame(gameLoop);
             }
@@ -164,7 +164,7 @@
                 else if (score >= 50 && score < 75) {
                     if (level < 4) showToast("¡Viento Fuerte!");
                     level = 4;
-                    wind = (Math.random() - 0.5) * 0.3; 
+                    wind = (Math.random() - 0.5) * 0.3;
                     scoreDisplay.style.color = '#ef4444'; // Red
                 }
                 // Level 5: 75+ (Ghost Ball)
@@ -179,8 +179,8 @@
 
             function showToast(text) {
                 const toast = document.createElement('div');
-                // Positioned at top-20 instead of center to avoid being hidden or annoying
-                toast.className = 'absolute top-24 left-1/2 transform -translate-x-1/2 text-2xl md:text-3xl font-bold text-white drop-shadow-lg animate-bounce z-40 pointer-events-none whitespace-nowrap bg-black/30 px-4 py-2 rounded-full backdrop-blur-sm border border-white/20';
+                // Fix: Allow wrapping, center text, constrain width, adjust font size for mobile
+                toast.className = 'absolute top-24 left-1/2 transform -translate-x-1/2 text-xl md:text-3xl font-bold text-white drop-shadow-lg animate-bounce z-40 pointer-events-none text-center w-11/12 bg-black/30 px-4 py-2 rounded-xl backdrop-blur-sm border border-white/20';
                 toast.textContent = text;
                 container.appendChild(toast);
                 setTimeout(() => toast.remove(), 2000);
@@ -198,14 +198,14 @@
 
                 // Physics
                 velocityY += currentGravity;
-                
+
                 // Wind update for levels 4+
                 if (level >= 4) {
-                     // Fluctuating wind
-                     wind += (Math.random() - 0.5) * 0.1;
-                     // Clamp wind
-                     wind = Math.max(-0.5, Math.min(0.5, wind));
-                     velocityX += wind;
+                    // Fluctuating wind
+                    wind += (Math.random() - 0.5) * 0.1;
+                    // Clamp wind
+                    wind = Math.max(-0.5, Math.min(0.5, wind));
+                    velocityX += wind;
                 }
 
                 ballX += velocityX;
@@ -238,6 +238,9 @@
             }
 
             function handleInput(e) {
+                // Fix: Don't prevent default if clicking a button (though stopPropagation on button should handle this)
+                if (e.target.tagName === 'BUTTON') return;
+
                 // Prevent default browser behavior (scrolling, zooming)
                 if (e.cancelable) e.preventDefault();
 
@@ -263,13 +266,13 @@
                     const currentSize = 64 * ballScale;
                     const ballCenterX = rect.left + (currentSize / 2);
                     const ballCenterY = rect.top + (currentSize / 2);
-                    
+
                     // Hit area scales with ball but stays generous
-                    const hitRadius = 120 * ballScale; 
-                    
+                    const hitRadius = 120 * ballScale;
+
                     const dist = Math.hypot(clientX - ballCenterX, clientY - ballCenterY);
-                    
-                    if (dist < hitRadius) { 
+
+                    if (dist < hitRadius) {
                         kickBall(clientX);
                     }
                 }
@@ -286,14 +289,14 @@
                 // Horizontal force based on hit position
                 // -1 (left edge) to 1 (right edge)
                 // Clamped to avoid extreme angles
-                let offset = (ballCenterX - inputX) / (40 * ballScale); 
+                let offset = (ballCenterX - inputX) / (40 * ballScale);
                 offset = Math.max(-1.5, Math.min(1.5, offset));
-                
-                velocityX = offset * 6; 
+
+                velocityX = offset * 6;
 
                 score++;
                 scoreDisplay.textContent = score;
-                
+
                 updateDifficulty();
 
                 // Visual pop
@@ -301,7 +304,7 @@
                 const popScale = ballScale * 0.9;
                 ball.style.transform = `translate3d(${ballX}px, ${ballY}px, 0) rotate(${rotation}deg) scale(${popScale})`;
                 setTimeout(() => {
-                     ball.style.transform = `translate3d(${ballX}px, ${ballY}px, 0) rotate(${rotation}deg) scale(${ballScale})`;
+                    ball.style.transform = `translate3d(${ballX}px, ${ballY}px, 0) rotate(${rotation}deg) scale(${ballScale})`;
                 }, 50);
             }
 
@@ -310,14 +313,21 @@
             container.addEventListener('touchstart', handleInput, { passive: false });
             container.addEventListener('mousedown', handleInput);
 
+            // Fix: Add touchstart listener to button for mobile responsiveness
+            restartBtn.addEventListener('touchstart', (e) => {
+                e.stopPropagation();
+                e.preventDefault(); // Prevent ghost clicks
+                initGame();
+            });
+
             restartBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 initGame();
             });
-            
+
             // Prevent scrolling on the game container
             container.addEventListener('touchmove', (e) => {
-                if(e.cancelable) e.preventDefault();
+                if (e.cancelable) e.preventDefault();
             }, { passive: false });
 
             async function saveScore(score) {
