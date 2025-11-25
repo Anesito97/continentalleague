@@ -41,6 +41,12 @@ Route::get('logout', [AuthController::class, 'logout'])->name('logout');
 Route::get('auth/google', [AuthController::class, 'redirectToGoogle'])->name('auth.google');
 Route::get('auth/google/callback', [AuthController::class, 'handleGoogleCallback']);
 
+// --- MINIJUEGO ---
+Route::middleware('auth')->group(function () {
+    Route::get('/game', [\App\Http\Controllers\GameController::class, 'index'])->name('game.index');
+    Route::post('/game/save', [\App\Http\Controllers\GameController::class, 'store'])->name('game.save');
+});
+
 // --- RUTAS DE ADMINISTRACIÓN (Protegidas) ---
 // Usaremos un Middleware simple para simular 'is_admin'
 Route::middleware(\App\Http\Middleware\AdminCheck::class)

@@ -1,6 +1,4 @@
-<aside id="admin-sidebar"
-    {{-- MEJORA: "Glassmorphism" aplicado al sidebar --}}
-    class="w-3/4 sm:w-72 bg-gray-900/80 backdrop-blur-lg p-6 flex-col justify-between border-r border-white/10 shadow-2xl 
+<aside id="admin-sidebar" {{-- MEJORA: "Glassmorphism" aplicado al sidebar --}} class="w-3/4 sm:w-72 bg-gray-900/80 backdrop-blur-lg p-6 flex-col justify-between border-r border-white/10 shadow-2xl 
               {{-- ⬇️ CLASES DE VISIBILIDAD CRÍTICAS (NO TOCAR) ⬇️ --}}
               fixed top-0 left-0 h-full z-30 sm:relative sm:flex hidden sm:flex">
     <div>
@@ -14,9 +12,7 @@
         <nav class="flex flex-col gap-2">
 
             {{-- Home / Dashboard --}}
-            <a href="{{ route('home') }}"
-                {{-- MEJORA: Lógica de clases para estado activo/inactivo --}}
-                class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200
+            <a href="{{ route('home') }}" {{-- MEJORA: Lógica de clases para estado activo/inactivo --}} class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200
                        @if (!isset($activeView) || $activeView === 'home' || $activeView === 'stats') 
                            bg-gradient-to-r from-primary to-emerald-600 text-white shadow-lg shadow-primary/30 
                        @else 
@@ -27,8 +23,7 @@
             </a>
 
             {{-- Estadísticas / Líderes --}}
-            <a href="{{ route('home') }}?view=stats"
-                class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200
+            <a href="{{ route('home') }}?view=stats" class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200
                        @if (isset($activeView) && $activeView === 'stats') 
                            bg-gradient-to-r from-primary to-emerald-600 text-white shadow-lg shadow-primary/30 
                        @else 
@@ -40,8 +35,7 @@
 
 
             {{-- CALENDARIO DE PARTIDOS (NUEVO) --}}
-            <a href="{{ route('matches.calendar') }}"
-                class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200
+            <a href="{{ route('matches.calendar') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200
                        @if (isset($activeView) && $activeView === 'calendar') 
                            bg-gradient-to-r from-primary to-emerald-600 text-white shadow-lg shadow-primary/30 
                        @else 
@@ -52,8 +46,7 @@
             </a>
 
             {{-- NOTICIAS (NUEVO) --}}
-            <a href="{{ route('news.index') }}"
-                class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200
+            <a href="{{ route('news.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200
                        @if (request()->routeIs('news.*')) 
                            bg-gradient-to-r from-primary to-emerald-600 text-white shadow-lg shadow-primary/30 
                        @else 
@@ -64,8 +57,7 @@
             </a>
 
             {{-- REGLAS DE LA LIGA (NUEVO) --}}
-            <a href="{{ route('rules.index') }}"
-                class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200
+            <a href="{{ route('rules.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200
                        @if (isset($activeView) && $activeView === 'rules') 
                            bg-gradient-to-r from-primary to-emerald-600 text-white shadow-lg shadow-primary/30 
                        @else 
@@ -76,8 +68,7 @@
             </a>
 
             {{-- GALERÍA --}}
-            <a href="{{ route('gallery.index') }}"
-                class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200
+            <a href="{{ route('gallery.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200
                        @if (request()->routeIs('gallery.*')) 
                            bg-gradient-to-r from-primary to-emerald-600 text-white shadow-lg shadow-primary/30 
                        @else 
@@ -87,16 +78,26 @@
                 <span class="font-medium">Galería</span>
             </a>
 
+            {{-- MINIJUEGO --}}
+            <a href="{{ route('game.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200
+                       @if (request()->routeIs('game.*')) 
+                           bg-gradient-to-r from-primary to-emerald-600 text-white shadow-lg shadow-primary/30 
+                       @else 
+                           text-gray-300 hover:text-white hover:bg-white/10 
+                       @endif">
+                <span class="material-symbols-outlined">sports_soccer</span>
+                <span class="font-medium">Minijuego</span>
+            </a>
+
             <br><br>
             {{-- Panel de Administración --}}
             @if (session('is_admin'))
-                <a href="{{ route('admin.panel') }}"
-                    class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200
-                           @if (isset($activeView) && $activeView === 'admin') 
-                               bg-gradient-to-r from-primary to-emerald-600 text-white shadow-lg shadow-primary/30 
-                           @else 
-                               text-gray-300 hover:text-white hover:bg-white/10 
-                           @endif">
+                <a href="{{ route('admin.panel') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200
+                               @if (isset($activeView) && $activeView === 'admin') 
+                                   bg-gradient-to-r from-primary to-emerald-600 text-white shadow-lg shadow-primary/30 
+                               @else 
+                                   text-gray-300 hover:text-white hover:bg-white/10 
+                               @endif">
                     <span class="material-symbols-outlined">admin_panel_settings</span>
                     <span class="font-medium">Panel Admin</span>
                 </a>
