@@ -57,11 +57,24 @@ class GameController extends Controller
             'game_type' => 'nullable|string|in:keepy_uppy,penalty'
         ]);
 
-        GameScore::create([
-            'user_id' => Auth::id(),
-            'score' => $request->score,
-            'game_type' => $request->game_type ?? 'keepy_uppy'
-        ]);
+        $gameType = $request->game_type ?? 'keepy_uppy';
+        $userId = Auth::id();
+
+        $existingScore = GameScore::where('user_id', $userId)
+            ->where('game_type', $gameType)
+            ->first();
+
+        if ($existingScore) {
+            if ($request->score > $existingScore->score) {
+                $existingScore->update(['score' => $request->score]);
+            }
+        } else {
+            GameScore::create([
+                'user_id' => $userId,
+                'score' => $request->score,
+                'game_type' => $gameType
+            ]);
+        }
 
         return response()->json(['success' => true]);
     }
