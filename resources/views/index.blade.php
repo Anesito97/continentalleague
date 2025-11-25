@@ -483,6 +483,13 @@
                     if (overlay) overlay.style.display = 'none';
                 }, 500);
             }, 300);
+
+            // Check for login query param to open modal
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('login') === 'true') {
+                document.getElementById('login-modal').classList.remove('hidden');
+                document.getElementById('login-modal').classList.add('flex'); // Ensure flex is added for centering
+            }
         });
 
         // ⬇️ FUNCIÓN CORREGIDA PARA EL SCROLL FIJO DEL SIDEBAR ⬇️
