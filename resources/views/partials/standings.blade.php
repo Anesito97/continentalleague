@@ -21,219 +21,325 @@
 
 @if ($nextMatch)
     <!-- @php
-        // Usamos el historial H2H para la probabilidad simple
-        $localTeamId = $nextMatch->localTeam->id;
-        $h2hLocalWins = $h2hRecord['G'] ?? 0;
-        $h2hVisitorWins = $h2hRecord['P'] ?? 0;
-        $h2hTotal = $h2hRecord['total'] ?? 0;
+            // Usamos el historial H2H para la probabilidad simple
+            $localTeamId = $nextMatch->localTeam->id;
+            $h2hLocalWins = $h2hRecord['G'] ?? 0;
+            $h2hVisitorWins = $h2hRecord['P'] ?? 0;
+            $h2hTotal = $h2hRecord['total'] ?? 0;
 
-        // Probabilidad de Victoria Local (Basado en el historial H2H)
-        $localProb = $prediction['localProb'];
-        $visitorProb = $prediction['visitorProb'];
-        $drawProb = $prediction['drawProb'];
+            // Probabilidad de Victoria Local (Basado en el historial H2H)
+            $localProb = $prediction['localProb'];
+            $visitorProb = $prediction['visitorProb'];
+            $drawProb = $prediction['drawProb'];
 
-        // Si no hay historial, usamos el 50/50 y lo etiquetamos como "Basado en Racha"
-        $probTitle = $prediction['title'];
+            // Si no hay historial, usamos el 50/50 y lo etiquetamos como "Basado en Racha"
+            $probTitle = $prediction['title'];
 
-        $votedCookieName = 'voted_' . $nextMatch->id;
-        $hasVoted = request()->cookie($votedCookieName);
-        $votingStartTime = \Carbon\Carbon::parse($nextMatch->fecha_hora)->subHour();
-        $isVotingActive = Carbon\Carbon::now()->lt($votingStartTime);
-    @endphp -->
+            $votedCookieName = 'voted_' . $nextMatch->id;
+            $hasVoted = request()->cookie($votedCookieName);
+            $votingStartTime = \Carbon\Carbon::parse($nextMatch->fecha_hora)->subHour();
+            $isVotingActive = Carbon\Carbon::now()->lt($votingStartTime);
+        @endphp -->
 
-{{-- ---------------------------------------------------- --}}
-{{-- SLIDER "MODERNO" CON BARRA CLÁSICA DE PROBABILIDAD   --}}
-{{-- ---------------------------------------------------- --}}
+    {{-- ---------------------------------------------------- --}}
+    {{-- SLIDER "MODERNO" CON BARRA CLÁSICA DE PROBABILIDAD --}}
+    {{-- ---------------------------------------------------- --}}
 
-<div class="relative w-full max-w-5xl mx-auto py-8">
+    <div class="relative w-full max-w-5xl mx-auto py-8">
 
-    {{-- Título con estilo neón sutil --}}
-    <div class="flex items-center justify-between mb-6 px-4">
-        <h3 class="text-2xl font-bold text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.3)]">
-            <span class="text-primary">Próximos</span> Grandes Duelos
-        </h3>
-        
-        {{-- Indicador visual de "Deslizar" (Solo móvil) --}}
-        <div class="flex items-center gap-1 text-xs text-gray-400 sm:hidden animate-pulse">
-            <span>Desliza</span>
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+        {{-- Título con estilo neón sutil --}}
+        <div class="flex items-center justify-between mb-6 px-4">
+            <h3 class="text-2xl font-bold text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.3)]">
+                <span class="text-primary">Próximos</span> Grandes Duelos
+            </h3>
+
+            {{-- Indicador visual de "Deslizar" (Solo móvil) --}}
+            <div class="flex items-center gap-1 text-xs text-gray-400 sm:hidden animate-pulse">
+                <span>Desliza</span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                </svg>
+            </div>
         </div>
-    </div>
 
-    {{-- CONTENEDOR PRINCIPAL --}}
-    <div class="relative group">
+        {{-- CONTENEDOR PRINCIPAL --}}
+        <div class="relative group">
 
-        {{-- Botón Anterior (Flotante y con Blur) --}}
-        <button id="btn-prev" class="absolute left-2 top-1/2 -translate-y-1/2 z-20 bg-black/40 backdrop-blur-md border border-white/10 text-white p-3 rounded-full hover:bg-primary hover:border-primary transition-all duration-300 transform hover:scale-110 opacity-0 group-hover:opacity-100 hidden sm:flex items-center justify-center shadow-lg shadow-black/50">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
-        </button>
+            {{-- Botón Anterior (Flotante y con Blur) --}}
+            <button id="btn-prev"
+                class="absolute left-2 top-1/2 -translate-y-1/2 z-20 bg-black/40 backdrop-blur-md border border-white/10 text-white p-3 rounded-full hover:bg-primary hover:border-primary transition-all duration-300 transform hover:scale-110 opacity-0 group-hover:opacity-100 hidden sm:flex items-center justify-center shadow-lg shadow-black/50">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                </svg>
+            </button>
 
-        {{-- SLIDER (Scroll Snap con Padding para efecto "Peek") --}}
-        <div id="modern-slider" 
-             class="flex overflow-x-auto snap-x snap-mandatory scroll-smooth pb-8 pt-2 no-scrollbar px-4 sm:px-0 gap-4"
-             style="scroll-padding-left: 1rem;">
+            {{-- SLIDER (Scroll Snap con Padding para efecto "Peek") --}}
+            <div id="modern-slider"
+                class="flex overflow-x-auto snap-x snap-mandatory scroll-smooth pb-8 pt-2 no-scrollbar px-4 sm:px-0 gap-4"
+                style="scroll-padding-left: 1rem;">
 
-            @foreach($sliderMatches as $index => $item)
-                @php
-                    $nextMatch = $item->match;
-                    $localProb = $item->prediction['localProb'];
-                    $drawProb = $item->prediction['drawProb'];
-                    $visitorProb = $item->prediction['visitorProb'];
-                    $probTitle = $item->probTitle;
-                    $h2hRecord = $item->h2hRecord;
-                    $h2hTotal = $h2hRecord['total'];
-                @endphp
+                @foreach($sliderMatches as $index => $item)
+                    @php
+                        $nextMatch = $item->match;
+                        $localProb = $item->prediction['localProb'];
+                        $drawProb = $item->prediction['drawProb'];
+                        $visitorProb = $item->prediction['visitorProb'];
+                        $probTitle = $item->probTitle;
+                        $h2hRecord = $item->h2hRecord;
+                        $h2hTotal = $h2hRecord['total'];
+                    @endphp
 
-                {{-- ITEM INDIVIDUAL --}}
-                {{-- w-[90%] permite ver el 10% de la siguiente tarjeta en móviles --}}
-                <div class="slider-item snap-center shrink-0 w-[90%] sm:w-[600px] md:w-[700px] transition-all duration-500 ease-out opacity-50 scale-95" 
-                     data-index="{{ $index }}">
-                    
-                    {{-- Etiqueta Flotante de Jornada --}}
-                    <div class="text-center -mb-3 relative z-10">
-                        <span class="bg-gray-900/90 border border-gray-700 text-gray-300 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-widest shadow-lg">
-                            Jornada {{ $nextMatch->jornada }}
-                        </span>
-                    </div>
+                    {{-- ITEM INDIVIDUAL --}}
+                    {{-- w-[90%] permite ver el 10% de la siguiente tarjeta en móviles --}}
+                    <div class="slider-item snap-center shrink-0 w-[90%] sm:w-[600px] md:w-[700px] transition-all duration-500 ease-out opacity-50 scale-95"
+                        data-index="{{ $index }}">
 
-                    {{-- TARJETA GLASSSMORPHISM --}}
-                    <div class="card relative overflow-hidden bg-[#1a1f2e]/90 backdrop-blur-xl border border-white/10 w-full p-4 sm:p-6 shadow-[0_10px_40px_-10px_rgba(0,0,0,0.5)] rounded-2xl group-hover/card:border-primary/30 transition-all">
-                        
-                        {{-- Efecto de brillo de fondo (Glow) --}}
-                        <div class="absolute top-0 right-0 -mr-16 -mt-16 w-32 h-32 bg-primary/20 blur-[60px] rounded-full pointer-events-none"></div>
-                        <div class="absolute bottom-0 left-0 -ml-16 -mb-16 w-32 h-32 bg-secondary/20 blur-[60px] rounded-full pointer-events-none"></div>
+                        {{-- Etiqueta Flotante de Jornada --}}
+                        <div class="text-center -mb-3 relative z-10">
+                            <span
+                                class="bg-gray-900/90 border border-gray-700 text-gray-300 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-widest shadow-lg">
+                                Jornada {{ $nextMatch->jornada }}
+                            </span>
+                        </div>
 
-                        {{-- CONTENIDO DE LA TARJETA --}}
-                        <div class="relative z-10">
-                            {{-- 1. CABECERA EQUIPOS --}}
-                            <div class="flex flex-row items-start justify-between space-x-2">
-                                {{-- LOCAL --}}
-                                <div class="flex flex-col items-center w-5/12 text-center flex-shrink-0">
-                                    <a href="{{ route('team.profile', $nextMatch->localTeam->id) }}" class="flex flex-col items-center hover:scale-105 transition transform duration-300">
-                                        <div class="relative">
-                                            <div class="absolute inset-0 bg-primary/30 blur-md rounded-full"></div>
-                                            <img src="{{ $nextMatch->localTeam->escudo_url ?? 'https://placehold.co/100x100' }}" alt="Local" class="relative w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover border-2 border-primary/80 shadow-lg z-10" />
-                                        </div>
-                                        <span class="mt-2 text-sm sm:text-lg font-bold text-white leading-tight">{{ $nextMatch->localTeam->nombre }}</span>
-                                    </a>
-                                </div>
+                        {{-- TARJETA GLASSSMORPHISM --}}
+                        <div
+                            class="card relative overflow-hidden bg-[#1a1f2e]/90 backdrop-blur-xl border border-white/10 w-full p-4 sm:p-6 shadow-[0_10px_40px_-10px_rgba(0,0,0,0.5)] rounded-2xl group-hover/card:border-primary/30 transition-all">
 
-                                {{-- VS --}}
-                                <div class="w-2/12 flex flex-col items-center justify-center pt-4">
-                                    <span class="text-3xl sm:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-b from-red-500 to-red-700 drop-shadow-sm italic">VS</span>
-                                </div>
-
-                                {{-- VISITANTE --}}
-                                <div class="flex flex-col items-center w-5/12 text-center flex-shrink-0">
-                                    <a href="{{ route('team.profile', $nextMatch->visitorTeam->id) }}" class="flex flex-col items-center hover:scale-105 transition transform duration-300">
-                                        <div class="relative">
-                                            <div class="absolute inset-0 bg-secondary/30 blur-md rounded-full"></div>
-                                            <img src="{{ $nextMatch->visitorTeam->escudo_url ?? 'https://placehold.co/100x100' }}" alt="Visitante" class="relative w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover border-2 border-secondary/80 shadow-lg z-10" />
-                                        </div>
-                                        <span class="mt-2 text-sm sm:text-lg font-bold text-white leading-tight">{{ $nextMatch->visitorTeam->nombre }}</span>
-                                    </a>
-                                </div>
+                            {{-- Efecto de brillo de fondo (Glow) --}}
+                            <div
+                                class="absolute top-0 right-0 -mr-16 -mt-16 w-32 h-32 bg-primary/20 blur-[60px] rounded-full pointer-events-none">
+                            </div>
+                            <div
+                                class="absolute bottom-0 left-0 -ml-16 -mb-16 w-32 h-32 bg-secondary/20 blur-[60px] rounded-full pointer-events-none">
                             </div>
 
-                            {{-- 2. DATOS CON BARRA UNIFICADA (Aquí está la corrección) --}}
-                            <div class="mt-5 pt-4 border-t border-white/5">
-                                
-                                {{-- Fecha y Hora --}}
-                                <div class="text-center mb-5">
-                                    <span class="text-base text-gray-200 font-medium">
-                                        {{ \Carbon\Carbon::parse($nextMatch->fecha_hora)->locale('es')->isoFormat('dddd, D [de] MMMM') }}
-                                    </span><br>
-                                    <span class="text-base text-primary font-bold">
-                                        {{ \Carbon\Carbon::parse($nextMatch->fecha_hora)->format('h:i A') }}
-                                    </span>
-                                </div>
-
-                                {{-- ⬇️ AQUÍ ESTÁ EL CAMBIO: BARRA DE PROBABILIDAD UNIFICADA ⬇️ --}}
-                                <div class="w-full max-w-lg mx-auto px-2">
-                                    <span class="text-xs font-semibold text-gray-400 block mb-2 text-center uppercase tracking-wider">
-                                        {{ $probTitle }}
-                                    </span>
-
-                                    {{-- La Barra: Flex container con 3 colores --}}
-                                    <div class="flex w-full h-5 rounded-full overflow-hidden text-[10px] sm:text-xs font-bold shadow-inner border border-white/10">
-                                        
-                                        {{-- 1. LOCAL (Verde) --}}
-                                        <div class="bg-green-600 flex items-center justify-center text-white relative group/segment" style="width: {{ $localProb }}%;">
-                                            @if ($localProb > 10) 
-                                                <span>{{ $localProb }}%</span>
-                                            @endif
-                                            <div class="absolute -top-8 bg-gray-900 text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover/segment:opacity-100 transition z-20">Victoria Local</div>
-                                        </div>
-
-                                        {{-- 2. EMPATE (Amarillo) --}}
-                                        <div class="bg-yellow-500 flex items-center justify-center text-gray-900 relative group/segment" style="width: {{ $drawProb }}%;">
-                                            @if ($drawProb > 5) 
-                                                <span>{{ $drawProb }}%</span>
-                                            @endif
-                                            <div class="absolute -top-8 bg-gray-900 text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover/segment:opacity-100 transition z-20">Empate</div>
-                                        </div>
-
-                                        {{-- 3. VISITANTE (Rojo) --}}
-                                        <div class="bg-red-600 flex items-center justify-center text-white relative group/segment" style="width: {{ $visitorProb }}%;">
-                                            @if ($visitorProb > 10) 
-                                                <span>{{ $visitorProb }}%</span>
-                                            @endif
-                                            <div class="absolute -top-8 bg-gray-900 text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover/segment:opacity-100 transition z-20">Victoria Visitante</div>
-                                        </div>
+                            {{-- CONTENIDO DE LA TARJETA --}}
+                            <div class="relative z-10">
+                                {{-- 1. CABECERA EQUIPOS --}}
+                                <div class="flex flex-row items-start justify-between space-x-2">
+                                    {{-- LOCAL --}}
+                                    <div class="flex flex-col items-center w-5/12 text-center flex-shrink-0">
+                                        <a href="{{ route('team.profile', $nextMatch->localTeam->id) }}"
+                                            class="flex flex-col items-center hover:scale-105 transition transform duration-300">
+                                            <div class="relative">
+                                                <div class="absolute inset-0 bg-primary/30 blur-md rounded-full"></div>
+                                                <img src="{{ $nextMatch->localTeam->escudo_url ?? 'https://placehold.co/100x100' }}"
+                                                    alt="Local"
+                                                    class="relative w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover border-2 border-primary/80 shadow-lg z-10" />
+                                            </div>
+                                            <span
+                                                class="mt-2 text-sm sm:text-lg font-bold text-white leading-tight">{{ $nextMatch->localTeam->nombre }}</span>
+                                        </a>
                                     </div>
 
-                                    {{-- Texto H2H Debajo de la barra --}}
-                                    @if ($h2hTotal > 0)
-                                        <p class="text-[10px] sm:text-xs text-gray-400 mt-3 text-center">
-                                            Historial: <span class="text-gray-300">{{ $h2hTotal }}</span> encuentros 
-                                            (L: <span class="text-green-400">{{ $h2hRecord['G'] }}</span> - 
-                                             E: <span class="text-yellow-400">{{ $h2hRecord['E'] }}</span> - 
-                                             V: <span class="text-red-400">{{ $h2hRecord['P'] }}</span>)
-                                        </p>
-                                    @endif
-                                </div>
-                                {{-- ⬆️ FIN DEL CAMBIO ⬆️ --}}
+                                    {{-- VS --}}
+                                    <div class="w-2/12 flex flex-col items-center justify-center pt-4">
+                                        <span
+                                            class="text-3xl sm:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-b from-red-500 to-red-700 drop-shadow-sm italic">VS</span>
+                                    </div>
 
+                                    {{-- VISITANTE --}}
+                                    <div class="flex flex-col items-center w-5/12 text-center flex-shrink-0">
+                                        <a href="{{ route('team.profile', $nextMatch->visitorTeam->id) }}"
+                                            class="flex flex-col items-center hover:scale-105 transition transform duration-300">
+                                            <div class="relative">
+                                                <div class="absolute inset-0 bg-secondary/30 blur-md rounded-full"></div>
+                                                <img src="{{ $nextMatch->visitorTeam->escudo_url ?? 'https://placehold.co/100x100' }}"
+                                                    alt="Visitante"
+                                                    class="relative w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover border-2 border-secondary/80 shadow-lg z-10" />
+                                            </div>
+                                            <span
+                                                class="mt-2 text-sm sm:text-lg font-bold text-white leading-tight">{{ $nextMatch->visitorTeam->nombre }}</span>
+                                        </a>
+                                    </div>
+                                </div>
+
+                                {{-- 2. DATOS CON BARRA UNIFICADA (Aquí está la corrección) --}}
+                                <div class="mt-5 pt-4 border-t border-white/5">
+
+                                    {{-- Fecha y Hora --}}
+                                    <div class="text-center mb-5">
+                                        <span class="text-base text-gray-200 font-medium">
+                                            {{ \Carbon\Carbon::parse($nextMatch->fecha_hora)->locale('es')->isoFormat('dddd, D [de] MMMM') }}
+                                        </span><br>
+                                        <span class="text-base text-primary font-bold">
+                                            {{ \Carbon\Carbon::parse($nextMatch->fecha_hora)->format('h:i A') }}
+                                        </span>
+                                    </div>
+
+                                    {{-- ⬇️ AQUÍ ESTÁ EL CAMBIO: BARRA DE PROBABILIDAD UNIFICADA ⬇️ --}}
+                                    <div class="w-full max-w-lg mx-auto px-2">
+                                        <span
+                                            class="text-xs font-semibold text-gray-400 block mb-2 text-center uppercase tracking-wider">
+                                            {{ $probTitle }}
+                                        </span>
+
+                                        {{-- La Barra: Flex container con 3 colores --}}
+                                        <div
+                                            class="flex w-full h-5 rounded-full overflow-hidden text-[10px] sm:text-xs font-bold shadow-inner border border-white/10">
+
+                                            {{-- 1. LOCAL (Verde) --}}
+                                            <div class="bg-green-600 flex items-center justify-center text-white relative group/segment"
+                                                style="width: {{ $localProb }}%;">
+                                                @if ($localProb > 10)
+                                                    <span>{{ $localProb }}%</span>
+                                                @endif
+                                                <div
+                                                    class="absolute -top-8 bg-gray-900 text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover/segment:opacity-100 transition z-20">
+                                                    Victoria Local</div>
+                                            </div>
+
+                                            {{-- 2. EMPATE (Amarillo) --}}
+                                            <div class="bg-yellow-500 flex items-center justify-center text-gray-900 relative group/segment"
+                                                style="width: {{ $drawProb }}%;">
+                                                @if ($drawProb > 5)
+                                                    <span>{{ $drawProb }}%</span>
+                                                @endif
+                                                <div
+                                                    class="absolute -top-8 bg-gray-900 text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover/segment:opacity-100 transition z-20">
+                                                    Empate</div>
+                                            </div>
+
+                                            {{-- 3. VISITANTE (Rojo) --}}
+                                            <div class="bg-red-600 flex items-center justify-center text-white relative group/segment"
+                                                style="width: {{ $visitorProb }}%;">
+                                                @if ($visitorProb > 10)
+                                                    <span>{{ $visitorProb }}%</span>
+                                                @endif
+                                                <div
+                                                    class="absolute -top-8 bg-gray-900 text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover/segment:opacity-100 transition z-20">
+                                                    Victoria Visitante</div>
+                                            </div>
+                                        </div>
+
+                                        {{-- Texto H2H Debajo de la barra --}}
+                                        @if ($h2hTotal > 0)
+                                            <p class="text-[10px] sm:text-xs text-gray-400 mt-3 text-center">
+                                                Historial: <span class="text-gray-300">{{ $h2hTotal }}</span> encuentros
+                                                (L: <span class="text-green-400">{{ $h2hRecord['G'] }}</span> -
+                                                E: <span class="text-yellow-400">{{ $h2hRecord['E'] }}</span> -
+                                                V: <span class="text-red-400">{{ $h2hRecord['P'] }}</span>)
+                                            </p>
+                                        @endif
+                                    </div>
+
+                                    {{-- ⬇️ VOTACIÓN DE LA COMUNIDAD ⬇️ --}}
+                                    <div class="mt-4 px-4">
+                                        @if(Auth::check())
+                                            @if($item->hasVoted)
+                                                {{-- YA VOTÓ: Mostrar resultados --}}
+                                                <div class="text-center">
+                                                    <p class="text-xs text-gray-400 mb-2">
+                                                        Tu voto: <span
+                                                            class="font-bold text-primary uppercase">{{ $item->userVote === 'draw' ? 'Empate' : ($item->userVote === 'local' ? 'Local' : 'Visitante') }}</span>
+                                                    </p>
+
+                                                    {{-- Barra de Resultados de la Comunidad --}}
+                                                    @php
+                                                        $total = $item->totalVotes > 0 ? $item->totalVotes : 1;
+                                                        $pLocal = round(($item->votes['local'] / $total) * 100);
+                                                        $pDraw = round(($item->votes['draw'] / $total) * 100);
+                                                        $pVisitor = round(($item->votes['visitor'] / $total) * 100);
+                                                    @endphp
+
+                                                    <div class="w-full h-2 bg-gray-700 rounded-full overflow-hidden flex">
+                                                        <div class="bg-green-500 h-full" style="width: {{ $pLocal }}%"></div>
+                                                        <div class="bg-yellow-500 h-full" style="width: {{ $pDraw }}%"></div>
+                                                        <div class="bg-red-500 h-full" style="width: {{ $pVisitor }}%"></div>
+                                                    </div>
+                                                    <div class="flex justify-between text-[10px] text-gray-400 mt-1">
+                                                        <span>{{ $pLocal }}%</span>
+                                                        <span>{{ $pDraw }}%</span>
+                                                        <span>{{ $pVisitor }}%</span>
+                                                    </div>
+                                                </div>
+                                            @else
+                                                {{-- NO HA VOTADO: Mostrar botones --}}
+                                                <form action="{{ route('community.vote', $nextMatch->id) }}" method="POST"
+                                                    class="flex justify-center gap-2">
+                                                    @csrf
+                                                    <button type="submit" name="voto" value="local"
+                                                        class="px-3 py-1 bg-green-600/20 hover:bg-green-600 text-green-400 hover:text-white border border-green-600 rounded text-xs font-bold transition">
+                                                        Local
+                                                    </button>
+                                                    <button type="submit" name="voto" value="draw"
+                                                        class="px-3 py-1 bg-yellow-600/20 hover:bg-yellow-600 text-yellow-400 hover:text-white border border-yellow-600 rounded text-xs font-bold transition">
+                                                        Empate
+                                                    </button>
+                                                    <button type="submit" name="voto" value="visitor"
+                                                        class="px-3 py-1 bg-red-600/20 hover:bg-red-600 text-red-400 hover:text-white border border-red-600 rounded text-xs font-bold transition">
+                                                        Visitante
+                                                    </button>
+                                                </form>
+                                            @endif
+                                        @else
+                                            {{-- NO LOGUEADO: Botón para iniciar sesión --}}
+                                            <div class="text-center">
+                                                <button
+                                                    onclick="document.getElementById('login-modal').classList.remove('hidden'); document.getElementById('login-modal').classList.add('flex');"
+                                                    class="text-xs text-primary hover:text-white underline decoration-dashed underline-offset-4 transition">
+                                                    Inicia sesión para votar
+                                                </button>
+                                            </div>
+                                        @endif
+                                    </div>
+                                    {{-- ⬆️ FIN DEL CAMBIO ⬆️ --}}
+
+                                </div>
                             </div>
                         </div>
-                    </div> 
-                    {{-- FIN TARJETA --}}
-                </div>
-            @endforeach
+                        {{-- FIN TARJETA --}}
+                    </div>
+                @endforeach
 
-            {{-- ELEMENTO FANTASMA AL FINAL --}}
-            <div class="shrink-0 w-4 sm:w-0"></div>
+                {{-- ELEMENTO FANTASMA AL FINAL --}}
+                <div class="shrink-0 w-4 sm:w-0"></div>
 
+            </div>
+
+            {{-- Botón Siguiente (Flotante) --}}
+            <button id="btn-next"
+                class="absolute right-2 top-1/2 -translate-y-1/2 z-20 bg-black/40 backdrop-blur-md border border-white/10 text-white p-3 rounded-full hover:bg-primary hover:border-primary transition-all duration-300 transform hover:scale-110 opacity-0 group-hover:opacity-100 hidden sm:flex items-center justify-center shadow-lg shadow-black/50">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+            </button>
         </div>
 
-        {{-- Botón Siguiente (Flotante) --}}
-        <button id="btn-next" class="absolute right-2 top-1/2 -translate-y-1/2 z-20 bg-black/40 backdrop-blur-md border border-white/10 text-white p-3 rounded-full hover:bg-primary hover:border-primary transition-all duration-300 transform hover:scale-110 opacity-0 group-hover:opacity-100 hidden sm:flex items-center justify-center shadow-lg shadow-black/50">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
-        </button>
-    </div>
-
-    {{-- PAGINACIÓN / INDICADORES --}}
-    <div class="flex justify-center mt-2 space-x-2" id="slider-dots">
-        @foreach($sliderMatches as $index => $item)
-            <button class="dot transition-all duration-300 h-1.5 rounded-full bg-gray-600 hover:bg-gray-400 {{ $index === 0 ? 'w-8 bg-primary' : 'w-2' }}" 
+        {{-- PAGINACIÓN / INDICADORES --}}
+        <div class="flex justify-center mt-2 space-x-2" id="slider-dots">
+            @foreach($sliderMatches as $index => $item)
+                <button
+                    class="dot transition-all duration-300 h-1.5 rounded-full bg-gray-600 hover:bg-gray-400 {{ $index === 0 ? 'w-8 bg-primary' : 'w-2' }}"
                     onclick="scrollToSlide({{ $index }})">
-            </button>
-        @endforeach
+                </button>
+            @endforeach
+        </div>
+
     </div>
 
-</div>
+    {{-- ESTILOS NECESARIOS --}}
+    <style>
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
 
-{{-- ESTILOS NECESARIOS --}}
-<style>
-    .no-scrollbar::-webkit-scrollbar { display: none; }
-    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-    /* Clase para cuando el item está activo (enfocado) */
-    .slider-active {
-        opacity: 1 !important;
-        transform: scale(1) !important;
-        z-index: 10;
-    }
-</style>
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* Clase para cuando el item está activo (enfocado) */
+        .slider-active {
+            opacity: 1 !important;
+            transform: scale(1) !important;
+            z-index: 10;
+        }
+    </style>
 @endif
 
 {{-- ---------------------------------------------------- --}}
@@ -241,8 +347,7 @@
 {{-- ---------------------------------------------------- --}}
 <h3 class="text-2xl font-bold mb-4">Clasificación</h3>
 {{-- MEJORA: "Glassmorphism" para la tabla --}}
-<div
-    class="bg-card-bg/80 backdrop-blur-lg rounded-lg shadow-xl overflow-hidden mb-8 border border-white/10">
+<div class="bg-card-bg/80 backdrop-blur-lg rounded-lg shadow-xl overflow-hidden mb-8 border border-white/10">
     <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-white/5">
             <thead>
@@ -297,7 +402,8 @@
                             </a>
                         </td>
                         <td class="py-3 px-2 text-center font-bold {{ $pointsTextColor }}">
-                            {{ $team->puntos }}</td>
+                            {{ $team->puntos }}
+                        </td>
                         <td class="py-3 px-2 text-center">{{ $team->partidos_jugados }}</td>
                         <td class="py-3 px-2 text-center">{{ $team->ganados }}</td>
                         <td class="py-3 px-2 text-center hidden sm:table-cell">{{ $team->empatados }}</td>
@@ -443,9 +549,8 @@
 
         <a href="{{ route('team.profile', $team->id) }}" class="block">
             {{-- MEJORA: "Glassmorphism" para las tarjetas de análisis --}}
-            <div
-                class="bg-card-bg/80 backdrop-blur-lg rounded-lg p-5 flex flex-col shadow-xl border border-primary/20 
-                        transform hover:scale-[1.03] transition duration-200 relative overflow-hidden">
+            <div class="bg-card-bg/80 backdrop-blur-lg rounded-lg p-5 flex flex-col shadow-xl border border-primary/20 
+                            transform hover:scale-[1.03] transition duration-200 relative overflow-hidden">
 
                 {{-- ⬇️ 1. CABECERA PRINCIPAL (Nombre, Logo y Rank) ⬇️ --}}
                 <div class="flex items-center justify-between w-full border-b border-gray-700 pb-3 mb-3">
@@ -479,7 +584,8 @@
                         <div class="text-left">
                             <p class="text-white/70 text-sm">DIF</p>
                             <p class="text-2xl font-bold {{ $diffSign }}">
-                                {{ $goalDiff > 0 ? '+' : '' }}{{ $goalDiff }}</p>
+                                {{ $goalDiff > 0 ? '+' : '' }}{{ $goalDiff }}
+                            </p>
                         </div>
 
                         {{-- Métrica: Partidos Jugados --}}
@@ -545,7 +651,7 @@
     @endforelse
 </div>
 {{-- ========================================================== --}}
-{{-- 4. CARD MEJORADA: PARTE MÉDICO DE LA LIGA (DINÁMICA)       --}}
+{{-- 4. CARD MEJORADA: PARTE MÉDICO DE LA LIGA (DINÁMICA) --}}
 {{-- ========================================================== --}}
 <div class="mt-8">
 
@@ -573,8 +679,7 @@
                                 <img src="{{ $player->foto_url ?? 'https://placehold.co/50x50/1f2937/FFFFFF?text=JUG' }}"
                                     class="w-14 h-14 rounded-full object-cover border-2 border-gray-600 group-hover:border-red-500 transition" />
                                 {{-- ✨ MEJORA: Icono de lesión más descriptivo --}}
-                                <div
-                                    class="absolute -bottom-1 -right-1 bg-red-600 rounded-full p-1 border-2 border-gray-800">
+                                <div class="absolute -bottom-1 -right-1 bg-red-600 rounded-full p-1 border-2 border-gray-800">
                                     <i class="fa-solid fa-briefcase-medical text-white text-xs"></i>
                                 </div>
                             </div>
@@ -606,14 +711,14 @@
                 <p class="text-gray-400 mt-2">
                     ¡Buenas noticias! El fisio está de vacaciones. <br class="hidden sm:block">
                     Todos los jugadores están en plena forma y listos para jugar.
-                </abp>
+                    </abp>
             </div>
         </div>
     @endif
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         const slider = document.getElementById('modern-slider');
         const items = document.querySelectorAll('.slider-item');
         const dots = document.querySelectorAll('.dot');
@@ -634,7 +739,7 @@
                         i.classList.remove('slider-active');
                         i.classList.add('opacity-50', 'scale-95');
                     });
-                    
+
                     // Activamos el actual (Efecto POP)
                     entry.target.classList.add('slider-active');
                     entry.target.classList.remove('opacity-50', 'scale-95');
@@ -673,7 +778,7 @@
         // Función global para click en los dots
         window.scrollToSlide = (index) => {
             const target = items[index];
-            if(target) {
+            if (target) {
                 // Cálculo simple para centrar el elemento
                 const left = target.offsetLeft - (slider.clientWidth - target.clientWidth) / 2;
                 slider.scrollTo({ left: left, behavior: 'smooth' });

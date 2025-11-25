@@ -2,9 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
-use App\Models\GalleryItem; // Asegúrate de que este sea el modelo correcto
+use App\Models\GalleryItem;
+use Illuminate\Http\Request; // Asegúrate de que este sea el modelo correcto
 use Illuminate\Support\Facades\File;
 
 class GalleryController extends Controller
@@ -29,7 +28,6 @@ class GalleryController extends Controller
     /**
      * Almacena una nueva imagen en la galería.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\RedirectResponse
      */
     public function upload(Request $request)
@@ -51,22 +49,22 @@ class GalleryController extends Controller
         ]);
 
         $url = null;
-        $physicalPath = null; 
+        $physicalPath = null;
 
         // 2. Almacenar la imagen (SIGUIENDO TU EJEMPLO)
         if ($request->hasFile('image') && $request->file('image')->isValid()) { // <-- 2. Añadido isValid()
-            
+
             $file = $request->file('image');
-            
+
             // Definimos la ruta de destino (la carpeta public/gallery)
             $directory = public_path('gallery');
-            
+
             // Generamos un nombre de archivo único
-            $filename = uniqid('gallery_') . '.' . $file->getClientOriginalExtension();
+            $filename = uniqid('gallery_').'.'.$file->getClientOriginalExtension();
 
             try {
                 // 3. Comprobar y crear el directorio si no existe
-                if (!File::isDirectory($directory)) {
+                if (! File::isDirectory($directory)) {
                     File::makeDirectory($directory, 0777, true, true);
                 }
 
@@ -74,18 +72,18 @@ class GalleryController extends Controller
                 $file->move($directory, $filename);
 
                 // 5. Esta es la URL pública COMPLETA que guardaremos
-                $url = asset('gallery/' . $filename);
+                $url = asset('gallery/'.$filename);
 
                 // Guardamos la ruta física completa por si falla la BD
-                $physicalPath = $directory . '/' . $filename;
+                $physicalPath = $directory.'/'.$filename;
 
             } catch (\Exception $e) {
                 // Manejar error de movimiento de archivo
-                return back()->with('error', 'Error al guardar la imagen: ' . $e->getMessage());
+                return back()->with('error', 'Error al guardar la imagen: '.$e->getMessage());
             }
         }
 
-        if (!$url) {
+        if (! $url) {
             return back()->with('error', 'No se pudo generar la URL de la imagen.');
         }
 
@@ -94,15 +92,16 @@ class GalleryController extends Controller
             GalleryItem::create([
                 'titulo' => $request->input('titulo'),
                 'image_url' => $url, // <-- 6. Guardamos la URL completa (ej: http://localhost/gallery/...)
-                'partido_id' => $request->input('match_id'), 
-                'uploaded_by_user_id' => auth()->id(), 
+                'partido_id' => $request->input('match_id'),
+                'uploaded_by_user_id' => auth()->id(),
             ]);
         } catch (\Exception $e) {
             // En caso de error de BD, eliminamos el archivo subido
             if ($physicalPath && file_exists($physicalPath)) {
                 unlink($physicalPath);
             }
-            return back()->with('error', 'Error al guardar en la base de datos: ' . $e->getMessage());
+
+            return back()->with('error', 'Error al guardar en la base de datos: '.$e->getMessage());
         }
 
         // 4. Redirigir con éxito
@@ -128,7 +127,7 @@ class GalleryController extends Controller
             return back()->with('success', 'Imagen eliminada con éxito.');
 
         } catch (\Exception $e) {
-            return back()->with('error', 'Error al eliminar la imagen: ' . $e->getMessage());
+            return back()->with('error', 'Error al eliminar la imagen: '.$e->getMessage());
         }
     }
 }

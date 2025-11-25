@@ -1,12 +1,46 @@
 <?php
+
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Noticia;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
+
+use App\Traits\LoadsCommonData;
 
 class NewsAdminController extends Controller
 {
+    use LoadsCommonData;
+
+    public function adminNews()
+    {
+        // Cargar las noticias paginadas reales
+        $news = \App\Models\Noticia::orderBy('publicada_en', 'desc')->paginate(10);
+
+        session(['activeAdminContent' => 'news']);
+        $data = $this->loadAllData();
+
+        // Aquí, $data['news'] obtiene los datos reales, NO el paginador vacío.
+        $data['news'] = $news;
+        $data['activeView'] = 'admin';
+
+        return view('index', $data);
+    }
+
+    public function editNews(Noticia $noticia)
+    {
+        // Cargar todos los datos base (equipos, jugadores) necesarios para el layout
+        $data = $this->loadAllData();
+
+        // Asignar el ítem actual y su tipo para la vista edit.blade.php
+        $data['item'] = $noticia;
+        $data['type'] = 'news';
+
+        // Necesitas pasar los equipos si el formulario de edición (edit.blade.php) los requiere
+        // $data['teams'] = $data['teams'];
+
+        return view('edit', $data);
+    }
     // Creado para la acción POST del formulario de creación
     public function store(Request $request)
     {
@@ -44,6 +78,7 @@ class NewsAdminController extends Controller
     public function destroy(Noticia $noticia)
     {
         $noticia->delete();
+
         return redirect()->route('admin.news')->with('success', 'Noticia eliminada.');
     }
 

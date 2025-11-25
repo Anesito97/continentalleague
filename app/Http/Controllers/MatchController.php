@@ -2,15 +2,101 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Partido;
 use App\Models\Equipo;
-use App\Models\Jugador;
 use App\Models\EventoPartido;
+use App\Models\Jugador;
+use App\Models\Partido;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
+use App\Traits\LoadsCommonData;
+
 class MatchController extends Controller
 {
+    use LoadsCommonData;
+
+    public function adminMatches()
+    {
+        session(['activeAdminContent' => 'matches']);
+        $data = $this->loadAllData();
+        $data['news'] = $this->getEmptyNewsPaginator();
+        $data['activeView'] = 'admin';
+
+        return view('index', $data);
+    }
+
+    public function adminFinalizeMatch()
+    {
+        session(['activeAdminContent' => 'finalize-match']);
+        $data = $this->loadAllData();
+        $data['news'] = $this->getEmptyNewsPaginator();
+        $data['activeView'] = 'admin';
+
+        return view('index', $data);
+    }
+
+    public function editMatch(Partido $partido)
+    {
+        $data = $this->loadAllData();
+        $data['item'] = $partido;
+        $data['type'] = 'match';
+        // Asegúrate de cargar las relaciones necesarias para el formulario de partido
+        $partido->load(['localTeam', 'visitorTeam']);
+
+        return view('edit', $data);
+    }
+
+    public function showCalendar(Request $request)
+    {
+        // 1. Determinar el filtro activo
+        $filter = $request->query('status', 'pending');
+
+        // ⬇️ Obtener el número de jornada activa si se pasa en la URL, o la jornada más baja pendiente ⬇️
+        $activeJornada = $request->query('jornada');
+
+        $query = Partido::with(['localTeam', 'visitorTeam', 'eventos.jugador', 'eventos.equipo'])
+            ->orderBy('jornada', 'asc') // ⬅️ Ordenar primero por jornada
+            ->orderBy('fecha_hora', 'asc');
+
+        // 2. Aplicar filtros de ESTADO (pending, finished, all)
+        if ($filter === 'pending') {
+            $query->where('estado', 'pendiente');
+        } elseif ($filter === 'finished') {
+            $query->where('estado', 'finalizado');
+        }
+
+        // 3. Aplicar filtro de JORNADA si se selecciona una específica
+        if ($activeJornada) {
+            $query->where('jornada', $activeJornada);
+        }
+
+        $allMatches = $query->get();
+
+        // 4. Agrupar los partidos por JORNADA (CRÍTICO)
+        // Ya no agrupamos por fecha, sino por el número de jornada.
+        $matchesByJornada = $allMatches->groupBy('jornada');
+
+        // 5. Determinar todas las jornadas existentes para el selector
+        $allJornadas = Partido::select('jornada')->distinct()->orderBy('jornada', 'asc')->pluck('jornada');
+        // Determinar la jornada más baja que contiene partidos pendientes (para el foco inicial)
+        $firstPendingJornada = Partido::where('estado', 'pendiente')->min('jornada');
+
+        // Si no hay jornada activa en la URL, usar la primera pendiente
+        if (!$activeJornada && $firstPendingJornada) {
+            $activeJornada = $firstPendingJornada;
+        } elseif (!$activeJornada) {
+            $activeJornada = $allJornadas->first(); // Si no hay pendientes, usar la primera jornada existente
+        }
+
+        $data = $this->loadAllData();
+        $data['matchesByJornada'] = $matchesByJornada; // ⬅️ Nuevo nombre
+        $data['activeView'] = 'calendar';
+        $data['activeFilter'] = $filter;
+        $data['allJornadas'] = $allJornadas; // Para el selector
+        $data['activeJornada'] = (int) $activeJornada; // Para saber qué pestaña resaltar
+
+        return view('calendar', $data);
+    }
     // 1. Programar Partido (SIN CAMBIOS)
     public function store(Request $request)
     {
@@ -29,6 +115,7 @@ class MatchController extends Controller
             'fecha_hora' => $dateTime,
             'estado' => 'pendiente',
         ]);
+
         return redirect()->route('admin.matches')->with('success', 'Partido programado correctamente.');
     }
 
@@ -60,9 +147,11 @@ class MatchController extends Controller
             $this->applyPlayerStats($request->events ?? [], $match->id);
 
             DB::commit();
+
             return redirect()->route('admin.finalize-match')->with('success', 'Partido finalizado con éxito.');
         } catch (\Exception $e) {
             DB::rollback();
+
             return back()->with('error', 'Error al finalizar el partido: ' . $e->getMessage())->withInput();
         }
     }
@@ -87,6 +176,7 @@ class MatchController extends Controller
                 'jornada' => $request->jornada,
                 'fecha_hora' => $dateTime,
             ]);
+
             return redirect()->route('admin.matches')->with('success', 'Partido pendiente actualizado.');
         }
 
@@ -118,9 +208,11 @@ class MatchController extends Controller
             $this->applyPlayerStats($request->events ?? [], $partido->id);
 
             DB::commit();
+
             return redirect()->route('admin.matches')->with('success', 'Partido finalizado actualizado con éxito.');
         } catch (\Exception $e) {
             DB::rollback();
+
             return back()->with('error', 'Error al actualizar el partido: ' . $e->getMessage())->withInput();
         }
     }
@@ -133,9 +225,9 @@ class MatchController extends Controller
             $this->reverseStats($partido);
         }
         $partido->delete();
+
         return redirect()->route('admin.matches')->with('success', 'Partido eliminado.');
     }
-
 
     // ===================================================================
     // FUNCIONES PRIVADAS DE ESTADÍSTICAS (El motor de tu controlador)
@@ -153,11 +245,18 @@ class MatchController extends Controller
         $visitorPts = $visitorG = $visitorE = $visitorP = 0;
 
         if ($golesLocal > $golesVisitor) {
-            $localPts = 3; $localG = 1; $visitorP = 1;
+            $localPts = 3;
+            $localG = 1;
+            $visitorP = 1;
         } elseif ($golesLocal < $golesVisitor) {
-            $visitorPts = 3; $visitorG = 1; $localP = 1;
+            $visitorPts = 3;
+            $visitorG = 1;
+            $localP = 1;
         } else {
-            $localPts = 1; $localE = 1; $visitorPts = 1; $visitorE = 1;
+            $localPts = 1;
+            $localE = 1;
+            $visitorPts = 1;
+            $visitorE = 1;
         }
 
         $localTeam->increment('puntos', $localPts);
@@ -182,10 +281,12 @@ class MatchController extends Controller
         foreach ($events as $event) {
             $playerId = (int) ($event['player_id'] ?? 0);
             $eventType = strtolower($event['event_type'] ?? '');
-            
+
             if ($playerId > 0 && !empty($eventType)) {
                 $player = Jugador::find($playerId);
-                if (!$player) continue;
+                if (!$player) {
+                    continue;
+                }
 
                 EventoPartido::create([
                     'partido_id' => $matchId,
@@ -204,7 +305,9 @@ class MatchController extends Controller
                     'roja' => 'rojas',
                     default => null,
                 };
-                if ($statCol) $player->increment($statCol);
+                if ($statCol) {
+                    $player->increment($statCol);
+                }
             }
         }
     }
@@ -216,7 +319,7 @@ class MatchController extends Controller
     {
         // Cargar las relaciones es crucial
         $match->load('eventos.jugador', 'localTeam', 'visitorTeam');
-        
+
         $localTeam = $match->localTeam;
         $visitorTeam = $match->visitorTeam;
 
@@ -225,11 +328,18 @@ class MatchController extends Controller
         $visitorPts = $visitorG = $visitorE = $visitorP = 0;
 
         if ($match->goles_local > $match->goles_visitante) {
-            $localPts = 3; $localG = 1; $visitorP = 1;
+            $localPts = 3;
+            $localG = 1;
+            $visitorP = 1;
         } elseif ($match->goles_local < $match->goles_visitante) {
-            $visitorPts = 3; $visitorG = 1; $localP = 1;
+            $visitorPts = 3;
+            $visitorG = 1;
+            $localP = 1;
         } else {
-            $localPts = 1; $localE = 1; $visitorPts = 1; $visitorE = 1;
+            $localPts = 1;
+            $localE = 1;
+            $visitorPts = 1;
+            $visitorE = 1;
         }
 
         $localTeam->decrement('puntos', $localPts);
@@ -259,7 +369,9 @@ class MatchController extends Controller
                     'roja' => 'rojas',
                     default => null,
                 };
-                if ($statCol) $event->jugador->decrement($statCol);
+                if ($statCol) {
+                    $event->jugador->decrement($statCol);
+                }
             }
         }
 

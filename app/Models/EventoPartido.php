@@ -8,9 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class EventoPartido extends Model
 {
     use HasFactory;
-    
+
     // Nombre de la tabla
-    protected $table = 'eventos_partido'; 
+    protected $table = 'eventos_partido';
 
     // Campos que pueden ser asignados masivamente
     protected $fillable = [

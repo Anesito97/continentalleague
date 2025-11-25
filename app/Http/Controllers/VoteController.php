@@ -1,44 +1,52 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Cookie;
-use Symfony\Component\HttpFoundation\Response;
 
 class VoteController extends Controller
 {
     private const COOKIE_LIFETIME_MINUTES = 60 * 72;
+
     private const CACHE_KEY_PREFIX = 'match_votes_';
 
     public function handleVote(Request $request, $match_id)
     {
+        // 1. Verificar si el usuario está autenticado
+        if (!Auth::check()) {
+            return redirect()->route('login')->with('error', 'Debes iniciar sesión para votar.');
+        }
+
+        $request->validate([
+            'voto' => 'required|in:local,draw,visitor',
+        ]);
+
+        $user = Auth::user();
         $voto = $request->input('voto');
-        $cookieName = 'voted_' . $match_id;
 
-        // 1. VERIFICACIÓN DE LA COOKIE (Evita votos múltiples por usuario)
-        if ($request->cookie($cookieName)) {
-            return back()->with('error', 'Ya has votado en este partido.');
+        // 2. Verificar si ya votó en este partido (DB check)
+        $existingVote = \App\Models\Vote::where('user_id', $user->id)
+            ->where('match_id', $match_id)
+            ->first();
+
+        if ($existingVote) {
+            // Opcional: Permitir cambiar el voto
+            $existingVote->update(['vote' => $voto]);
+            $message = 'Tu voto ha sido actualizado.';
+        } else {
+            // Crear nuevo voto
+            \App\Models\Vote::create([
+                'user_id' => $user->id,
+                'match_id' => $match_id,
+                'vote' => $voto,
+            ]);
+            $message = '¡Gracias por tu voto!';
         }
 
-        // 2. ACTUALIZAR CONTEO GLOBAL EN CACHE (Esta lógica se mantiene)
-        $cacheKey = self::CACHE_KEY_PREFIX . $match_id;
-        $votes = Cache::get($cacheKey, ['local' => 0, 'draw' => 0, 'visitor' => 0]);
-
-        if (in_array($voto, ['local', 'draw', 'visitor'])) {
-            $votes[$voto]++;
-            Cache::put($cacheKey, $votes, 60 * 24 * 30);
-        }
-
-        // 3. RESPUESTA: Configurar la Cookie y Redirigir
-
-        // Creamos la instancia de la cookie
-        $cookie = Cookie::make($cookieName, true, self::COOKIE_LIFETIME_MINUTES);
-
-        // ⬇️ FIX: Usar el helper redirect()->back() y encadenar el método cookie() ⬇️
-        return redirect()->back()
-            ->withCookie($cookie) // Adjunta la cookie a la respuesta de redirección
-            ->with('success', '¡Gracias por tu voto!');
+        return back()->with('success', $message);
     }
 
     /**
@@ -46,7 +54,17 @@ class VoteController extends Controller
      */
     public static function getVotes($match_id)
     {
-        $cacheKey = self::CACHE_KEY_PREFIX . $match_id;
-        return Cache::get($cacheKey, ['local' => 0, 'draw' => 0, 'visitor' => 0]);
+        // Obtener conteo real de la base de datos
+        $votes = \App\Models\Vote::where('match_id', $match_id)
+            ->selectRaw('vote, count(*) as count')
+            ->groupBy('vote')
+            ->pluck('count', 'vote')
+            ->toArray();
+
+        return [
+            'local' => $votes['local'] ?? 0,
+            'draw' => $votes['draw'] ?? 0,
+            'visitor' => $votes['visitor'] ?? 0,
+        ];
     }
 }
