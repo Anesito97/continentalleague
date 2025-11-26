@@ -64,7 +64,7 @@
                 </div>
             </div>
 
-            <!-- LEADERBOARD -->
+            <!-- LEADERBOARDD -->
             <div class="w-full md:w-80 bg-gray-800 rounded-xl p-6 border border-gray-700 h-fit">
                 <h2 class="text-2xl font-bold mb-4 text-yellow-400 border-b border-gray-700 pb-2">Top 10 Jugadores</h2>
 

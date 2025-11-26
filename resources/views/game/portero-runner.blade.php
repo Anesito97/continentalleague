@@ -700,7 +700,7 @@
                 }
             }, { passive: false });
 
-            // Prevent scrolling while playing
+            // Prevent scrolling while playingg
             container.addEventListener('touchmove', (e) => {
                 if (isPlaying) {
                     e.preventDefault();
