@@ -97,8 +97,7 @@
                     <!-- Image -->
                     <div class="h-48 overflow-hidden relative">
                         <div class="absolute inset-0 bg-gradient-to-t from-gray-900 to-transparent z-10"></div>
-                        <img src="https://images.unsplash.com/photo-1517466787929-bc90951d64b8?q=80&w=2069&auto=format&fit=crop"
-                            alt="Portero Runner"
+                        <img src="{{ asset('images/games/portero-runner.png') }}" alt="Portero Runner"
                             class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500">
                         <div
                             class="absolute top-4 right-4 z-20 bg-purple-500 text-white text-xs font-bold px-2 py-1 rounded-full">
