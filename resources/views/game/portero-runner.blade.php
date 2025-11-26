@@ -304,8 +304,12 @@
                     if (pType < 0.2) { // Life
                         item.dataset.powerup = 'life';
                         item.textContent = '❤️';
-                        item.style.backgroundColor = '#ef4444';
-                        item.style.fontSize = '24px';
+                        item.style.backgroundColor = 'transparent';
+                        item.style.border = 'none';
+                        item.style.boxShadow = 'none';
+                        item.style.fontSize = '48px'; // Double size
+                        item.style.width = '60px'; // Adjust container to fit
+                        item.style.height = '60px';
                     } else if (pType < 0.4) { // Magnet
                         item.dataset.powerup = 'magnet';
                         item.textContent = '🧲';
@@ -314,8 +318,12 @@
                     } else if (pType < 0.6) { // Shield
                         item.dataset.powerup = 'shield';
                         item.textContent = '🛡️';
-                        item.style.backgroundColor = '#0ea5e9'; // Sky
-                        item.style.fontSize = '24px';
+                        item.style.backgroundColor = 'transparent';
+                        item.style.border = 'none';
+                        item.style.boxShadow = 'none';
+                        item.style.fontSize = '48px'; // Double size
+                        item.style.width = '60px';
+                        item.style.height = '60px';
                     } else if (pType < 0.8) { // Slow
                         item.dataset.powerup = 'slow';
                         item.textContent = '⏱️';
