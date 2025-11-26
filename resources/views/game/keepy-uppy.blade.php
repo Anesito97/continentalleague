@@ -47,12 +47,6 @@
                                 <span class="material-symbols-outlined">replay</span>
                                 Jugar de Nuevo
                             </button>
-
-                            <a id="whatsapp-share-btn" href="#" target="_blank"
-                                class="px-8 py-3 bg-[#25D366] hover:bg-[#128C7E] rounded-full font-bold text-white text-lg transition transform hover:scale-105 shadow-lg flex items-center justify-center gap-2">
-                                <span class="material-symbols-outlined">share</span>
-                                Compartir en WhatsApp
-                            </a>
                         </div>
                     </div>
 
@@ -107,7 +101,6 @@
             const gameOverScreen = document.getElementById('game-over-screen');
             const finalScoreDisplay = document.getElementById('final-score');
             const restartBtn = document.getElementById('restart-btn');
-            const whatsappShareBtn = document.getElementById('whatsapp-share-btn');
 
             let isPlaying = false;
             let score = 0;
@@ -219,8 +212,8 @@
 
             function gameOver() {
                 isPlaying = false;
-                gameOverScreen.classList.remove('hidden');
                 finalScoreDisplay.textContent = score;
+                gameOverScreen.classList.remove('hidden');
                 saveScore(score);
             }
 
