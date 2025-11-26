@@ -670,6 +670,13 @@
                 if (!isPlaying) initGame();
             }, { passive: false });
 
+            // Prevent scrolling while playing
+            container.addEventListener('touchmove', (e) => {
+                if (isPlaying) {
+                    e.preventDefault();
+                }
+            }, { passive: false });
+
             container.addEventListener('touchend', (e) => {
                 const touchEndX = e.changedTouches[0].clientX;
                 const diff = touchEndX - touchStartX;
