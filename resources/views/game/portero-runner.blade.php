@@ -42,6 +42,11 @@
                             class="material-symbols-outlined text-red-500 text-3xl drop-shadow-md animate-pulse">favorite</span>
                     </div>
 
+                    <!-- Active Effects Container -->
+                    <div id="active-effects-container" class="absolute top-16 right-4 flex flex-col gap-2 z-10 items-end">
+                        <!-- Effects will be injected here -->
+                    </div>
+
                     <!-- Start Message -->
                     <div id="start-message"
                         class="absolute inset-0 flex items-center justify-center bg-black/60 z-20 backdrop-blur-sm cursor-pointer">
@@ -148,6 +153,7 @@
             let hasShield = false;
             let magnetActive = false;
             let isFrozen = false;
+            let activeEffects = []; // { type, endTime, duration, icon, color }
 
             // Settings
             const LANES_COUNT = 3;
@@ -173,6 +179,9 @@
                 hasShield = false;
                 magnetActive = false;
                 isFrozen = false;
+                activeEffects = [];
+                updateEffectsUI();
+
                 player.classList.remove('border-blue-400', 'shadow-[0_0_15px_rgba(59,130,246,0.8)]', 'opacity-50');
                 const fogOverlay = document.getElementById('fog-overlay');
                 if (fogOverlay) {
@@ -364,7 +373,6 @@
             }
 
             function applyPowerup(type) {
-
                 if (type === 'life') {
                     if (lives < 3) {
                         lives++;
@@ -378,28 +386,96 @@
                 } else if (type === 'magnet') {
                     showToast("¡IMÁN!");
                     magnetActive = true;
+                    addEffect('magnet', 5000, '🧲', '#3b82f6');
                     setTimeout(() => {
                         magnetActive = false;
                     }, 5000);
                 } else if (type === 'shield') {
                     showToast("¡ESCUDO!");
                     hasShield = true;
+                    addEffect('shield', 0, '🛡️', '#0ea5e9');
                     player.classList.add('border-blue-400', 'shadow-[0_0_15px_rgba(59,130,246,0.8)]');
                     player.classList.remove('border-white');
                 } else if (type === 'slow') {
                     showToast("¡TIEMPO LENTO!");
                     const originalSpeed = gameSpeed;
                     gameSpeed = gameSpeed * 0.5;
+                    addEffect('slow', 5000, '⏱️', '#a855f7');
                     setTimeout(() => {
                         gameSpeed = originalSpeed;
                     }, 5000);
                 } else if (type === 'double') {
                     showToast("¡PUNTOS DOBLES!");
                     scoreMultiplier = 2;
+                    addEffect('double', 5000, '2x', '#eab308');
                     setTimeout(() => {
                         scoreMultiplier = 1;
                     }, 5000);
                 }
+            }
+
+            function addEffect(type, duration, icon, color) {
+                const now = Date.now();
+                // Remove existing effect of same type
+                activeEffects = activeEffects.filter(e => e.type !== type);
+
+                activeEffects.push({
+                    type: type,
+                    startTime: now,
+                    endTime: now + duration,
+                    duration: duration,
+                    icon: icon,
+                    color: color
+                });
+                updateEffectsUI();
+            }
+
+            function updateEffectsUI() {
+                const container = document.getElementById('active-effects-container');
+                container.innerHTML = '';
+
+                const now = Date.now();
+
+                // Filter expired effects (except shield which is persistent)
+                activeEffects = activeEffects.filter(e => {
+                    if (e.type === 'shield') return hasShield;
+                    return e.endTime > now;
+                });
+
+                activeEffects.forEach(effect => {
+                    const el = document.createElement('div');
+                    el.className = 'flex items-center gap-2 bg-gray-800/80 rounded-full px-3 py-1 border border-gray-600 shadow-lg';
+
+                    const icon = document.createElement('span');
+                    icon.textContent = effect.icon;
+                    icon.className = 'text-xl';
+
+                    el.appendChild(icon);
+
+                    if (effect.type !== 'shield') {
+                        const timeLeft = Math.max(0, effect.endTime - now);
+                        const percent = (timeLeft / effect.duration) * 100;
+
+                        const progressContainer = document.createElement('div');
+                        progressContainer.className = 'w-12 h-2 bg-gray-700 rounded-full overflow-hidden';
+
+                        const progressBar = document.createElement('div');
+                        progressBar.className = 'h-full rounded-full transition-all duration-100 ease-linear';
+                        progressBar.style.width = `${percent}%`;
+                        progressBar.style.backgroundColor = effect.color;
+
+                        progressContainer.appendChild(progressBar);
+                        el.appendChild(progressContainer);
+                    } else {
+                        // Shield has no timer
+                        const text = document.createElement('span');
+                        text.textContent = 'ACTIVO';
+                        text.className = 'text-xs font-bold text-blue-400';
+                        el.appendChild(text);
+                    }
+
+                    container.appendChild(el);
+                });
             }
 
             function showToast(text) {
@@ -412,6 +488,8 @@
 
             function gameLoop() {
                 if (!isPlaying) return;
+
+                updateEffectsUI();
 
                 // Move items
                 for (let i = items.length - 1; i >= 0; i--) {
@@ -448,6 +526,7 @@
                         if (item.type === 'bomb') {
                             if (hasShield) {
                                 hasShield = false;
+                                updateEffectsUI(); // Update UI immediately
                                 player.classList.remove('border-blue-400', 'shadow-[0_0_15px_rgba(59,130,246,0.8)]');
                                 player.classList.add('border-white');
                                 showToast("¡ESCUDO ROTO!");
