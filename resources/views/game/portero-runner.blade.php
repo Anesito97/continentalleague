@@ -21,6 +21,11 @@
                         <div class="flex-1 bg-gray-800/50"></div>
                     </div>
 
+                    <!-- Fog Overlay -->
+                    <div id="fog-overlay"
+                        class="absolute inset-0 bg-gradient-to-b from-gray-900 via-transparent to-transparent opacity-0 transition-opacity duration-1000 pointer-events-none z-0">
+                    </div>
+
                     <!-- Score Display -->
                     <div class="absolute top-4 left-0 w-full text-center pointer-events-none z-10">
                         <span id="current-score"
@@ -139,6 +144,11 @@
             let difficultyLoopId;
             let items = [];
 
+            // Powerup States
+            let hasShield = false;
+            let magnetActive = false;
+            let isFrozen = false;
+
             // Settings
             const LANES_COUNT = 3;
             let gameSpeed = 5;
@@ -158,6 +168,17 @@
                 scoreMultiplier = 1;
                 playerWidth = 1;
                 items = [];
+
+                // Reset States
+                hasShield = false;
+                magnetActive = false;
+                isFrozen = false;
+                player.classList.remove('border-blue-400', 'shadow-[0_0_15px_rgba(59,130,246,0.8)]', 'opacity-50');
+                const fogOverlay = document.getElementById('fog-overlay');
+                if (fogOverlay) {
+                    fogOverlay.classList.remove('opacity-90');
+                    fogOverlay.classList.add('opacity-0');
+                }
 
                 // Clear items
                 itemsContainer.innerHTML = '';
@@ -220,7 +241,7 @@
             }
 
             function moveLane(direction) {
-                if (!isPlaying) return;
+                if (!isPlaying || isFrozen) return;
 
                 const newLane = currentLane + direction;
 
@@ -237,9 +258,10 @@
                 const typeRoll = Math.random();
                 let type = 'ball';
 
-                // 10% Bomb, 5% Powerup, 85% Ball
+                // 10% Bomb, 5% Yellow Card, 10% Powerup, 75% Ball
                 if (typeRoll < 0.1) type = 'bomb';
-                else if (typeRoll < 0.15) type = 'powerup';
+                else if (typeRoll < 0.15) type = 'yellow_card';
+                else if (typeRoll < 0.25) type = 'powerup';
 
                 const lane = Math.floor(Math.random() * LANES_COUNT);
 
@@ -258,21 +280,34 @@
                     item.textContent = '💣';
                     item.style.backgroundColor = '#ef4444';
                     item.style.fontSize = '24px';
+                } else if (type === 'yellow_card') {
+                    item.style.backgroundColor = '#facc15'; // Yellow
+                    item.style.borderRadius = '4px'; // Card shape
+                    item.style.width = '32px';
+                    item.style.height = '48px';
                 } else {
                     // Random Powerup
                     const pType = Math.random();
-                    if (pType < 0.2) { // Rare Life (20% of powerups)
+                    if (pType < 0.2) { // Life
                         item.dataset.powerup = 'life';
                         item.textContent = '❤️';
-                        item.style.backgroundColor = '#ef4444'; // Red
-                    } else if (pType < 0.6) {
+                        item.style.backgroundColor = '#ef4444';
+                    } else if (pType < 0.4) { // Magnet
+                        item.dataset.powerup = 'magnet';
+                        item.textContent = '🧲';
+                        item.style.backgroundColor = '#3b82f6'; // Blue
+                    } else if (pType < 0.6) { // Shield
+                        item.dataset.powerup = 'shield';
+                        item.textContent = '🛡️';
+                        item.style.backgroundColor = '#0ea5e9'; // Sky
+                    } else if (pType < 0.8) { // Slow
                         item.dataset.powerup = 'slow';
                         item.textContent = '⏱️';
-                        item.style.backgroundColor = '#a855f7'; // Purple
-                    } else {
+                        item.style.backgroundColor = '#a855f7';
+                    } else { // Double
                         item.dataset.powerup = 'double';
                         item.textContent = '2x';
-                        item.style.backgroundColor = '#eab308'; // Yellow
+                        item.style.backgroundColor = '#eab308';
                     }
                 }
 
@@ -303,6 +338,16 @@
                     if (!isPlaying) return;
                     gameSpeed += 0.5;
                     spawnRate = Math.max(300, spawnRate - 50);
+
+                    // Fog Logic
+                    if (score > 100) {
+                        const fogOverlay = document.getElementById('fog-overlay');
+                        if (fogOverlay) {
+                            fogOverlay.classList.remove('opacity-0');
+                            fogOverlay.classList.add('opacity-90');
+                        }
+                    }
+
                     difficultyLoop();
                 }, 5000);
             }
@@ -319,6 +364,17 @@
                         scoreDisplay.textContent = score;
                         showToast("¡BONUS +50!");
                     }
+                } else if (type === 'magnet') {
+                    showToast("¡IMÁN!");
+                    magnetActive = true;
+                    setTimeout(() => {
+                        magnetActive = false;
+                    }, 5000);
+                } else if (type === 'shield') {
+                    showToast("¡ESCUDO!");
+                    hasShield = true;
+                    player.classList.add('border-blue-400', 'shadow-[0_0_15px_rgba(59,130,246,0.8)]');
+                    player.classList.remove('border-white');
                 } else if (type === 'slow') {
                     showToast("¡TIEMPO LENTO!");
                     const originalSpeed = gameSpeed;
@@ -349,6 +405,18 @@
                 // Move items
                 for (let i = items.length - 1; i >= 0; i--) {
                     const item = items[i];
+
+                    // Magnet Effect
+                    if (magnetActive && item.type === 'ball') {
+                        // Move towards player lane
+                        const targetLaneX = (currentLane * LANE_WIDTH_PERCENT) + (LANE_WIDTH_PERCENT / 2);
+                        const currentItemXPercent = parseFloat(item.element.style.left);
+
+                        // Simple lerp
+                        const diff = targetLaneX - currentItemXPercent;
+                        item.element.style.left = `${currentItemXPercent + (diff * 0.1)}%`;
+                    }
+
                     item.y += gameSpeed;
                     item.element.style.top = `${item.y}px`;
 
@@ -367,20 +435,37 @@
                     ) {
                         // Collision!
                         if (item.type === 'bomb') {
-                            lives--;
-                            updateLivesDisplay();
-
-                            // Visual feedback
-                            container.classList.add('animate-shake');
-                            setTimeout(() => container.classList.remove('animate-shake'), 500);
-
-                            if (lives <= 0) {
-                                gameOver();
-                                return;
+                            if (hasShield) {
+                                hasShield = false;
+                                player.classList.remove('border-blue-400', 'shadow-[0_0_15px_rgba(59,130,246,0.8)]');
+                                player.classList.add('border-white');
+                                showToast("¡ESCUDO ROTO!");
+                                // Visual pop for shield break
                             } else {
-                                showToast("¡CUIDADO!");
-                            }
+                                lives--;
+                                updateLivesDisplay();
 
+                                // Visual feedback
+                                container.classList.add('animate-shake');
+                                setTimeout(() => container.classList.remove('animate-shake'), 500);
+
+                                if (lives <= 0) {
+                                    gameOver();
+                                    return;
+                                } else {
+                                    showToast("¡CUIDADO!");
+                                }
+                            }
+                            item.element.remove();
+                            items.splice(i, 1);
+                        } else if (item.type === 'yellow_card') {
+                            showToast("¡FALTA! (Congelado)");
+                            isFrozen = true;
+                            player.classList.add('opacity-50');
+                            setTimeout(() => {
+                                isFrozen = false;
+                                player.classList.remove('opacity-50');
+                            }, 1500);
                             item.element.remove();
                             items.splice(i, 1);
                         } else if (item.type === 'ball') {
