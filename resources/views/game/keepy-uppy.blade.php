@@ -36,18 +36,15 @@
 
                     <!-- Game Over Screen -->
                     <div id="game-over-screen"
-                        class="hidden absolute inset-0 flex flex-col items-center justify-center bg-black/80 z-20 backdrop-blur-md">
+                        class="hidden absolute inset-0 flex flex-col items-center justify-center bg-black/80 z-30 backdrop-blur-md">
                         <h2 class="text-5xl font-black text-red-500 mb-2 font-display drop-shadow-lg">GAME OVER</h2>
                         <p class="text-2xl mb-6 text-white">Puntuación: <span id="final-score"
                                 class="font-bold text-yellow-400">0</span></p>
-
-                        <div class="flex flex-col gap-4">
-                            <button id="restart-btn"
-                                class="px-8 py-4 bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-400 hover:to-pink-500 rounded-full font-bold text-white text-xl transition transform hover:scale-105 shadow-lg hover:shadow-purple-500/50 flex items-center justify-center gap-2">
-                                <span class="material-symbols-outlined">replay</span>
-                                Jugar de Nuevo
-                            </button>
-                        </div>
+                        <button id="restart-btn"
+                            class="px-8 py-4 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-400 hover:to-emerald-500 rounded-full font-bold text-white text-xl transition transform hover:scale-105 shadow-lg hover:shadow-green-500/50 flex items-center gap-2">
+                            <span class="material-symbols-outlined">replay</span>
+                            Jugar de Nuevo
+                        </button>
                     </div>
 
                     <!-- The Ball -->
@@ -58,7 +55,7 @@
                 </div>
             </div>
 
-            <!-- LEADERBOARDD -->
+            <!-- LEADERBOARD -->
             <div class="w-full md:w-80 bg-gray-800 rounded-xl p-6 border border-gray-700 h-fit">
                 <h2 class="text-2xl font-bold mb-4 text-yellow-400 border-b border-gray-700 pb-2">Top 10 Jugadores</h2>
 
@@ -120,16 +117,7 @@
             const BASE_GRAVITY = 0.6;
             const BOUNCE = -14;
             const FRICTION = 0.99;
-            let FLOOR_Y = container.offsetHeight - 70;
-
-            function updateDimensions() {
-                FLOOR_Y = container.offsetHeight - 70;
-                // Keep ball within bounds if screen shrinks
-                if (ballY > FLOOR_Y) ballY = FLOOR_Y;
-                if (ballX > container.offsetWidth - 64) ballX = container.offsetWidth - 64;
-            }
-
-            window.addEventListener('resize', updateDimensions);
+            const FLOOR_Y = 530;
 
             ball.style.willChange = 'transform';
 
@@ -143,22 +131,19 @@
                 scoreDisplay.textContent = '0';
                 scoreDisplay.style.color = 'white';
 
-                // Wait for transition or just update immediately
-                setTimeout(updateDimensions, 100);
-
-                ballX = container.offsetWidth / 2;
-                ballY = container.offsetHeight / 2;
+                ballX = container.offsetWidth / 2 - 32;
+                ballY = 200;
                 velocityX = 0;
                 velocityY = 0;
                 rotation = 0;
 
-                ball.style.transform = `translate(${ballX}px, ${ballY}px) rotate(${rotation}deg) scale(${ballScale})`;
-
+                ball.style.transform = `translate3d(${ballX}px, ${ballY}px, 0) rotate(${rotation}deg) scale(${ballScale})`;
+                ball.classList.remove('hidden');
                 startMessage.classList.add('hidden');
                 gameOverScreen.classList.add('hidden');
 
                 isPlaying = true;
-                gameLoop();
+                requestAnimationFrame(gameLoop);
             }
 
             function updateDifficulty() {
@@ -167,6 +152,7 @@
                     level = 1;
                     currentGravity = BASE_GRAVITY;
                     ballScale = 1;
+                    wind = 0;
                     ball.style.opacity = '1';
                     scoreDisplay.style.color = 'white';
                 }
@@ -212,8 +198,8 @@
 
             function gameOver() {
                 isPlaying = false;
-                finalScoreDisplay.textContent = score;
                 gameOverScreen.classList.remove('hidden');
+                finalScoreDisplay.textContent = score;
                 saveScore(score);
             }
 
@@ -332,8 +318,15 @@
                 }, 50);
             }
 
-            // Listeners
-            startMessage.addEventListener('click', () => {
+            // Event Listeners
+            // Use 'touchstart' for immediate mobile response
+            container.addEventListener('touchstart', handleInput, { passive: false });
+            container.addEventListener('mousedown', handleInput);
+
+            // Fix: Add touchstart listener to button for mobile responsiveness
+            restartBtn.addEventListener('touchstart', (e) => {
+                e.stopPropagation();
+                e.preventDefault(); // Prevent ghost clicks
                 initGame();
             });
 
@@ -341,43 +334,11 @@
                 e.stopPropagation();
                 initGame();
             });
-            restartBtn.addEventListener('touchstart', (e) => {
-                e.stopPropagation();
-                e.preventDefault();
-                initGame();
-            });
 
             // Prevent scrolling on the game container
             container.addEventListener('touchmove', (e) => {
                 if (e.cancelable) e.preventDefault();
             }, { passive: false });
-
-            // Input Handling
-            container.addEventListener('click', (e) => {
-                if (!isPlaying && !gameOverScreen.classList.contains('hidden')) return;
-                if (!isPlaying) {
-                    initGame();
-                    // First tap shouldn't hit the ball immediately to avoid instant game over if bad spawn
-                    return;
-                }
-
-                const rect = container.getBoundingClientRect();
-                const clientX = e.clientX - rect.left;
-                kickBall(clientX);
-            });
-
-            container.addEventListener('touchstart', (e) => {
-                if (!isPlaying && !gameOverScreen.classList.contains('hidden')) return;
-                if (!isPlaying) {
-                    e.preventDefault();
-                    initGame();
-                    return;
-                }
-
-                const rect = container.getBoundingClientRect();
-                const clientX = e.touches[0].clientX - rect.left;
-                kickBall(clientX);
-            });
 
             async function saveScore(score) {
                 if (score === 0) return;
