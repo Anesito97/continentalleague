@@ -42,6 +42,12 @@
                             class="material-symbols-outlined text-red-500 text-3xl drop-shadow-md animate-pulse">favorite</span>
                     </div>
 
+                    <!-- Yellow Card Indicator -->
+                    <div id="yellow-card-indicator" class="absolute top-4 right-32 z-10 hidden">
+                        <div class="w-6 h-8 bg-yellow-400 rounded border-2 border-white shadow-lg transform rotate-12">
+                        </div>
+                    </div>
+
                     <!-- Active Effects Container -->
                     <div id="active-effects-container" class="absolute top-16 right-4 flex flex-col gap-2 z-10 items-end">
                         <!-- Effects will be injected here -->
@@ -154,6 +160,7 @@
             let shieldTimeoutId = null;
             let magnetActive = false;
             let isFrozen = false;
+            let yellowCardCount = 0;
             let activeEffects = []; // { type, endTime, duration, icon, color }
 
             // Settings
@@ -180,6 +187,8 @@
                 hasShield = false;
                 magnetActive = false;
                 isFrozen = false;
+                yellowCardCount = 0;
+                document.getElementById('yellow-card-indicator').classList.add('hidden');
                 activeEffects = [];
                 updateEffectsUI();
 
@@ -268,10 +277,11 @@
                 const typeRoll = Math.random();
                 let type = 'ball';
 
-                // 10% Bomb, 5% Yellow Card, 10% Powerup, 75% Ball
+                // 10% Bomb, 5% Yellow Card, 2% Red Card, 10% Powerup, 73% Ball
                 if (typeRoll < 0.1) type = 'bomb';
                 else if (typeRoll < 0.15) type = 'yellow_card';
-                else if (typeRoll < 0.25) type = 'powerup';
+                else if (typeRoll < 0.17) type = 'red_card';
+                else if (typeRoll < 0.27) type = 'powerup';
 
                 const lane = Math.floor(Math.random() * LANES_COUNT);
 
@@ -297,6 +307,12 @@
                     item.style.boxShadow = 'none';
                 } else if (type === 'yellow_card') {
                     item.style.backgroundColor = '#facc15'; // Yellow
+                    item.style.borderRadius = '4px'; // Card shape
+                    item.style.width = '32px';
+                    item.style.height = '48px';
+                    item.style.border = '2px solid white';
+                } else if (type === 'red_card') {
+                    item.style.backgroundColor = '#ef4444'; // Red
                     item.style.borderRadius = '4px'; // Card shape
                     item.style.width = '32px';
                     item.style.height = '48px';
@@ -576,7 +592,33 @@
                             item.element.remove();
                             items.splice(i, 1);
                         } else if (item.type === 'yellow_card') {
-                            showToast("¡FALTA! (Congelado)");
+                            yellowCardCount++;
+
+                            if (yellowCardCount >= 2) {
+                                // Red Penalty
+                                showToast("¡DOBLE AMARILLA! -50 pts");
+                                score = Math.max(0, score - 50);
+                                scoreDisplay.textContent = score;
+                                yellowCardCount = 0;
+                                document.getElementById('yellow-card-indicator').classList.add('hidden');
+                            } else {
+                                showToast("¡AMARILLA! (Congelado)");
+                                document.getElementById('yellow-card-indicator').classList.remove('hidden');
+                            }
+
+                            isFrozen = true;
+                            player.classList.add('opacity-50');
+                            setTimeout(() => {
+                                isFrozen = false;
+                                player.classList.remove('opacity-50');
+                            }, 1500);
+                            item.element.remove();
+                            items.splice(i, 1);
+                        } else if (item.type === 'red_card') {
+                            showToast("¡ROJA DIRECTA! -100 pts");
+                            score = Math.max(0, score - 100);
+                            scoreDisplay.textContent = score;
+
                             isFrozen = true;
                             player.classList.add('opacity-50');
                             setTimeout(() => {
