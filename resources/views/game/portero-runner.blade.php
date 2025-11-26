@@ -53,12 +53,19 @@
                         <!-- Effects will be injected here -->
                     </div>
 
+                    <!-- Score Display -->
+                    <div class="absolute top-4 left-4 z-10 bg-black/50 px-4 py-2 rounded-lg backdrop-blur-sm">
+                        <p class="text-sm text-gray-300">Puntuación</p>
+                        <p id="current-score" class="text-3xl font-bold text-white font-display">0</p>
+                    </div>
+
                     <!-- Start Message -->
                     <div id="start-message"
                         class="absolute inset-0 flex items-center justify-center bg-black/60 z-20 backdrop-blur-sm cursor-pointer">
                         <div class="text-center animate-pulse">
                             <span class="material-symbols-outlined text-6xl text-white mb-4">touch_app</span>
                             <p class="text-3xl font-bold text-white font-display">TOCA PARA EMPEZAR</p>
+                            <p class="text-gray-300 mt-2">Desliza para moverte</p>
                         </div>
                     </div>
 
@@ -68,11 +75,20 @@
                         <h2 class="text-5xl font-black text-red-500 mb-2 font-display drop-shadow-lg">GAME OVER</h2>
                         <p class="text-2xl mb-6 text-white">Puntuación: <span id="final-score"
                                 class="font-bold text-yellow-400">0</span></p>
-                        <button id="restart-btn"
-                            class="px-8 py-4 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-400 hover:to-emerald-500 rounded-full font-bold text-white text-xl transition transform hover:scale-105 shadow-lg hover:shadow-green-500/50 flex items-center gap-2">
-                            <span class="material-symbols-outlined">replay</span>
-                            Jugar de Nuevo
-                        </button>
+
+                        <div class="flex flex-col gap-4">
+                            <button id="restart-btn"
+                                class="px-8 py-4 bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-400 hover:to-pink-500 rounded-full font-bold text-white text-xl transition transform hover:scale-105 shadow-lg hover:shadow-purple-500/50 flex items-center justify-center gap-2">
+                                <span class="material-symbols-outlined">replay</span>
+                                Jugar de Nuevo
+                            </button>
+
+                            <a id="whatsapp-share-btn" href="#" target="_blank"
+                                class="px-8 py-3 bg-[#25D366] hover:bg-[#128C7E] rounded-full font-bold text-white text-lg transition transform hover:scale-105 shadow-lg flex items-center justify-center gap-2">
+                                <span class="material-symbols-outlined">share</span>
+                                Compartir en WhatsApp
+                            </a>
+                        </div>
                     </div>
 
                     <!-- Player (Goal) -->
@@ -144,6 +160,7 @@
             const gameOverScreen = document.getElementById('game-over-screen');
             const finalScoreDisplay = document.getElementById('final-score');
             const restartBtn = document.getElementById('restart-btn');
+            const whatsappShareBtn = document.getElementById('whatsapp-share-btn');
 
             // Game State
             let isPlaying = false;
@@ -173,6 +190,10 @@
             // Constants
             const LANE_WIDTH_PERCENT = 100 / LANES_COUNT;
 
+            window.addEventListener('resize', () => {
+                updatePlayerPosition();
+            });
+
             function initGame() {
                 score = 0;
                 lives = 3;
@@ -194,10 +215,8 @@
 
                 player.classList.remove('border-blue-400', 'shadow-[0_0_15px_rgba(59,130,246,0.8)]', 'opacity-50');
                 const fogOverlay = document.getElementById('fog-overlay');
-                if (fogOverlay) {
-                    fogOverlay.classList.remove('opacity-90');
-                    fogOverlay.classList.add('opacity-0');
-                }
+                fogOverlay.classList.remove('opacity-90');
+                fogOverlay.classList.add('opacity-0');
 
                 // Clear items
                 itemsContainer.innerHTML = '';
@@ -651,8 +670,17 @@
 
             function gameOver() {
                 isPlaying = false;
-                gameOverScreen.classList.remove('hidden');
+                cancelAnimationFrame(gameLoopId);
+                clearTimeout(spawnLoopId);
+                clearTimeout(difficultyLoopId);
+
                 finalScoreDisplay.textContent = score;
+                gameOverScreen.classList.remove('hidden');
+
+                // Update WhatsApp Link
+                const text = `¡He conseguido ${score} puntos en Portero Runner! 🏆 Te reto a superarme. Juega aquí: ${window.location.href}`;
+                whatsappShareBtn.href = `https://wa.me/?text=${encodeURIComponent(text)}`;
+
                 saveScore(score);
             }
 
@@ -667,7 +695,9 @@
             container.addEventListener('touchstart', (e) => {
                 touchStartX = e.touches[0].clientX;
                 if (!isPlaying && !gameOverScreen.classList.contains('hidden')) return;
-                if (!isPlaying) initGame();
+                if (!isPlaying) {
+                    initGame();
+                }
             }, { passive: false });
 
             // Prevent scrolling while playing

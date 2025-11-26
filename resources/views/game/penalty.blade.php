@@ -86,15 +86,24 @@
 
                     <!-- Game Over Screen -->
                     <div id="game-over-screen"
-                        class="hidden absolute inset-0 flex flex-col items-center justify-center bg-black/80 z-40 backdrop-blur-md">
-                        <h2 class="text-5xl font-black text-red-500 mb-2 font-display">GAME OVER</h2>
+                        class="hidden absolute inset-0 flex flex-col items-center justify-center bg-black/80 z-20 backdrop-blur-md">
+                        <h2 class="text-5xl font-black text-red-500 mb-2 font-display drop-shadow-lg">GAME OVER</h2>
                         <p class="text-2xl mb-6 text-white">Puntuación Final: <span id="final-score"
                                 class="font-bold text-yellow-400">0</span></p>
-                        <button id="restart-btn"
-                            class="px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-400 hover:to-purple-500 rounded-full font-bold text-white text-xl transition transform hover:scale-105 shadow-lg flex items-center gap-2">
-                            <span class="material-symbols-outlined">replay</span>
-                            Intentar de Nuevo
-                        </button>
+
+                        <div class="flex flex-col gap-4">
+                            <button id="restart-btn"
+                                class="px-8 py-4 bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-400 hover:to-pink-500 rounded-full font-bold text-white text-xl transition transform hover:scale-105 shadow-lg hover:shadow-purple-500/50 flex items-center justify-center gap-2">
+                                <span class="material-symbols-outlined">replay</span>
+                                Jugar de Nuevo
+                            </button>
+
+                            <a id="whatsapp-share-btn" href="#" target="_blank"
+                                class="px-8 py-3 bg-[#25D366] hover:bg-[#128C7E] rounded-full font-bold text-white text-lg transition transform hover:scale-105 shadow-lg flex items-center justify-center gap-2">
+                                <span class="material-symbols-outlined">share</span>
+                                Compartir en WhatsApp
+                            </a>
+                        </div>
                     </div>
 
                     <!-- Start Screen -->
@@ -159,6 +168,7 @@
             const gameOverScreen = document.getElementById('game-over-screen');
             const finalScoreDisplay = document.getElementById('final-score');
             const restartBtn = document.getElementById('restart-btn');
+            const whatsappShareBtn = document.getElementById('whatsapp-share-btn');
 
             // Game State
             let state = 'START'; // START, AIMING, POWER, SHOOTING, RESULT, GAMEOVER
@@ -189,6 +199,7 @@
                 startScreen.classList.add('hidden');
                 gameOverScreen.classList.add('hidden');
                 state = 'AIMING';
+
                 gameLoop();
             }
 
@@ -197,9 +208,6 @@
                 ball.style.transform = 'translate(-50%, 0) scale(1)';
                 ball.style.bottom = '10%';
                 ball.style.left = '50%';
-
-                goalkeeper.style.transform = 'translate(-50%, 0)';
-                goalkeeper.style.left = '50%';
 
                 aimValue = 50;
                 powerValue = 0;
@@ -421,7 +429,6 @@
             });
             restartBtn.addEventListener('touchstart', (e) => {
                 e.stopPropagation();
-                e.preventDefault();
                 initGame();
             });
 
