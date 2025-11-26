@@ -14,8 +14,9 @@ class GameController extends Controller
         // Hub Menu
         $keepyUppyTopScore = GameScore::where('game_type', 'keepy_uppy')->max('score') ?? 0;
         $penaltyTopScore = GameScore::where('game_type', 'penalty')->max('score') ?? 0;
+        $porteroRunnerTopScore = GameScore::where('game_type', 'portero_runner')->max('score') ?? 0;
 
-        return view('game.menu', compact('keepyUppyTopScore', 'penaltyTopScore'));
+        return view('game.menu', compact('keepyUppyTopScore', 'penaltyTopScore', 'porteroRunnerTopScore'));
     }
 
     public function keepyUppy()
@@ -50,11 +51,27 @@ class GameController extends Controller
         return view('game.penalty', compact('topScores', 'userBest'));
     }
 
+    public function porteroRunner()
+    {
+        // Portero Runner Game View
+        $topScores = GameScore::where('game_type', 'portero_runner')
+            ->with('user')
+            ->orderBy('score', 'desc')
+            ->take(10)
+            ->get();
+
+        $userBest = Auth::check()
+            ? GameScore::where('user_id', Auth::id())->where('game_type', 'portero_runner')->max('score') ?? 0
+            : 0;
+
+        return view('game.portero-runner', compact('topScores', 'userBest'));
+    }
+
     public function store(Request $request)
     {
         $request->validate([
             'score' => 'required|integer|min:1',
-            'game_type' => 'nullable|string|in:keepy_uppy,penalty'
+            'game_type' => 'nullable|string|in:keepy_uppy,penalty,portero_runner'
         ]);
 
         $gameType = $request->game_type ?? 'keepy_uppy';

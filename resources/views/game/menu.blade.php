@@ -91,13 +91,42 @@
                 </div>
 
                 <!-- COMING SOON CARD -->
-                <div class="group relative bg-gray-800/50 rounded-2xl overflow-hidden border border-gray-700 border-dashed">
-                    <div class="h-full flex flex-col items-center justify-center p-8 text-center opacity-50">
-                        <span class="material-symbols-outlined text-6xl text-gray-600 mb-4">sports_esports</span>
-                        <h3 class="text-xl font-bold text-gray-400 mb-2">Próximamente</h3>
-                        <p class="text-gray-500 text-sm">
-                            Estamos trabajando en nuevos desafíos. ¡Mantente atento!
+                <!-- PORTERO RUNNER CARD -->
+                <div
+                    class="group relative bg-gray-800 rounded-2xl overflow-hidden shadow-2xl transition-all duration-300 hover:-translate-y-2 hover:shadow-purple-500/20 border border-gray-700 hover:border-purple-500/50">
+                    <!-- Image -->
+                    <div class="h-48 overflow-hidden relative">
+                        <div class="absolute inset-0 bg-gradient-to-t from-gray-900 to-transparent z-10"></div>
+                        <img src="https://images.unsplash.com/photo-1517466787929-bc90951d64b8?q=80&w=2069&auto=format&fit=crop"
+                            alt="Portero Runner"
+                            class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500">
+                        <div
+                            class="absolute top-4 right-4 z-20 bg-purple-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                            NUEVO
+                        </div>
+                    </div>
+
+                    <!-- Content -->
+                    <div class="p-6 relative z-20">
+                        <h3 class="text-2xl font-bold text-white mb-2 group-hover:text-purple-400 transition-colors">
+                            Portero Runner
+                        </h3>
+                        <p class="text-gray-400 mb-6 text-sm line-clamp-2">
+                            ¡Esquiva bombas y atrapa balones! Muévete entre carriles y usa power-ups para sobrevivir.
                         </p>
+
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-2 text-sm text-gray-500">
+                                <span class="material-symbols-outlined text-yellow-500 text-lg">trophy</span>
+                                <span>Top: {{ $porteroRunnerTopScore }}</span>
+                            </div>
+
+                            <a href="{{ route('game.portero-runner') }}"
+                                class="inline-flex items-center justify-center px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold rounded-lg hover:from-purple-500 hover:to-pink-500 transition-all shadow-lg hover:shadow-purple-500/30">
+                                <span class="material-symbols-outlined mr-2">play_circle</span>
+                                Jugar
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -49,6 +49,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/games', [\App\Http\Controllers\GameController::class, 'index'])->name('games.index');
     Route::get('/games/keepy-uppy', [\App\Http\Controllers\GameController::class, 'keepyUppy'])->name('game.keepy-uppy');
     Route::get('/games/penalty', [\App\Http\Controllers\GameController::class, 'penalty'])->name('game.penalty');
+    Route::get('/games/portero-runner', [\App\Http\Controllers\GameController::class, 'porteroRunner'])->name('game.portero-runner');
     Route::post('/game/save', [\App\Http\Controllers\GameController::class, 'store'])->name('game.save');
 });
 
