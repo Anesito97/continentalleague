@@ -266,10 +266,11 @@
                 const lane = Math.floor(Math.random() * LANES_COUNT);
 
                 const item = document.createElement('div');
-                item.className = 'absolute w-12 h-12 rounded-full shadow-lg flex items-center justify-center text-xs font-bold transition-transform';
+                item.className = 'absolute w-12 h-12 rounded-full shadow-lg flex items-center justify-center text-base font-black transition-transform border-2 border-white/20';
                 item.style.left = `${(lane * LANE_WIDTH_PERCENT) + (LANE_WIDTH_PERCENT / 2)}%`;
                 item.style.top = '-50px';
                 item.style.transform = 'translateX(-50%)';
+                item.style.textShadow = '0 2px 4px rgba(0,0,0,0.5)';
 
                 // Item Styles
                 if (type === 'ball') {
@@ -285,29 +286,39 @@
                     item.style.borderRadius = '4px'; // Card shape
                     item.style.width = '32px';
                     item.style.height = '48px';
+                    item.style.border = '2px solid white';
                 } else {
                     // Random Powerup
                     const pType = Math.random();
+                    item.style.color = 'white';
+
                     if (pType < 0.2) { // Life
                         item.dataset.powerup = 'life';
                         item.textContent = '❤️';
                         item.style.backgroundColor = '#ef4444';
+                        item.style.fontSize = '24px';
                     } else if (pType < 0.4) { // Magnet
                         item.dataset.powerup = 'magnet';
                         item.textContent = '🧲';
                         item.style.backgroundColor = '#3b82f6'; // Blue
+                        item.style.fontSize = '24px';
                     } else if (pType < 0.6) { // Shield
                         item.dataset.powerup = 'shield';
                         item.textContent = '🛡️';
                         item.style.backgroundColor = '#0ea5e9'; // Sky
+                        item.style.fontSize = '24px';
                     } else if (pType < 0.8) { // Slow
                         item.dataset.powerup = 'slow';
                         item.textContent = '⏱️';
                         item.style.backgroundColor = '#a855f7';
+                        item.style.fontSize = '24px';
                     } else { // Double
                         item.dataset.powerup = 'double';
                         item.textContent = '2x';
                         item.style.backgroundColor = '#eab308';
+                        item.style.fontSize = '20px'; // Slightly smaller for text
+                        item.style.color = 'black'; // Black text on yellow for contrast
+                        item.style.textShadow = 'none';
                     }
                 }
 
