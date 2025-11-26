@@ -151,6 +151,7 @@
 
             // Powerup States
             let hasShield = false;
+            let shieldTimeoutId = null;
             let magnetActive = false;
             let isFrozen = false;
             let activeEffects = []; // { type, endTime, duration, icon, color }
@@ -288,8 +289,12 @@
                     item.style.backgroundColor = 'white';
                 } else if (type === 'bomb') {
                     item.textContent = '💣';
-                    item.style.backgroundColor = '#ef4444';
-                    item.style.fontSize = '24px';
+                    item.style.backgroundColor = 'transparent';
+                    item.style.fontSize = '48px';
+                    item.style.width = '60px';
+                    item.style.height = '60px';
+                    item.style.border = 'none';
+                    item.style.boxShadow = 'none';
                 } else if (type === 'yellow_card') {
                     item.style.backgroundColor = '#facc15'; // Yellow
                     item.style.borderRadius = '4px'; // Card shape
@@ -400,10 +405,28 @@
                     }, 5000);
                 } else if (type === 'shield') {
                     showToast("¡ESCUDO!");
+
+                    if (shieldTimeoutId) clearTimeout(shieldTimeoutId);
+
                     hasShield = true;
-                    addEffect('shield', 0, '🛡️', '#0ea5e9');
+                    const duration = 10000; // 10 seconds
+                    addEffect('shield', duration, '🛡️', '#0ea5e9');
+
                     player.classList.add('border-blue-400', 'shadow-[0_0_15px_rgba(59,130,246,0.8)]');
                     player.classList.remove('border-white');
+
+                    shieldTimeoutId = setTimeout(() => {
+                        if (hasShield) {
+                            hasShield = false;
+                            player.classList.remove('border-blue-400', 'shadow-[0_0_15px_rgba(59,130,246,0.8)]');
+                            player.classList.add('border-white');
+                            showToast("¡ESCUDO EXPIRADO!");
+                            // Force UI update to remove effect
+                            activeEffects = activeEffects.filter(e => e.type !== 'shield');
+                            updateEffectsUI();
+                        }
+                    }, duration);
+
                 } else if (type === 'slow') {
                     showToast("¡TIEMPO LENTO!");
                     const originalSpeed = gameSpeed;
@@ -444,9 +467,8 @@
 
                 const now = Date.now();
 
-                // Filter expired effects (except shield which is persistent)
+                // Filter expired effects
                 activeEffects = activeEffects.filter(e => {
-                    if (e.type === 'shield') return hasShield;
                     return e.endTime > now;
                 });
 
@@ -460,27 +482,19 @@
 
                     el.appendChild(icon);
 
-                    if (effect.type !== 'shield') {
-                        const timeLeft = Math.max(0, effect.endTime - now);
-                        const percent = (timeLeft / effect.duration) * 100;
+                    const timeLeft = Math.max(0, effect.endTime - now);
+                    const percent = (timeLeft / effect.duration) * 100;
 
-                        const progressContainer = document.createElement('div');
-                        progressContainer.className = 'w-12 h-2 bg-gray-700 rounded-full overflow-hidden';
+                    const progressContainer = document.createElement('div');
+                    progressContainer.className = 'w-12 h-2 bg-gray-700 rounded-full overflow-hidden';
 
-                        const progressBar = document.createElement('div');
-                        progressBar.className = 'h-full rounded-full transition-all duration-100 ease-linear';
-                        progressBar.style.width = `${percent}%`;
-                        progressBar.style.backgroundColor = effect.color;
+                    const progressBar = document.createElement('div');
+                    progressBar.className = 'h-full rounded-full transition-all duration-100 ease-linear';
+                    progressBar.style.width = `${percent}%`;
+                    progressBar.style.backgroundColor = effect.color;
 
-                        progressContainer.appendChild(progressBar);
-                        el.appendChild(progressContainer);
-                    } else {
-                        // Shield has no timer
-                        const text = document.createElement('span');
-                        text.textContent = 'ACTIVO';
-                        text.className = 'text-xs font-bold text-blue-400';
-                        el.appendChild(text);
-                    }
+                    progressContainer.appendChild(progressBar);
+                    el.appendChild(progressContainer);
 
                     container.appendChild(el);
                 });
@@ -534,7 +548,12 @@
                         if (item.type === 'bomb') {
                             if (hasShield) {
                                 hasShield = false;
-                                updateEffectsUI(); // Update UI immediately
+                                if (shieldTimeoutId) clearTimeout(shieldTimeoutId);
+
+                                // Remove effect from UI immediately
+                                activeEffects = activeEffects.filter(e => e.type !== 'shield');
+                                updateEffectsUI();
+
                                 player.classList.remove('border-blue-400', 'shadow-[0_0_15px_rgba(59,130,246,0.8)]');
                                 player.classList.add('border-white');
                                 showToast("¡ESCUDO ROTO!");
