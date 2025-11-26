@@ -81,7 +81,7 @@
                                     <span class="text-sm font-medium truncate max-w-[120px]">{{ $score->user->name }}</span>
                                 </div>
                             </div>
-                            <span class="font-bold text-yellow-400">{{ $score->max_score }}</span>
+                            <span class="font-bold text-yellow-400">{{ $score->score }}</span>
                         </li>
                     @endforeach
                 </ul>
