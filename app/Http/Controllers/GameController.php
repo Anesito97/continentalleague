@@ -77,22 +77,40 @@ class GameController extends Controller
         $gameType = $request->game_type ?? 'keepy_uppy';
         $userId = Auth::id();
 
-        $existingScore = GameScore::where('user_id', $userId)
-            ->where('game_type', $gameType)
-            ->first();
+        return DB::transaction(function () use ($userId, $gameType, $request) {
+            // Fetch all scores for this user and game type with a lock
+            $existingScores = GameScore::where('user_id', $userId)
+                ->where('game_type', $gameType)
+                ->lockForUpdate()
+                ->orderBy('score', 'desc')
+                ->get();
 
-        if ($existingScore) {
-            if ($request->score > $existingScore->score) {
-                $existingScore->update(['score' => $request->score]);
+            if ($existingScores->count() > 0) {
+                // The first one is the best score because of orderBy desc
+                $bestScoreRecord = $existingScores->first();
+
+                // Delete any duplicates (all records except the first one)
+                if ($existingScores->count() > 1) {
+                    $duplicates = $existingScores->slice(1);
+                    foreach ($duplicates as $duplicate) {
+                        $duplicate->delete();
+                    }
+                }
+
+                // Check if new score is higher than the best existing score
+                if ((int) $request->score > (int) $bestScoreRecord->score) {
+                    $bestScoreRecord->update(['score' => $request->score]);
+                }
+            } else {
+                // No existing score, create new one
+                GameScore::create([
+                    'user_id' => $userId,
+                    'score' => $request->score,
+                    'game_type' => $gameType
+                ]);
             }
-        } else {
-            GameScore::create([
-                'user_id' => $userId,
-                'score' => $request->score,
-                'game_type' => $gameType
-            ]);
-        }
 
-        return response()->json(['success' => true]);
+            return response()->json(['success' => true]);
+        });
     }
 }

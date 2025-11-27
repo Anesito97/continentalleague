@@ -670,9 +670,8 @@
                 finalScoreDisplay.textContent = score;
                 gameOverScreen.classList.remove('hidden');
 
-                // Update WhatsApp Link
-                const text = `¡He conseguido ${score} puntos en Portero Runner! 🏆 Te reto a superarme. Juega aquí: ${window.location.href}`;
-                whatsappShareBtn.href = `https://wa.me/?text=${encodeURIComponent(text)}`;
+                finalScoreDisplay.textContent = score;
+                gameOverScreen.classList.remove('hidden');
 
                 saveScore(score);
             }
