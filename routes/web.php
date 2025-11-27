@@ -31,7 +31,7 @@ Route::get('player/{jugador}', [PublicController::class, 'showPlayerProfile'])->
 
 Route::post('vote/{match_id}', [VoteController::class, 'handleVote'])->name('community.vote');
 
-Route::get('images', [GalleryController::class, 'index'])->name('gallery.index');
+Route::get('imagess', [GalleryController::class, 'index'])->name('gallery.index');
 
 // --- AUTENTICACIÓN ---
 Route::get('login', function () {
