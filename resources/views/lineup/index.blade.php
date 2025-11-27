@@ -4,8 +4,7 @@
     <div class="min-h-screen bg-gray-900 py-8 px-4 sm:px-6 lg:px-8">
         <div class="max-w-7xl mx-auto">
             <div class="text-center mb-8">
-                <h1
-                    class="text-3xl md:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-blue-500 drop-shadow-lg">
+                <h1 class="text-3xl md:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-blue-500 drop-shadow-lg">
                     Pizarra Táctica
                 </h1>
                 <p class="text-gray-400 mt-2">Crea y comparte tu alineación ideal</p>
@@ -15,8 +14,7 @@
                 <div class="w-full lg:w-1/4 space-y-6">
                     <div class="bg-gray-800 p-4 rounded-xl border border-gray-700">
                         <label class="block text-sm font-medium text-gray-300 mb-2">Seleccionar Equipo</label>
-                        <select id="teamSelect"
-                            class="w-full bg-gray-700 border-gray-600 text-white rounded-lg focus:ring-green-500 focus:border-green-500">
+                        <select id="teamSelect" class="w-full bg-gray-700 border-gray-600 text-white rounded-lg focus:ring-green-500 focus:border-green-500">
                             <option value="">-- Elige un equipo --</option>
                             @foreach($teams as $team)
                                 <option value="{{ $team->id }}">{{ $team->nombre }}</option>
@@ -26,8 +24,7 @@
 
                     <div class="bg-gray-800 p-4 rounded-xl border border-gray-700">
                         <label class="block text-sm font-medium text-gray-300 mb-2">Formación</label>
-                        <select id="formationSelect"
-                            class="w-full bg-gray-700 border-gray-600 text-white rounded-lg focus:ring-green-500 focus:border-green-500">
+                        <select id="formationSelect" class="w-full bg-gray-700 border-gray-600 text-white rounded-lg focus:ring-green-500 focus:border-green-500">
                             <option value="4-4-2">4-4-2</option>
                             <option value="4-3-3">4-3-3</option>
                             <option value="4-2-3-1">4-2-3-1</option>
@@ -41,16 +38,12 @@
                     </div>
 
                     <div class="bg-gray-800 p-4 rounded-xl border border-gray-700 space-y-3">
-                        <button id="resetBtn"
-                            class="w-full py-2 px-4 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg transition-colors">
+                        <button id="resetBtn" class="w-full py-2 px-4 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg transition-colors">
                             Reiniciar
                         </button>
-                        <button id="downloadBtn"
-                            class="w-full py-2 px-4 bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg transition-colors flex items-center justify-center gap-2">
+                        <button id="downloadBtn" class="w-full py-2 px-4 bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg transition-colors flex items-center justify-center gap-2">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd"
-                                    d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
-                                    clip-rule="evenodd" />
+                                <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
                             </svg>
                             Descargar Imagen
                         </button>
@@ -58,27 +51,16 @@
                 </div>
 
                 <div class="w-full lg:w-3/4 flex justify-center">
-                    <div id="pitch-container"
-                        class="relative w-full max-w-[600px] aspect-[2/3] bg-green-800 rounded-lg border-4 border-white shadow-2xl overflow-hidden select-none">
-                        <div class="absolute inset-0 opacity-20"
-                            style="background-image: repeating-linear-gradient(0deg, transparent, transparent 20px, #000 20px, #000 40px);">
-                        </div>
+                    <div id="pitch-container" class="relative w-full max-w-[600px] aspect-[2/3] bg-green-800 rounded-lg border-4 border-white shadow-2xl overflow-hidden select-none">
+                        <div class="absolute inset-0 opacity-20" style="background-image: repeating-linear-gradient(0deg, transparent, transparent 20px, #000 20px, #000 40px);"></div>
 
-                        <div class="absolute inset-4 border-2 border-white/50"></div> <div class="absolute top-1/2 left-4 right-4 h-0.5 bg-white/50 -translate-y-1/2"></div>
-                        <div
-                            class="absolute top-1/2 left-1/2 w-24 h-24 border-2 border-white/50 rounded-full -translate-x-1/2 -translate-y-1/2">
-                        </div> <div
-                            class="absolute top-4 left-1/2 w-48 h-24 border-2 border-t-0 border-white/50 -translate-x-1/2 bg-white/5">
-                        </div>
-                        <div
-                            class="absolute bottom-4 left-1/2 w-48 h-24 border-2 border-b-0 border-white/50 -translate-x-1/2 bg-white/5">
-                        </div>
-
-                        <div class="absolute top-4 left-1/2 w-20 h-8 border-2 border-t-0 border-white/50 -translate-x-1/2">
-                        </div>
-                        <div
-                            class="absolute bottom-4 left-1/2 w-20 h-8 border-2 border-b-0 border-white/50 -translate-x-1/2">
-                        </div>
+                        <div class="absolute inset-4 border-2 border-white/50"></div> 
+                        <div class="absolute top-1/2 left-4 right-4 h-0.5 bg-white/50 -translate-y-1/2"></div>
+                        <div class="absolute top-1/2 left-1/2 w-24 h-24 border-2 border-white/50 rounded-full -translate-x-1/2 -translate-y-1/2"></div> 
+                        <div class="absolute top-4 left-1/2 w-48 h-24 border-2 border-t-0 border-white/50 -translate-x-1/2 bg-white/5"></div>
+                        <div class="absolute bottom-4 left-1/2 w-48 h-24 border-2 border-b-0 border-white/50 -translate-x-1/2 bg-white/5"></div>
+                        <div class="absolute top-4 left-1/2 w-20 h-8 border-2 border-t-0 border-white/50 -translate-x-1/2"></div>
+                        <div class="absolute bottom-4 left-1/2 w-20 h-8 border-2 border-b-0 border-white/50 -translate-x-1/2"></div>
 
                         <div class="absolute bottom-2 right-4 text-white/30 font-bold text-sm z-0">
                             Continental League
@@ -92,30 +74,33 @@
         </div>
     </div>
 
-    <div id="playerModal" class="fixed inset-0 z-50 hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog"
-        aria-modal="true">
-        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div class="fixed inset-0 bg-gray-900 bg-opacity-75 transition-opacity" aria-hidden="true" id="modalBackdrop">
-            </div>
-            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-            <div
-                class="inline-block align-bottom bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg w-full">
-                <div class="bg-gray-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                    <h3 class="text-lg leading-6 font-medium text-white mb-4" id="modal-title">Seleccionar Jugador</h3>
-
-                    <div class="mb-4">
-                        <input type="text" id="playerSearch" placeholder="Buscar jugador..."
-                            class="w-full bg-gray-700 border-gray-600 text-white rounded-lg focus:ring-green-500 focus:border-green-500 px-4 py-2">
+    <div id="playerModal" class="fixed inset-0 z-50 hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="fixed inset-0 bg-gray-900 bg-opacity-75 transition-opacity" id="modalBackdrop"></div>
+        
+        <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
+            <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
+                
+                <div class="relative transform overflow-hidden rounded-lg bg-gray-800 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg w-full max-h-[85vh] flex flex-col border border-gray-700">
+                    
+                    <div class="bg-gray-800 px-4 pt-5 pb-2 sm:p-6 sm:pb-4 flex-shrink-0">
+                        <h3 class="text-lg leading-6 font-medium text-white mb-4" id="modal-title">Seleccionar Jugador</h3>
+                        <div>
+                            <input type="text" id="playerSearch" placeholder="Buscar jugador..." autocomplete="off"
+                                class="w-full bg-gray-700 border-gray-600 text-white rounded-lg focus:ring-green-500 focus:border-green-500 px-4 py-2 shadow-inner">
+                        </div>
                     </div>
 
-                    <div id="playersList" class="grid grid-cols-1 gap-2 max-h-60 overflow-y-auto">
-                        </div>
-                </div>
-                <div class="bg-gray-700 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                    <button type="button" id="closeModalBtn"
-                        class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-600 shadow-sm px-4 py-2 bg-gray-800 text-base font-medium text-gray-300 hover:bg-gray-700 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
-                        Cancelar
-                    </button>
+                    <div class="bg-gray-800 px-4 flex-1 overflow-y-auto min-h-[200px]" id="modal-content-scroll">
+                        <div id="playersList" class="grid grid-cols-1 gap-2 pb-4">
+                            </div>
+                    </div>
+
+                    <div class="bg-gray-700 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse flex-shrink-0">
+                        <button type="button" id="closeModalBtn"
+                            class="w-full inline-flex justify-center rounded-md border border-gray-600 shadow-sm px-4 py-2 bg-gray-800 text-base font-medium text-gray-300 hover:bg-gray-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm">
+                            Cancelar
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -139,7 +124,7 @@
             let activeSlotIndex = null;
             let lineupState = {};
 
-            // Configuración de formaciones (Sin cambios)
+            // Formations Configuration
             const formations = {
                 '4-4-2': [
                     { top: '88%', left: '50%' }, // GK
@@ -199,7 +184,7 @@
                 ]
             };
 
-            // Inicializar
+            // Initialize
             renderFormation('4-4-2');
 
             // Event Listeners
@@ -231,7 +216,6 @@
                 renderFormation(formationSelect.value);
             });
 
-            // Función de descarga (Se mantiene la corrección de scrollY)
             downloadBtn.addEventListener('click', async () => {
                 const pitch = document.getElementById('pitch-container');
                 const originalText = downloadBtn.innerHTML;
@@ -298,6 +282,8 @@
                 }
             });
 
+            // CORRECCIÓN MODAL: Quitamos 'hidden' de la clase base y usamos JS para controlarlo
+            // para evitar conflictos con estilos inline
             const closeModal = () => playerModal.classList.add('hidden');
             closeModalBtn.addEventListener('click', closeModal);
             modalBackdrop.addEventListener('click', closeModal);
@@ -311,9 +297,6 @@
                 return `/lineup-builder/proxy?url=${encodeURIComponent(url)}`;
             }
 
-            // ------------------------------------------
-            // RENDERIZADO MODIFICADO (Sin números, sin fondo negro, más pequeño)
-            // ------------------------------------------
             function renderFormation(formationName) {
                 formationLayer.innerHTML = '';
                 const positions = formations[formationName];
@@ -330,7 +313,6 @@
                     if (player) {
                         const imageUrl = player.foto_url ? getProxyUrl(player.foto_url) : null;
 
-                        // ESTRUCTURA MINIMALISTA Y MÁS PEQUEÑA
                         slot.innerHTML = `
                             <div class="flex flex-col items-center justify-center">
                                 <div class="w-12 h-12 md:w-16 md:h-16 rounded-full border-[2px] md:border-[3px] border-white overflow-hidden bg-gray-800 shadow-xl z-10 block">
@@ -348,7 +330,6 @@
                             </div>
                         `;
                     } else {
-                        // Slot Vacío (Ajustado al nuevo tamaño más pequeño)
                         slot.innerHTML = `
                             <div class="w-12 h-12 md:w-16 md:h-16 rounded-full border-2 border-dashed border-white/50 flex items-center justify-center bg-white/10 hover:bg-white/20 transition-colors shadow-sm">
                                 <span class="text-white font-bold text-xl opacity-80">+</span>
@@ -370,7 +351,11 @@
                 playerSearch.value = '';
                 renderPlayerList();
                 playerModal.classList.remove('hidden');
-                setTimeout(() => playerSearch.focus(), 100);
+                
+                // Timeout para asegurar que el input esté visible antes de enfocar
+                setTimeout(() => {
+                    playerSearch.focus();
+                }, 100);
             }
 
             function renderPlayerList(searchTerm = '') {
