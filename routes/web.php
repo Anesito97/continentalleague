@@ -45,6 +45,7 @@ Route::get('auth/google', [AuthController::class, 'redirectToGoogle'])->name('au
 Route::get('auth/google/callback', [AuthController::class, 'handleGoogleCallback']);
 
 Route::get('/ideal-11', [App\Http\Controllers\IdealElevenController::class, 'index'])->name('ideal-eleven');
+Route::get('/mvp', [App\Http\Controllers\MvpController::class, 'index'])->name('mvp.index');
 
 // --- MINIJUEGOS ---
 Route::middleware('auth')->group(function () {

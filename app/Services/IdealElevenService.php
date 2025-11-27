@@ -9,6 +9,13 @@ use Illuminate\Support\Facades\DB;
 
 class IdealElevenService
 {
+    private PlayerRatingService $ratingService;
+
+    public function __construct(PlayerRatingService $ratingService)
+    {
+        $this->ratingService = $ratingService;
+    }
+
     public function getBestEleven(?int $teamId = null): array
     {
         // 4-3-3 Formation
@@ -52,57 +59,24 @@ class IdealElevenService
 
     private function calculateRating(Jugador $player): float
     {
-        $score = 0;
-        $goals = $player->goles ?? 0;
-        $assists = $player->asistencias ?? 0;
-        $saves = $player->paradas ?? 0;
+        $stats = [
+            'goals' => $player->goles ?? 0,
+            'assists' => $player->asistencias ?? 0,
+            'saves' => $player->paradas ?? 0,
+            'yellow_cards' => $player->amarillas ?? 0,
+            'red_cards' => $player->rojas ?? 0,
+            'goals_conceded' => 0,
+            'clean_sheets' => 0,
+            'matches_lost' => 0,
+        ];
 
-        // Calculate team stats
-        $goalsConceded = 0;
         if ($player->equipo_id) {
-            $goalsConceded = $this->calculateGoalsConceded($player->equipo_id);
+            $stats['goals_conceded'] = $this->calculateGoalsConceded($player->equipo_id);
+            $stats['clean_sheets'] = $this->calculateCleanSheets($player->equipo_id);
+            $stats['matches_lost'] = $this->calculateMatchesLost($player->equipo_id);
         }
 
-        switch ($player->posicion_general) {
-            case 'delantero':
-                // FWD: Goals + Assists
-                $score += ($goals * 10);
-                $score += ($assists * 7);
-                break;
-
-            case 'medio':
-                // MID: Goals + Assists
-                $score += ($goals * 8);
-                $score += ($assists * 8);
-                break;
-
-            case 'defensa':
-                // DEF: Goals + Assists + Goals Received (Negative)
-                $score += ($goals * 12); // High value for scoring defenders
-                $score += ($assists * 8);
-                $score -= ($goalsConceded * 1.5); // Penalty for conceding
-
-                // Bonus for clean sheets (still good to have)
-                $cleanSheets = $this->calculateCleanSheets($player->equipo_id);
-                $score += ($cleanSheets * 5);
-                break;
-
-            case 'portero':
-                // GK: Saves + Goals Received (Negative)
-                $score += ($saves * 5);
-                $score -= ($goalsConceded * 2);
-
-                // Bonus for clean sheets
-                $cleanSheets = $this->calculateCleanSheets($player->equipo_id);
-                $score += ($cleanSheets * 10);
-                break;
-        }
-
-        // General Penalties
-        $score -= ($player->amarillas ?? 0) * 1;
-        $score -= ($player->rojas ?? 0) * 3;
-
-        return $score;
+        return $this->ratingService->calculate($player->posicion_general, $stats);
     }
 
     private function calculateGoalsConceded(?int $teamId): int
@@ -139,5 +113,23 @@ class IdealElevenService
             ->count();
 
         return $homeCleanSheets + $awayCleanSheets;
+    }
+
+    private function calculateMatchesLost(?int $teamId): int
+    {
+        if (!$teamId)
+            return 0;
+
+        $lostAsHome = Partido::where('equipo_local_id', $teamId)
+            ->where('estado', 'finalizado')
+            ->whereColumn('goles_local', '<', 'goles_visitante')
+            ->count();
+
+        $lostAsAway = Partido::where('equipo_visitante_id', $teamId)
+            ->where('estado', 'finalizado')
+            ->whereColumn('goles_visitante', '<', 'goles_local')
+            ->count();
+
+        return $lostAsHome + $lostAsAway;
     }
 }
