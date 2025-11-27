@@ -33,6 +33,17 @@
                 <span class="font-medium">Tops</span>
             </a>
 
+            {{-- 11 IDEAL (NUEVO) --}}
+            <a href="{{ route('ideal-eleven') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200
+                       @if (request()->routeIs('ideal-eleven')) 
+                           bg-gradient-to-r from-primary to-emerald-600 text-white shadow-lg shadow-primary/30 
+                       @else 
+                           text-gray-300 hover:text-white hover:bg-white/10 
+                       @endif">
+                <span class="material-symbols-outlined">stars</span>
+                <span class="font-medium">11 Ideal</span>
+            </a>
+
 
             {{-- CALENDARIO DE PARTIDOS (NUEVO) --}}
             <a href="{{ route('matches.calendar') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200
@@ -90,11 +101,11 @@
             {{-- Panel de Administración --}}
             @if (session('is_admin'))
                 <a href="{{ route('admin.panel') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200
-                                       @if (isset($activeView) && $activeView === 'admin') 
-                                           bg-gradient-to-r from-primary to-emerald-600 text-white shadow-lg shadow-primary/30 
-                                       @else 
-                                           text-gray-300 hover:text-white hover:bg-white/10 
-                                       @endif">
+                                           @if (isset($activeView) && $activeView === 'admin') 
+                                               bg-gradient-to-r from-primary to-emerald-600 text-white shadow-lg shadow-primary/30 
+                                           @else 
+                                               text-gray-300 hover:text-white hover:bg-white/10 
+                                           @endif">
                     <span class="material-symbols-outlined">admin_panel_settings</span>
                     <span class="font-medium">Panel Admin</span>
                 </a>
