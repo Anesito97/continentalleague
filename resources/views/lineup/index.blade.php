@@ -33,9 +33,13 @@
                             class="w-full bg-gray-700 border-gray-600 text-white rounded-lg focus:ring-green-500 focus:border-green-500">
                             <option value="4-4-2">4-4-2</option>
                             <option value="4-3-3">4-3-3</option>
+                            <option value="4-2-3-1">4-2-3-1</option>
+                            <option value="4-1-4-1">4-1-4-1</option>
+                            <option value="4-5-1">4-5-1</option>
                             <option value="3-4-3">3-4-3</option>
                             <option value="3-5-2">3-5-2</option>
                             <option value="5-3-2">5-3-2</option>
+                            <option value="5-4-1">5-4-1</option>
                         </select>
                     </div>
 
@@ -171,6 +175,26 @@
                     { top: '40%', left: '30%' }, { top: '40%', left: '50%' }, { top: '40%', left: '70%' }, // MID
                     { top: '15%', left: '20%' }, { top: '15%', left: '50%' }, { top: '15%', left: '80%' } // FWD
                 ],
+                '4-2-3-1': [
+                    { top: '85%', left: '50%' }, // GK
+                    { top: '65%', left: '20%' }, { top: '65%', left: '40%' }, { top: '65%', left: '60%' }, { top: '65%', left: '80%' }, // DEF
+                    { top: '50%', left: '35%' }, { top: '50%', left: '65%' }, // CDM
+                    { top: '30%', left: '20%' }, { top: '30%', left: '50%' }, { top: '30%', left: '80%' }, // CAM/Wingers
+                    { top: '15%', left: '50%' } // ST
+                ],
+                '4-1-4-1': [
+                    { top: '85%', left: '50%' }, // GK
+                    { top: '65%', left: '20%' }, { top: '65%', left: '40%' }, { top: '65%', left: '60%' }, { top: '65%', left: '80%' }, // DEF
+                    { top: '53%', left: '50%' }, // CDM
+                    { top: '35%', left: '20%' }, { top: '35%', left: '40%' }, { top: '35%', left: '60%' }, { top: '35%', left: '80%' }, // MID
+                    { top: '15%', left: '50%' } // ST
+                ],
+                '4-5-1': [
+                    { top: '85%', left: '50%' }, // GK
+                    { top: '65%', left: '20%' }, { top: '65%', left: '40%' }, { top: '65%', left: '60%' }, { top: '65%', left: '80%' }, // DEF
+                    { top: '40%', left: '15%' }, { top: '40%', left: '32%' }, { top: '40%', left: '50%' }, { top: '40%', left: '68%' }, { top: '40%', left: '85%' }, // MID
+                    { top: '15%', left: '50%' } // ST
+                ],
                 '3-4-3': [
                     { top: '85%', left: '50%' }, // GK
                     { top: '65%', left: '30%' }, { top: '65%', left: '50%' }, { top: '65%', left: '70%' }, // DEF
@@ -188,6 +212,12 @@
                     { top: '65%', left: '15%' }, { top: '65%', left: '32%' }, { top: '65%', left: '50%' }, { top: '65%', left: '68%' }, { top: '65%', left: '85%' }, // DEF
                     { top: '40%', left: '30%' }, { top: '40%', left: '50%' }, { top: '40%', left: '70%' }, // MID
                     { top: '15%', left: '35%' }, { top: '15%', left: '65%' } // FWD
+                ],
+                '5-4-1': [
+                    { top: '85%', left: '50%' }, // GK
+                    { top: '65%', left: '15%' }, { top: '65%', left: '32%' }, { top: '65%', left: '50%' }, { top: '65%', left: '68%' }, { top: '65%', left: '85%' }, // DEF
+                    { top: '40%', left: '20%' }, { top: '40%', left: '40%' }, { top: '40%', left: '60%' }, { top: '40%', left: '80%' }, // MID
+                    { top: '15%', left: '50%' } // ST
                 ]
             };
 
@@ -310,30 +340,30 @@
                         const imageUrl = player.foto_url ? getProxyUrl(player.foto_url) : null;
 
                         // Filled Slot
-                        // Added w-32 to container, mx-auto to children, removed backdrop-blur
+                        // Added gap-2 for better spacing, ensured z-index
                         slot.innerHTML = `
-                                <div class="w-32 flex flex-col items-center justify-center text-center">
-                                    <div class="w-12 h-12 md:w-16 md:h-16 rounded-full border-2 border-white overflow-hidden bg-gray-800 shadow-lg relative mx-auto">
-                                        ${imageUrl
+                                                <div class="w-32 flex flex-col items-center justify-center text-center gap-2">
+                                                    <div class="w-12 h-12 md:w-16 md:h-16 rounded-full border-2 border-white overflow-hidden bg-gray-800 shadow-lg relative mx-auto z-10">
+                                                        ${imageUrl
                                 ? `<img src="${imageUrl}" class="w-full h-full object-cover" crossorigin="anonymous">`
                                 : `<div class="w-full h-full flex items-center justify-center font-bold text-white text-xl">${player.nombre.charAt(0)}</div>`
                             }
-                                        <div class="absolute bottom-0 right-0 bg-yellow-500 text-black text-[10px] font-bold px-1 rounded-tl leading-none">
-                                            ${player.numero ?? '-'}
-                                        </div>
-                                    </div>
-                                    <div class="mt-1 bg-black/70 px-2 py-0.5 rounded-full mx-auto inline-block">
-                                        <span class="text-white text-[10px] md:text-xs font-bold whitespace-nowrap block">${player.nombre}</span>
-                                    </div>
-                                </div>
-                            `;
+                                                        <div class="absolute bottom-0 right-0 bg-yellow-500 text-black text-[10px] font-bold px-1 rounded-tl leading-none">
+                                                            ${player.numero ?? '-'}
+                                                        </div>
+                                                    </div>
+                                                    <div class="bg-black/80 px-3 py-1 rounded-full mx-auto inline-block z-20">
+                                                        <span class="text-white text-[10px] md:text-xs font-bold whitespace-nowrap block">${player.nombre}</span>
+                                                    </div>
+                                                </div>
+                                            `;
                     } else {
                         // Empty Slot
                         slot.innerHTML = `
-                                <div class="w-10 h-10 md:w-12 md:h-12 rounded-full border-2 border-dashed border-white/50 flex items-center justify-center bg-white/10 hover:bg-white/20 transition-colors mx-auto">
-                                    <span class="text-white font-bold text-xl">+</span>
-                                </div>
-                            `;
+                                                    <div class="w-10 h-10 md:w-12 md:h-12 rounded-full border-2 border-dashed border-white/50 flex items-center justify-center bg-white/10 hover:bg-white/20 transition-colors mx-auto">
+                                                        <span class="text-white font-bold text-xl">+</span>
+                                                    </div>
+                                                `;
                     }
 
                     slot.addEventListener('click', () => openPlayerSelection(index));
@@ -381,17 +411,17 @@
                     // Use direct URL for list (no CORS needed for simple display usually, but consistent is better)
                     // Actually list doesn't need crossOrigin, so direct URL is fine and faster.
                     btn.innerHTML = `
-                                <div class="w-8 h-8 rounded-full bg-gray-500 overflow-hidden flex-shrink-0">
-                                    ${player.foto_url
+                                                    <div class="w-8 h-8 rounded-full bg-gray-500 overflow-hidden flex-shrink-0">
+                                                        ${player.foto_url
                             ? `<img src="${player.foto_url}" class="w-full h-full object-cover">`
                             : `<div class="w-full h-full flex items-center justify-center text-white font-bold">${player.nombre.charAt(0)}</div>`
                         }
-                                </div>
-                                <div>
-                                    <div class="text-white font-bold text-sm">${player.nombre}</div>
-                                    <div class="text-gray-400 text-xs">${player.posicion_general} #${player.numero ?? '?'}</div>
-                                </div>
-                            `;
+                                                    </div>
+                                                    <div>
+                                                        <div class="text-white font-bold text-sm">${player.nombre}</div>
+                                                        <div class="text-gray-400 text-xs">${player.posicion_general} #${player.numero ?? '?'}</div>
+                                                    </div>
+                                                `;
                     btn.addEventListener('click', () => selectPlayer(player));
                     playersList.appendChild(btn);
                 });
