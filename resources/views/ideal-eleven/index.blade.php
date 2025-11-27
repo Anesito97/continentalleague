@@ -5,10 +5,20 @@
         <div class="container mx-auto px-4">
             <h1
                 class="text-4xl font-bold mb-2 text-center text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-blue-500">
-                11 Ideal de la Liga
+                {{ $team ? 'Posible Alineación - ' . $team->nombre : '11 Ideal de la Liga' }}
             </h1>
-            <p class="text-center text-gray-400 mb-10">Los mejores jugadores basados en estadísticas y rendimiento actual
+            <p class="text-center text-gray-400 mb-6">
+                {{ $team ? 'Los mejores jugadores disponibles para este equipo' : 'Los mejores jugadores basados en estadísticas y rendimiento actual' }}
             </p>
+
+            @if($team)
+                <div class="flex justify-center mb-6">
+                    <a href="{{ route('ideal-eleven') }}"
+                        class="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-full text-sm font-bold transition">
+                        Ver 11 Ideal de la Liga
+                    </a>
+                </div>
+            @endif
 
             <!-- Football Pitch Container -->
             <div

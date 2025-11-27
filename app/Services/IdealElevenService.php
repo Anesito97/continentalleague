@@ -9,29 +9,29 @@ use Illuminate\Support\Facades\DB;
 
 class IdealElevenService
 {
-    public function getBestEleven(): array
+    public function getBestEleven(?int $teamId = null): array
     {
         // 4-3-3 Formation
         // Use lowercase position names as found in the database
-        $goalkeeper = $this->getBestPlayers('portero', 1);
-        $defenders = $this->getBestPlayers('defensa', 4);
-        $midfielders = $this->getBestPlayers('medio', 3);
-        $forwards = $this->getBestPlayers('delantero', 3);
-
         return [
-            'goalkeeper' => $goalkeeper->first(),
-            'defenders' => $defenders,
-            'midfielders' => $midfielders,
-            'forwards' => $forwards,
+            'forwards' => $this->getBestPlayers('delantero', 3, $teamId),
+            'midfielders' => $this->getBestPlayers('medio', 3, $teamId),
+            'defenders' => $this->getBestPlayers('defensa', 4, $teamId),
+            'goalkeeper' => $this->getBestPlayers('portero', 1, $teamId)->first(),
         ];
     }
 
-    private function getBestPlayers(string $position, int $limit): Collection
+    private function getBestPlayers(string $position, int $limit, ?int $teamId = null): Collection
     {
-        // Get all players of the position
-        $players = Jugador::where('posicion_general', $position)
-            ->with('equipo')
-            ->get();
+        // Get all players of the position, optionally filtered by team
+        $query = Jugador::where('posicion_general', $position)
+            ->with('equipo');
+
+        if ($teamId) {
+            $query->where('equipo_id', $teamId);
+        }
+
+        $players = $query->get();
 
         // Calculate score for each player
         $players->each(function ($player) {

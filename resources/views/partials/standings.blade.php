@@ -21,25 +21,25 @@
 
 @if ($nextMatch)
     <!-- @php
-            // Usamos el historial H2H para la probabilidad simple
-            $localTeamId = $nextMatch->localTeam->id;
-            $h2hLocalWins = $h2hRecord['G'] ?? 0;
-            $h2hVisitorWins = $h2hRecord['P'] ?? 0;
-            $h2hTotal = $h2hRecord['total'] ?? 0;
+                // Usamos el historial H2H para la probabilidad simple
+                $localTeamId = $nextMatch->localTeam->id;
+                $h2hLocalWins = $h2hRecord['G'] ?? 0;
+                $h2hVisitorWins = $h2hRecord['P'] ?? 0;
+                $h2hTotal = $h2hRecord['total'] ?? 0;
 
-            // Probabilidad de Victoria Local (Basado en el historial H2H)
-            $localProb = $prediction['localProb'];
-            $visitorProb = $prediction['visitorProb'];
-            $drawProb = $prediction['drawProb'];
+                // Probabilidad de Victoria Local (Basado en el historial H2H)
+                $localProb = $prediction['localProb'];
+                $visitorProb = $prediction['visitorProb'];
+                $drawProb = $prediction['drawProb'];
 
-            // Si no hay historial, usamos el 50/50 y lo etiquetamos como "Basado en Racha"
-            $probTitle = $prediction['title'];
+                // Si no hay historial, usamos el 50/50 y lo etiquetamos como "Basado en Racha"
+                $probTitle = $prediction['title'];
 
-            $votedCookieName = 'voted_' . $nextMatch->id;
-            $hasVoted = request()->cookie($votedCookieName);
-            $votingStartTime = \Carbon\Carbon::parse($nextMatch->fecha_hora)->subHour();
-            $isVotingActive = Carbon\Carbon::now()->lt($votingStartTime);
-        @endphp -->
+                $votedCookieName = 'voted_' . $nextMatch->id;
+                $hasVoted = request()->cookie($votedCookieName);
+                $votingStartTime = \Carbon\Carbon::parse($nextMatch->fecha_hora)->subHour();
+                $isVotingActive = Carbon\Carbon::now()->lt($votingStartTime);
+            @endphp -->
 
     {{-- ---------------------------------------------------- --}}
     {{-- SLIDER "MODERNO" CON BARRA CLÁSICA DE PROBABILIDAD --}}
@@ -133,6 +133,11 @@
                                             <span
                                                 class="mt-2 text-sm sm:text-lg font-bold text-white leading-tight">{{ $nextMatch->localTeam->nombre }}</span>
                                         </a>
+                                        <!-- Possible Lineup Button -->
+                                        <a href="{{ route('ideal-eleven', ['team_id' => $nextMatch->localTeam->id]) }}"
+                                            class="mt-2 px-2 py-1 bg-primary/20 hover:bg-primary/40 border border-primary/50 rounded text-[10px] text-primary hover:text-white transition font-bold uppercase tracking-wider">
+                                            Posible Alineación
+                                        </a>
                                     </div>
 
                                     {{-- VS --}}
@@ -153,6 +158,11 @@
                                             </div>
                                             <span
                                                 class="mt-2 text-sm sm:text-lg font-bold text-white leading-tight">{{ $nextMatch->visitorTeam->nombre }}</span>
+                                        </a>
+                                        <!-- Possible Lineup Button -->
+                                        <a href="{{ route('ideal-eleven', ['team_id' => $nextMatch->visitorTeam->id]) }}"
+                                            class="mt-2 px-2 py-1 bg-secondary/20 hover:bg-secondary/40 border border-secondary/50 rounded text-[10px] text-secondary hover:text-white transition font-bold uppercase tracking-wider">
+                                            Posible Alineación
                                         </a>
                                     </div>
                                 </div>
@@ -550,7 +560,7 @@
         <a href="{{ route('team.profile', $team->id) }}" class="block">
             {{-- MEJORA: "Glassmorphism" para las tarjetas de análisis --}}
             <div class="bg-card-bg/80 backdrop-blur-lg rounded-lg p-5 flex flex-col shadow-xl border border-primary/20 
-                            transform hover:scale-[1.03] transition duration-200 relative overflow-hidden">
+                                transform hover:scale-[1.03] transition duration-200 relative overflow-hidden">
 
                 {{-- ⬇️ 1. CABECERA PRINCIPAL (Nombre, Logo y Rank) ⬇️ --}}
                 <div class="flex items-center justify-between w-full border-b border-gray-700 pb-3 mb-3">

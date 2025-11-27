@@ -14,10 +14,17 @@ class IdealElevenController extends Controller
         $this->idealElevenService = $idealElevenService;
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $bestEleven = $this->idealElevenService->getBestEleven();
+        $teamId = $request->query('team_id');
+        $team = null;
 
-        return view('ideal-eleven.index', compact('bestEleven'));
+        if ($teamId) {
+            $team = \App\Models\Equipo::find($teamId);
+        }
+
+        $bestEleven = $this->idealElevenService->getBestEleven($teamId);
+
+        return view('ideal-eleven.index', compact('bestEleven', 'team'));
     }
 }
