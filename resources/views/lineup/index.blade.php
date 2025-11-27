@@ -4,7 +4,8 @@
     <div class="min-h-screen bg-gray-900 py-8 px-4 sm:px-6 lg:px-8">
         <div class="max-w-7xl mx-auto">
             <div class="text-center mb-8">
-                <h1 class="text-3xl md:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-blue-500 drop-shadow-lg">
+                <h1
+                    class="text-3xl md:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-blue-500 drop-shadow-lg">
                     Pizarra Táctica
                 </h1>
                 <p class="text-gray-400 mt-2">Crea y comparte tu alineación ideal</p>
@@ -14,7 +15,8 @@
                 <div class="w-full lg:w-1/4 space-y-6">
                     <div class="bg-gray-800 p-4 rounded-xl border border-gray-700">
                         <label class="block text-sm font-medium text-gray-300 mb-2">Seleccionar Equipo</label>
-                        <select id="teamSelect" class="w-full bg-gray-700 border-gray-600 text-white rounded-lg focus:ring-green-500 focus:border-green-500">
+                        <select id="teamSelect"
+                            class="w-full bg-gray-700 border-gray-600 text-white rounded-lg focus:ring-green-500 focus:border-green-500">
                             <option value="">-- Elige un equipo --</option>
                             @foreach($teams as $team)
                                 <option value="{{ $team->id }}">{{ $team->nombre }}</option>
@@ -24,7 +26,8 @@
 
                     <div class="bg-gray-800 p-4 rounded-xl border border-gray-700">
                         <label class="block text-sm font-medium text-gray-300 mb-2">Formación</label>
-                        <select id="formationSelect" class="w-full bg-gray-700 border-gray-600 text-white rounded-lg focus:ring-green-500 focus:border-green-500">
+                        <select id="formationSelect"
+                            class="w-full bg-gray-700 border-gray-600 text-white rounded-lg focus:ring-green-500 focus:border-green-500">
                             <option value="4-4-2">4-4-2</option>
                             <option value="4-3-3">4-3-3</option>
                             <option value="4-2-3-1">4-2-3-1</option>
@@ -38,12 +41,16 @@
                     </div>
 
                     <div class="bg-gray-800 p-4 rounded-xl border border-gray-700 space-y-3">
-                        <button id="resetBtn" class="w-full py-2 px-4 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg transition-colors">
+                        <button id="resetBtn"
+                            class="w-full py-2 px-4 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg transition-colors">
                             Reiniciar
                         </button>
-                        <button id="downloadBtn" class="w-full py-2 px-4 bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg transition-colors flex items-center justify-center gap-2">
+                        <button id="downloadBtn"
+                            class="w-full py-2 px-4 bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg transition-colors flex items-center justify-center gap-2">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                <path fill-rule="evenodd"
+                                    d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
+                                    clip-rule="evenodd" />
                             </svg>
                             Descargar Imagen
                         </button>
@@ -51,16 +58,28 @@
                 </div>
 
                 <div class="w-full lg:w-3/4 flex justify-center">
-                    <div id="pitch-container" class="relative w-full max-w-[600px] aspect-[2/3] bg-green-800 rounded-lg border-4 border-white shadow-2xl overflow-hidden select-none">
-                        <div class="absolute inset-0 opacity-20" style="background-image: repeating-linear-gradient(0deg, transparent, transparent 20px, #000 20px, #000 40px);"></div>
+                    <div id="pitch-container"
+                        class="relative w-full max-w-[600px] aspect-[2/3] bg-green-800 rounded-lg border-4 border-white shadow-2xl overflow-hidden select-none">
+                        <div class="absolute inset-0 opacity-20"
+                            style="background-image: repeating-linear-gradient(0deg, transparent, transparent 20px, #000 20px, #000 40px);">
+                        </div>
 
-                        <div class="absolute inset-4 border-2 border-white/50"></div> 
+                        <div class="absolute inset-4 border-2 border-white/50"></div>
                         <div class="absolute top-1/2 left-4 right-4 h-0.5 bg-white/50 -translate-y-1/2"></div>
-                        <div class="absolute top-1/2 left-1/2 w-24 h-24 border-2 border-white/50 rounded-full -translate-x-1/2 -translate-y-1/2"></div> 
-                        <div class="absolute top-4 left-1/2 w-48 h-24 border-2 border-t-0 border-white/50 -translate-x-1/2 bg-white/5"></div>
-                        <div class="absolute bottom-4 left-1/2 w-48 h-24 border-2 border-b-0 border-white/50 -translate-x-1/2 bg-white/5"></div>
-                        <div class="absolute top-4 left-1/2 w-20 h-8 border-2 border-t-0 border-white/50 -translate-x-1/2"></div>
-                        <div class="absolute bottom-4 left-1/2 w-20 h-8 border-2 border-b-0 border-white/50 -translate-x-1/2"></div>
+                        <div
+                            class="absolute top-1/2 left-1/2 w-24 h-24 border-2 border-white/50 rounded-full -translate-x-1/2 -translate-y-1/2">
+                        </div>
+                        <div
+                            class="absolute top-4 left-1/2 w-48 h-24 border-2 border-t-0 border-white/50 -translate-x-1/2 bg-white/5">
+                        </div>
+                        <div
+                            class="absolute bottom-4 left-1/2 w-48 h-24 border-2 border-b-0 border-white/50 -translate-x-1/2 bg-white/5">
+                        </div>
+                        <div class="absolute top-4 left-1/2 w-20 h-8 border-2 border-t-0 border-white/50 -translate-x-1/2">
+                        </div>
+                        <div
+                            class="absolute bottom-4 left-1/2 w-20 h-8 border-2 border-b-0 border-white/50 -translate-x-1/2">
+                        </div>
 
                         <div class="absolute bottom-2 right-4 text-white/30 font-bold text-sm z-0">
                             Continental League
@@ -75,29 +94,31 @@
     </div>
 
     <div id="playerModal" class="fixed inset-0 z-50 hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-        <div class="fixed inset-0 bg-gray-900 bg-opacity-75 transition-opacity" id="modalBackdrop"></div>
-        
+        <div class="fixed inset-0 bg-gray-900 bg-opacity-75 transition-opacity backdrop-blur-sm" id="modalBackdrop"></div>
+
         <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
             <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
-                
-                <div class="relative transform overflow-hidden rounded-lg bg-gray-800 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg w-full max-h-[85vh] flex flex-col border border-gray-700">
-                    
-                    <div class="bg-gray-800 px-4 pt-5 pb-2 sm:p-6 sm:pb-4 flex-shrink-0">
-                        <h3 class="text-lg leading-6 font-medium text-white mb-4" id="modal-title">Seleccionar Jugador</h3>
+
+                <div
+                    class="relative transform overflow-hidden rounded-xl bg-gray-800 text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-lg w-full max-h-[85vh] flex flex-col border border-gray-700">
+
+                    <div class="bg-gray-800 px-4 pt-5 pb-2 sm:p-6 sm:pb-4 flex-shrink-0 border-b border-gray-700">
+                        <h3 class="text-lg leading-6 font-bold text-white mb-4" id="modal-title">Seleccionar Jugador</h3>
                         <div>
                             <input type="text" id="playerSearch" placeholder="Buscar jugador..." autocomplete="off"
-                                class="w-full bg-gray-700 border-gray-600 text-white rounded-lg focus:ring-green-500 focus:border-green-500 px-4 py-2 shadow-inner">
+                                class="w-full bg-gray-900 border-gray-600 text-white rounded-lg focus:ring-green-500 focus:border-green-500 px-4 py-3 shadow-inner placeholder-gray-500">
                         </div>
                     </div>
 
-                    <div class="bg-gray-800 px-4 flex-1 overflow-y-auto min-h-[200px]" id="modal-content-scroll">
-                        <div id="playersList" class="grid grid-cols-1 gap-2 pb-4">
+                    <div class="bg-gray-800 px-4 flex-1 overflow-y-auto min-h-[200px] overscroll-contain"
+                        id="modal-content-scroll">
+                        <div id="playersList" class="grid grid-cols-1 gap-2 py-4">
                             </div>
                     </div>
 
-                    <div class="bg-gray-700 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse flex-shrink-0">
+                    <div class="bg-gray-900 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse flex-shrink-0 border-t border-gray-700">
                         <button type="button" id="closeModalBtn"
-                            class="w-full inline-flex justify-center rounded-md border border-gray-600 shadow-sm px-4 py-2 bg-gray-800 text-base font-medium text-gray-300 hover:bg-gray-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm">
+                            class="w-full inline-flex justify-center rounded-lg border border-gray-600 shadow-sm px-4 py-2.5 bg-gray-800 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 focus:ring-gray-500 sm:ml-3 sm:w-auto sm:text-sm transition-colors">
                             Cancelar
                         </button>
                     </div>
@@ -282,9 +303,22 @@
                 }
             });
 
-            // CORRECCIÓN MODAL: Quitamos 'hidden' de la clase base y usamos JS para controlarlo
-            // para evitar conflictos con estilos inline
-            const closeModal = () => playerModal.classList.add('hidden');
+            // LOGICA DEL MODAL CORREGIDA (SCROLL LOCK)
+            
+            function toggleModal(show) {
+                if (show) {
+                    playerModal.classList.remove('hidden');
+                    // BLOQUEAR SCROLL DEL BODY
+                    document.body.style.overflow = 'hidden';
+                } else {
+                    playerModal.classList.add('hidden');
+                    // DESBLOQUEAR SCROLL DEL BODY
+                    document.body.style.overflow = '';
+                }
+            }
+
+            const closeModal = () => toggleModal(false);
+            
             closeModalBtn.addEventListener('click', closeModal);
             modalBackdrop.addEventListener('click', closeModal);
 
@@ -321,9 +355,7 @@
                                         : `<div class="w-full h-full flex items-center justify-center font-bold text-white text-lg md:text-xl">${player.nombre.charAt(0)}</div>`
                                     }
                                 </div>
-
                                 <div class="h-1"></div>
-
                                 <span class="text-white text-[10px] md:text-[12px] font-bold block leading-none tracking-wide text-center uppercase whitespace-nowrap drop-shadow-[0_2px_3px_rgba(0,0,0,0.9)]">
                                     ${player.nombre}
                                 </span>
@@ -350,9 +382,10 @@
                 activeSlotIndex = index;
                 playerSearch.value = '';
                 renderPlayerList();
-                playerModal.classList.remove('hidden');
                 
-                // Timeout para asegurar que el input esté visible antes de enfocar
+                // Usamos la nueva función con bloqueo de scroll
+                toggleModal(true);
+                
                 setTimeout(() => {
                     playerSearch.focus();
                 }, 100);
