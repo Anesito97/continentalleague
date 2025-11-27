@@ -12,7 +12,7 @@
 
             <!-- Football Pitch Container -->
             <div
-                class="relative w-full max-w-4xl mx-auto aspect-[4/3] md:aspect-[4/3] bg-green-700 rounded-xl border-4 border-white/20 shadow-2xl overflow-hidden">
+                class="relative w-full max-w-4xl mx-auto aspect-[2/3] md:aspect-[4/3] bg-green-700 rounded-xl border-4 border-white/20 shadow-2xl overflow-hidden">
 
                 <!-- Pitch Markings -->
                 <div class="absolute inset-0 opacity-30 pointer-events-none">
@@ -39,31 +39,31 @@
                 </div>
 
                 <!-- Formation Grid (4-3-3) -->
-                <div class="absolute inset-0 flex flex-col justify-between py-6 md:py-8 px-4">
+                <div class="absolute inset-0 flex flex-col justify-between py-2 md:py-4 px-2 md:px-4">
 
-                    <!-- Forwards (Top) -->
-                    <div class="flex justify-around items-center h-1/4 px-8 md:px-16">
+                    <!-- Forwards (Top) - Spread out -->
+                    <div class="flex justify-between items-start h-1/4 px-4 md:px-20 pt-8 md:pt-12">
                         @foreach($bestEleven['forwards'] as $player)
                             <x-ideal-player-card :player="$player" position="Delantero" />
                         @endforeach
                     </div>
 
-                    <!-- Midfielders -->
-                    <div class="flex justify-around items-center h-1/4 px-4 md:px-12">
+                    <!-- Midfielders - Centered/Lower -->
+                    <div class="flex justify-around items-center h-1/4 px-2 md:px-12 pt-8 md:pt-12">
                         @foreach($bestEleven['midfielders'] as $player)
                             <x-ideal-player-card :player="$player" position="Medio" />
                         @endforeach
                     </div>
 
-                    <!-- Defenders -->
-                    <div class="flex justify-around items-center h-1/4 px-2 md:px-8">
+                    <!-- Defenders - Lower -->
+                    <div class="flex justify-around items-end h-1/4 px-1 md:px-8 pb-2 md:pb-4">
                         @foreach($bestEleven['defenders'] as $player)
                             <x-ideal-player-card :player="$player" position="Defensa" />
                         @endforeach
                     </div>
 
-                    <!-- Goalkeeper (Bottom) -->
-                    <div class="flex justify-center items-center h-1/4">
+                    <!-- Goalkeeper (Bottom) - Bottom edge -->
+                    <div class="flex justify-center items-end h-1/4 pb-1 md:pb-2">
                         @if($bestEleven['goalkeeper'])
                             <x-ideal-player-card :player="$bestEleven['goalkeeper']" position="Portero" />
                         @endif
