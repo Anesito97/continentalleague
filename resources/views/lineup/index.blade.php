@@ -164,59 +164,59 @@
             // Let's do GK at BOTTOM for standard TV view perspective.
             const formations = {
                 '4-4-2': [
-                    { top: '85%', left: '50%' }, // GK
-                    { top: '65%', left: '20%' }, { top: '65%', left: '40%' }, { top: '65%', left: '60%' }, { top: '65%', left: '80%' }, // DEF
-                    { top: '40%', left: '20%' }, { top: '40%', left: '40%' }, { top: '40%', left: '60%' }, { top: '40%', left: '80%' }, // MID
-                    { top: '15%', left: '35%' }, { top: '15%', left: '65%' } // FWD
+                    { top: '88%', left: '50%' }, // GK
+                    { top: '68%', left: '15%' }, { top: '72%', left: '38%' }, { top: '72%', left: '62%' }, { top: '68%', left: '85%' }, // DEF (Arc)
+                    { top: '45%', left: '15%' }, { top: '50%', left: '38%' }, { top: '50%', left: '62%' }, { top: '45%', left: '85%' }, // MID (Arc)
+                    { top: '18%', left: '35%' }, { top: '18%', left: '65%' } // FWD
                 ],
                 '4-3-3': [
-                    { top: '85%', left: '50%' }, // GK
-                    { top: '65%', left: '20%' }, { top: '65%', left: '40%' }, { top: '65%', left: '60%' }, { top: '65%', left: '80%' }, // DEF
-                    { top: '40%', left: '30%' }, { top: '40%', left: '50%' }, { top: '40%', left: '70%' }, // MID
-                    { top: '15%', left: '20%' }, { top: '15%', left: '50%' }, { top: '15%', left: '80%' } // FWD
+                    { top: '88%', left: '50%' }, // GK
+                    { top: '68%', left: '15%' }, { top: '72%', left: '38%' }, { top: '72%', left: '62%' }, { top: '68%', left: '85%' }, // DEF (Arc)
+                    { top: '48%', left: '30%' }, { top: '52%', left: '50%' }, { top: '48%', left: '70%' }, // MID (V-Shape inverted)
+                    { top: '20%', left: '20%' }, { top: '15%', left: '50%' }, { top: '20%', left: '80%' } // FWD (Arrow)
                 ],
                 '4-2-3-1': [
-                    { top: '85%', left: '50%' }, // GK
-                    { top: '65%', left: '20%' }, { top: '65%', left: '40%' }, { top: '65%', left: '60%' }, { top: '65%', left: '80%' }, // DEF
-                    { top: '50%', left: '35%' }, { top: '50%', left: '65%' }, // CDM
-                    { top: '30%', left: '20%' }, { top: '30%', left: '50%' }, { top: '30%', left: '80%' }, // CAM/Wingers
+                    { top: '88%', left: '50%' }, // GK
+                    { top: '68%', left: '15%' }, { top: '72%', left: '38%' }, { top: '72%', left: '62%' }, { top: '68%', left: '85%' }, // DEF (Arc)
+                    { top: '55%', left: '35%' }, { top: '55%', left: '65%' }, // CDM
+                    { top: '35%', left: '20%' }, { top: '35%', left: '50%' }, { top: '35%', left: '80%' }, // CAM/Wingers
                     { top: '15%', left: '50%' } // ST
                 ],
                 '4-1-4-1': [
-                    { top: '85%', left: '50%' }, // GK
-                    { top: '65%', left: '20%' }, { top: '65%', left: '40%' }, { top: '65%', left: '60%' }, { top: '65%', left: '80%' }, // DEF
-                    { top: '53%', left: '50%' }, // CDM
-                    { top: '35%', left: '20%' }, { top: '35%', left: '40%' }, { top: '35%', left: '60%' }, { top: '35%', left: '80%' }, // MID
+                    { top: '88%', left: '50%' }, // GK
+                    { top: '68%', left: '15%' }, { top: '72%', left: '38%' }, { top: '72%', left: '62%' }, { top: '68%', left: '85%' }, // DEF (Arc)
+                    { top: '55%', left: '50%' }, // CDM
+                    { top: '38%', left: '15%' }, { top: '42%', left: '35%' }, { top: '42%', left: '65%' }, { top: '38%', left: '85%' }, // MID (Arc)
                     { top: '15%', left: '50%' } // ST
                 ],
                 '4-5-1': [
-                    { top: '85%', left: '50%' }, // GK
-                    { top: '65%', left: '20%' }, { top: '65%', left: '40%' }, { top: '65%', left: '60%' }, { top: '65%', left: '80%' }, // DEF
-                    { top: '40%', left: '15%' }, { top: '40%', left: '32%' }, { top: '40%', left: '50%' }, { top: '40%', left: '68%' }, { top: '40%', left: '85%' }, // MID
+                    { top: '88%', left: '50%' }, // GK
+                    { top: '68%', left: '15%' }, { top: '72%', left: '38%' }, { top: '72%', left: '62%' }, { top: '68%', left: '85%' }, // DEF (Arc)
+                    { top: '45%', left: '10%' }, { top: '50%', left: '30%' }, { top: '52%', left: '50%' }, { top: '50%', left: '70%' }, { top: '45%', left: '90%' }, // MID (Arc)
                     { top: '15%', left: '50%' } // ST
                 ],
                 '3-4-3': [
-                    { top: '85%', left: '50%' }, // GK
-                    { top: '65%', left: '30%' }, { top: '65%', left: '50%' }, { top: '65%', left: '70%' }, // DEF
-                    { top: '40%', left: '20%' }, { top: '40%', left: '40%' }, { top: '40%', left: '60%' }, { top: '40%', left: '80%' }, // MID
-                    { top: '15%', left: '20%' }, { top: '15%', left: '50%' }, { top: '15%', left: '80%' } // FWD
+                    { top: '88%', left: '50%' }, // GK
+                    { top: '70%', left: '25%' }, { top: '72%', left: '50%' }, { top: '70%', left: '75%' }, // DEF (Arc)
+                    { top: '45%', left: '15%' }, { top: '50%', left: '38%' }, { top: '50%', left: '62%' }, { top: '45%', left: '85%' }, // MID (Arc)
+                    { top: '20%', left: '20%' }, { top: '15%', left: '50%' }, { top: '20%', left: '80%' } // FWD (Arrow)
                 ],
                 '3-5-2': [
-                    { top: '85%', left: '50%' }, // GK
-                    { top: '65%', left: '30%' }, { top: '65%', left: '50%' }, { top: '65%', left: '70%' }, // DEF
-                    { top: '40%', left: '15%' }, { top: '40%', left: '35%' }, { top: '40%', left: '50%' }, { top: '40%', left: '65%' }, { top: '40%', left: '85%' }, // MID
-                    { top: '15%', left: '35%' }, { top: '15%', left: '65%' } // FWD
+                    { top: '88%', left: '50%' }, // GK
+                    { top: '70%', left: '25%' }, { top: '72%', left: '50%' }, { top: '70%', left: '75%' }, // DEF (Arc)
+                    { top: '45%', left: '15%' }, { top: '50%', left: '35%' }, { top: '52%', left: '50%' }, { top: '50%', left: '65%' }, { top: '45%', left: '85%' }, // MID (Arc)
+                    { top: '18%', left: '35%' }, { top: '18%', left: '65%' } // FWD
                 ],
                 '5-3-2': [
-                    { top: '85%', left: '50%' }, // GK
-                    { top: '65%', left: '15%' }, { top: '65%', left: '32%' }, { top: '65%', left: '50%' }, { top: '65%', left: '68%' }, { top: '65%', left: '85%' }, // DEF
-                    { top: '40%', left: '30%' }, { top: '40%', left: '50%' }, { top: '40%', left: '70%' }, // MID
-                    { top: '15%', left: '35%' }, { top: '15%', left: '65%' } // FWD
+                    { top: '88%', left: '50%' }, // GK
+                    { top: '60%', left: '10%' }, { top: '70%', left: '30%' }, { top: '72%', left: '50%' }, { top: '70%', left: '70%' }, { top: '60%', left: '90%' }, // DEF (Wingbacks high)
+                    { top: '45%', left: '30%' }, { top: '48%', left: '50%' }, { top: '45%', left: '70%' }, // MID (V-Shape)
+                    { top: '18%', left: '35%' }, { top: '18%', left: '65%' } // FWD
                 ],
                 '5-4-1': [
-                    { top: '85%', left: '50%' }, // GK
-                    { top: '65%', left: '15%' }, { top: '65%', left: '32%' }, { top: '65%', left: '50%' }, { top: '65%', left: '68%' }, { top: '65%', left: '85%' }, // DEF
-                    { top: '40%', left: '20%' }, { top: '40%', left: '40%' }, { top: '40%', left: '60%' }, { top: '40%', left: '80%' }, // MID
+                    { top: '88%', left: '50%' }, // GK
+                    { top: '60%', left: '10%' }, { top: '70%', left: '30%' }, { top: '72%', left: '50%' }, { top: '70%', left: '70%' }, { top: '60%', left: '90%' }, // DEF (Wingbacks high)
+                    { top: '45%', left: '25%' }, { top: '48%', left: '42%' }, { top: '48%', left: '58%' }, { top: '45%', left: '75%' }, // MID (Box/Arc)
                     { top: '15%', left: '50%' } // ST
                 ]
             };
@@ -285,7 +285,7 @@
 
                     const canvas = await html2canvas(pitch, {
                         useCORS: true,
-                        scale: 2, // High res
+                        scale: 4, // Maximum res
                         backgroundColor: '#1f2937', // Ensure dark background
                         logging: false
                     });
@@ -340,9 +340,9 @@
                         const imageUrl = player.foto_url ? getProxyUrl(player.foto_url) : null;
 
                         // Filled Slot
-                        // Added gap-2 for better spacing, ensured z-index
+                        // Used spacer div for robust spacing in html2canvas
                         slot.innerHTML = `
-                                                <div class="w-32 flex flex-col items-center justify-center text-center gap-2">
+                                                        <div class="w-32 flex flex-col items-center justify-center text-center">
                                                     <div class="w-12 h-12 md:w-16 md:h-16 rounded-full border-2 border-white overflow-hidden bg-gray-800 shadow-lg relative mx-auto z-10">
                                                         ${imageUrl
                                 ? `<img src="${imageUrl}" class="w-full h-full object-cover" crossorigin="anonymous">`
@@ -352,18 +352,20 @@
                                                             ${player.numero ?? '-'}
                                                         </div>
                                                     </div>
-                                                    <div class="bg-black/80 px-3 py-1 rounded-full mx-auto inline-block z-20">
-                                                        <span class="text-white text-[10px] md:text-xs font-bold whitespace-nowrap block">${player.nombre}</span>
+                                                    <!-- Spacer for html2canvas -->
+                                                    <div style="height: 8px;"></div>
+                                                        <div class="bg-black/80 px-2 py-0.5 rounded-full mx-auto inline-block z-20">
+                                                            <span class="text-white text-[8px] md:text-[10px] font-bold whitespace-nowrap block">${player.nombre}</span>
                                                     </div>
                                                 </div>
                                             `;
                     } else {
                         // Empty Slot
                         slot.innerHTML = `
-                                                    <div class="w-10 h-10 md:w-12 md:h-12 rounded-full border-2 border-dashed border-white/50 flex items-center justify-center bg-white/10 hover:bg-white/20 transition-colors mx-auto">
-                                                        <span class="text-white font-bold text-xl">+</span>
-                                                    </div>
-                                                `;
+                                                                                                    <div class="w-10 h-10 md:w-12 md:h-12 rounded-full border-2 border-dashed border-white/50 flex items-center justify-center bg-white/10 hover:bg-white/20 transition-colors mx-auto">
+                                                                                                        <span class="text-white font-bold text-xl">+</span>
+                                                                                                    </div>
+                                                                                                `;
                     }
 
                     slot.addEventListener('click', () => openPlayerSelection(index));
@@ -411,17 +413,17 @@
                     // Use direct URL for list (no CORS needed for simple display usually, but consistent is better)
                     // Actually list doesn't need crossOrigin, so direct URL is fine and faster.
                     btn.innerHTML = `
-                                                    <div class="w-8 h-8 rounded-full bg-gray-500 overflow-hidden flex-shrink-0">
-                                                        ${player.foto_url
+                                                                                                    <div class="w-8 h-8 rounded-full bg-gray-500 overflow-hidden flex-shrink-0">
+                                                                                                        ${player.foto_url
                             ? `<img src="${player.foto_url}" class="w-full h-full object-cover">`
                             : `<div class="w-full h-full flex items-center justify-center text-white font-bold">${player.nombre.charAt(0)}</div>`
                         }
-                                                    </div>
-                                                    <div>
-                                                        <div class="text-white font-bold text-sm">${player.nombre}</div>
-                                                        <div class="text-gray-400 text-xs">${player.posicion_general} #${player.numero ?? '?'}</div>
-                                                    </div>
-                                                `;
+                                                                                                    </div>
+                                                                                                    <div>
+                                                                                                        <div class="text-white font-bold text-sm">${player.nombre}</div>
+                                                                                                        <div class="text-gray-400 text-xs">${player.posicion_general} #${player.numero ?? '?'}</div>
+                                                                                                    </div>
+                                                                                                `;
                     btn.addEventListener('click', () => selectPlayer(player));
                     playersList.appendChild(btn);
                 });
