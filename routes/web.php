@@ -47,6 +47,11 @@ Route::get('auth/google/callback', [AuthController::class, 'handleGoogleCallback
 Route::get('/ideal-11', [App\Http\Controllers\IdealElevenController::class, 'index'])->name('ideal-eleven');
 Route::get('/mvp', [App\Http\Controllers\MvpController::class, 'index'])->name('mvp.index');
 
+// --- LINEUP BUILDER ---
+Route::get('/lineup-builder', [\App\Http\Controllers\LineupBuilderController::class, 'index'])->name('lineup.index');
+Route::get('/lineup-builder/players/{team}', [\App\Http\Controllers\LineupBuilderController::class, 'getPlayers'])->name('lineup.players');
+Route::get('/lineup-builder/proxy', [\App\Http\Controllers\LineupBuilderController::class, 'proxyImage'])->name('lineup.proxy');
+
 // --- MINIJUEGOS ---
 Route::middleware('auth')->group(function () {
     Route::get('/games', [\App\Http\Controllers\GameController::class, 'index'])->name('games.index');
