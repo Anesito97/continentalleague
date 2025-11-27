@@ -12,9 +12,7 @@
             </div>
 
             <div class="flex flex-col lg:flex-row gap-8">
-                <!-- Sidebar Controls -->
                 <div class="w-full lg:w-1/4 space-y-6">
-                    <!-- Team Selector -->
                     <div class="bg-gray-800 p-4 rounded-xl border border-gray-700">
                         <label class="block text-sm font-medium text-gray-300 mb-2">Seleccionar Equipo</label>
                         <select id="teamSelect"
@@ -26,7 +24,6 @@
                         </select>
                     </div>
 
-                    <!-- Formation Selector -->
                     <div class="bg-gray-800 p-4 rounded-xl border border-gray-700">
                         <label class="block text-sm font-medium text-gray-300 mb-2">Formación</label>
                         <select id="formationSelect"
@@ -43,7 +40,6 @@
                         </select>
                     </div>
 
-                    <!-- Actions -->
                     <div class="bg-gray-800 p-4 rounded-xl border border-gray-700 space-y-3">
                         <button id="resetBtn"
                             class="w-full py-2 px-4 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg transition-colors">
@@ -61,54 +57,41 @@
                     </div>
                 </div>
 
-                <!-- Pitch Area -->
                 <div class="w-full lg:w-3/4 flex justify-center">
                     <div id="pitch-container"
                         class="relative w-full max-w-[600px] aspect-[2/3] bg-green-800 rounded-lg border-4 border-white shadow-2xl overflow-hidden select-none">
-                        <!-- Grass Pattern -->
                         <div class="absolute inset-0 opacity-20"
                             style="background-image: repeating-linear-gradient(0deg, transparent, transparent 20px, #000 20px, #000 40px);">
                         </div>
 
-                        <!-- Pitch Markings -->
-                        <div class="absolute inset-4 border-2 border-white/50"></div> <!-- Touchline -->
-                        <div class="absolute top-1/2 left-4 right-4 h-0.5 bg-white/50 -translate-y-1/2"></div>
-                        <!-- Halfway line -->
+                        <div class="absolute inset-4 border-2 border-white/50"></div> <div class="absolute top-1/2 left-4 right-4 h-0.5 bg-white/50 -translate-y-1/2"></div>
                         <div
                             class="absolute top-1/2 left-1/2 w-24 h-24 border-2 border-white/50 rounded-full -translate-x-1/2 -translate-y-1/2">
-                        </div> <!-- Center circle -->
-
-                        <!-- Penalty Areas -->
-                        <div
+                        </div> <div
                             class="absolute top-4 left-1/2 w-48 h-24 border-2 border-t-0 border-white/50 -translate-x-1/2 bg-white/5">
                         </div>
                         <div
                             class="absolute bottom-4 left-1/2 w-48 h-24 border-2 border-b-0 border-white/50 -translate-x-1/2 bg-white/5">
                         </div>
 
-                        <!-- Goal Areas -->
                         <div class="absolute top-4 left-1/2 w-20 h-8 border-2 border-t-0 border-white/50 -translate-x-1/2">
                         </div>
                         <div
                             class="absolute bottom-4 left-1/2 w-20 h-8 border-2 border-b-0 border-white/50 -translate-x-1/2">
                         </div>
 
-                        <!-- Branding Watermark -->
                         <div class="absolute bottom-2 right-4 text-white/30 font-bold text-sm z-0">
                             Continental League
                         </div>
 
-                        <!-- Player Slots Container -->
                         <div id="formation-layer" class="absolute inset-0 z-10 p-4">
-                            <!-- Slots will be injected here by JS -->
-                        </div>
+                            </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Player Selection Modal -->
     <div id="playerModal" class="fixed inset-0 z-50 hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog"
         aria-modal="true">
         <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
@@ -120,15 +103,13 @@
                 <div class="bg-gray-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                     <h3 class="text-lg leading-6 font-medium text-white mb-4" id="modal-title">Seleccionar Jugador</h3>
 
-                    <!-- Search Input -->
                     <div class="mb-4">
                         <input type="text" id="playerSearch" placeholder="Buscar jugador..."
                             class="w-full bg-gray-700 border-gray-600 text-white rounded-lg focus:ring-green-500 focus:border-green-500 px-4 py-2">
                     </div>
 
                     <div id="playersList" class="grid grid-cols-1 gap-2 max-h-60 overflow-y-auto">
-                        <!-- Players injected here -->
-                    </div>
+                        </div>
                 </div>
                 <div class="bg-gray-700 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
                     <button type="button" id="closeModalBtn"
@@ -156,86 +137,84 @@
 
             let currentTeamPlayers = [];
             let activeSlotIndex = null;
-            let lineupState = {}; // Key: slotIndex, Value: playerObject
+            let lineupState = {};
 
-            // Formations Configuration (Percentages for Top/Left)
-            // Assuming a vertical pitch. Top 0% is GK (top goal), Bottom 100% is opponent? 
-            // Usually lineups are shown bottom-up (GK at bottom) or top-down. 
-            // Let's do GK at BOTTOM for standard TV view perspective.
+            // Configuración de formaciones (Sin cambios)
             const formations = {
                 '4-4-2': [
                     { top: '88%', left: '50%' }, // GK
-                    { top: '68%', left: '15%' }, { top: '72%', left: '38%' }, { top: '72%', left: '62%' }, { top: '68%', left: '85%' }, // DEF (Arc)
-                    { top: '45%', left: '15%' }, { top: '50%', left: '38%' }, { top: '50%', left: '62%' }, { top: '45%', left: '85%' }, // MID (Arc)
+                    { top: '68%', left: '15%' }, { top: '72%', left: '38%' }, { top: '72%', left: '62%' }, { top: '68%', left: '85%' }, // DEF
+                    { top: '45%', left: '15%' }, { top: '50%', left: '38%' }, { top: '50%', left: '62%' }, { top: '45%', left: '85%' }, // MID
                     { top: '18%', left: '35%' }, { top: '18%', left: '65%' } // FWD
                 ],
                 '4-3-3': [
                     { top: '88%', left: '50%' }, // GK
-                    { top: '68%', left: '15%' }, { top: '72%', left: '38%' }, { top: '72%', left: '62%' }, { top: '68%', left: '85%' }, // DEF (Arc)
-                    { top: '48%', left: '30%' }, { top: '52%', left: '50%' }, { top: '48%', left: '70%' }, // MID (V-Shape inverted)
-                    { top: '20%', left: '20%' }, { top: '15%', left: '50%' }, { top: '20%', left: '80%' } // FWD (Arrow)
+                    { top: '68%', left: '15%' }, { top: '72%', left: '38%' }, { top: '72%', left: '62%' }, { top: '68%', left: '85%' }, // DEF
+                    { top: '48%', left: '30%' }, { top: '52%', left: '50%' }, { top: '48%', left: '70%' }, // MID
+                    { top: '20%', left: '20%' }, { top: '15%', left: '50%' }, { top: '20%', left: '80%' } // FWD
                 ],
                 '4-2-3-1': [
                     { top: '88%', left: '50%' }, // GK
-                    { top: '68%', left: '15%' }, { top: '72%', left: '38%' }, { top: '72%', left: '62%' }, { top: '68%', left: '85%' }, // DEF (Arc)
+                    { top: '68%', left: '15%' }, { top: '72%', left: '38%' }, { top: '72%', left: '62%' }, { top: '68%', left: '85%' }, // DEF
                     { top: '55%', left: '35%' }, { top: '55%', left: '65%' }, // CDM
                     { top: '35%', left: '20%' }, { top: '35%', left: '50%' }, { top: '35%', left: '80%' }, // CAM/Wingers
                     { top: '15%', left: '50%' } // ST
                 ],
                 '4-1-4-1': [
                     { top: '88%', left: '50%' }, // GK
-                    { top: '68%', left: '15%' }, { top: '72%', left: '38%' }, { top: '72%', left: '62%' }, { top: '68%', left: '85%' }, // DEF (Arc)
+                    { top: '68%', left: '15%' }, { top: '72%', left: '38%' }, { top: '72%', left: '62%' }, { top: '68%', left: '85%' }, // DEF
                     { top: '55%', left: '50%' }, // CDM
-                    { top: '38%', left: '15%' }, { top: '42%', left: '35%' }, { top: '42%', left: '65%' }, { top: '38%', left: '85%' }, // MID (Arc)
+                    { top: '38%', left: '15%' }, { top: '42%', left: '35%' }, { top: '42%', left: '65%' }, { top: '38%', left: '85%' }, // MID
                     { top: '15%', left: '50%' } // ST
                 ],
                 '4-5-1': [
                     { top: '88%', left: '50%' }, // GK
-                    { top: '68%', left: '15%' }, { top: '72%', left: '38%' }, { top: '72%', left: '62%' }, { top: '68%', left: '85%' }, // DEF (Arc)
-                    { top: '45%', left: '10%' }, { top: '50%', left: '30%' }, { top: '52%', left: '50%' }, { top: '50%', left: '70%' }, { top: '45%', left: '90%' }, // MID (Arc)
+                    { top: '68%', left: '15%' }, { top: '72%', left: '38%' }, { top: '72%', left: '62%' }, { top: '68%', left: '85%' }, // DEF
+                    { top: '45%', left: '10%' }, { top: '50%', left: '30%' }, { top: '52%', left: '50%' }, { top: '50%', left: '70%' }, { top: '45%', left: '90%' }, // MID
                     { top: '15%', left: '50%' } // ST
                 ],
                 '3-4-3': [
                     { top: '88%', left: '50%' }, // GK
-                    { top: '70%', left: '25%' }, { top: '72%', left: '50%' }, { top: '70%', left: '75%' }, // DEF (Arc)
-                    { top: '45%', left: '15%' }, { top: '50%', left: '38%' }, { top: '50%', left: '62%' }, { top: '45%', left: '85%' }, // MID (Arc)
-                    { top: '20%', left: '20%' }, { top: '15%', left: '50%' }, { top: '20%', left: '80%' } // FWD (Arrow)
+                    { top: '70%', left: '25%' }, { top: '72%', left: '50%' }, { top: '70%', left: '75%' }, // DEF
+                    { top: '45%', left: '15%' }, { top: '50%', left: '38%' }, { top: '50%', left: '62%' }, { top: '45%', left: '85%' }, // MID
+                    { top: '20%', left: '20%' }, { top: '15%', left: '50%' }, { top: '20%', left: '80%' } // FWD
                 ],
                 '3-5-2': [
                     { top: '88%', left: '50%' }, // GK
-                    { top: '70%', left: '25%' }, { top: '72%', left: '50%' }, { top: '70%', left: '75%' }, // DEF (Arc)
-                    { top: '45%', left: '15%' }, { top: '50%', left: '35%' }, { top: '52%', left: '50%' }, { top: '50%', left: '65%' }, { top: '45%', left: '85%' }, // MID (Arc)
+                    { top: '70%', left: '25%' }, { top: '72%', left: '50%' }, { top: '70%', left: '75%' }, // DEF
+                    { top: '45%', left: '15%' }, { top: '50%', left: '35%' }, { top: '52%', left: '50%' }, { top: '50%', left: '65%' }, { top: '45%', left: '85%' }, // MID
                     { top: '18%', left: '35%' }, { top: '18%', left: '65%' } // FWD
                 ],
                 '5-3-2': [
                     { top: '88%', left: '50%' }, // GK
-                    { top: '60%', left: '10%' }, { top: '70%', left: '30%' }, { top: '72%', left: '50%' }, { top: '70%', left: '70%' }, { top: '60%', left: '90%' }, // DEF (Wingbacks high)
-                    { top: '45%', left: '30%' }, { top: '48%', left: '50%' }, { top: '45%', left: '70%' }, // MID (V-Shape)
+                    { top: '60%', left: '10%' }, { top: '70%', left: '30%' }, { top: '72%', left: '50%' }, { top: '70%', left: '70%' }, { top: '60%', left: '90%' }, // DEF
+                    { top: '45%', left: '30%' }, { top: '48%', left: '50%' }, { top: '45%', left: '70%' }, // MID
                     { top: '18%', left: '35%' }, { top: '18%', left: '65%' } // FWD
                 ],
                 '5-4-1': [
                     { top: '88%', left: '50%' }, // GK
-                    { top: '60%', left: '10%' }, { top: '70%', left: '30%' }, { top: '72%', left: '50%' }, { top: '70%', left: '70%' }, { top: '60%', left: '90%' }, // DEF (Wingbacks high)
-                    { top: '45%', left: '25%' }, { top: '48%', left: '42%' }, { top: '48%', left: '58%' }, { top: '45%', left: '75%' }, // MID (Box/Arc)
+                    { top: '60%', left: '10%' }, { top: '70%', left: '30%' }, { top: '72%', left: '50%' }, { top: '70%', left: '70%' }, { top: '60%', left: '90%' }, // DEF
+                    { top: '45%', left: '25%' }, { top: '48%', left: '42%' }, { top: '48%', left: '58%' }, { top: '45%', left: '75%' }, // MID
                     { top: '15%', left: '50%' } // ST
                 ]
             };
 
-            // Initialize
+            // Inicializar
             renderFormation('4-4-2');
 
             // Event Listeners
             teamSelect.addEventListener('change', async (e) => {
                 const teamId = e.target.value;
-                lineupState = {}; // Reset lineup
-                renderFormation(formationSelect.value); // Re-render empty slots
+                lineupState = {};
+                renderFormation(formationSelect.value);
 
                 if (teamId) {
                     try {
                         const response = await fetch(`/lineup-builder/players/${teamId}`);
+                        if (!response.ok) throw new Error('Error de red');
                         currentTeamPlayers = await response.json();
                     } catch (error) {
-                        console.error('Error fetching players:', error);
+                        console.error('Error:', error);
                         currentTeamPlayers = [];
                     }
                 } else {
@@ -252,16 +231,17 @@
                 renderFormation(formationSelect.value);
             });
 
+            // Función de descarga (Se mantiene la corrección de scrollY)
             downloadBtn.addEventListener('click', async () => {
                 const pitch = document.getElementById('pitch-container');
-
-                // Show loading state
                 const originalText = downloadBtn.innerHTML;
                 downloadBtn.innerHTML = 'Generando...';
                 downloadBtn.disabled = true;
 
+                const scrollPos = window.scrollY;
+                window.scrollTo(0, 0);
+
                 try {
-                    // Pre-process images to Base64 to avoid CORS issues
                     const images = pitch.querySelectorAll('img');
                     const originalSrcs = [];
 
@@ -279,37 +259,45 @@
                                 reader.readAsDataURL(blob);
                             });
                         } catch (e) {
-                            console.warn('Could not convert image to base64:', img.src, e);
+                            console.warn('Proxy fallback:', e);
                         }
                     }
 
+                    await new Promise(r => setTimeout(r, 100));
+
                     const canvas = await html2canvas(pitch, {
                         useCORS: true,
-                        scale: 4, // Maximum res
-                        backgroundColor: '#1f2937', // Ensure dark background
-                        logging: false
+                        scale: 3,
+                        backgroundColor: '#1f2937',
+                        scrollY: -window.scrollY,
+                        windowWidth: document.documentElement.offsetWidth,
+                        windowHeight: document.documentElement.offsetHeight,
+                        logging: false,
+                        onclone: (clonedDoc) => {
+                            const clonedPitch = clonedDoc.getElementById('pitch-container');
+                            clonedPitch.style.fontFamily = 'sans-serif';
+                        }
                     });
 
-                    // Restore original images
                     images.forEach((img, i) => {
                         img.src = originalSrcs[i];
                     });
 
                     const link = document.createElement('a');
-                    link.download = 'mi-alineacion-continental.png';
-                    link.href = canvas.toDataURL('image/png');
+                    link.download = `alineacion-${teamSelect.options[teamSelect.selectedIndex]?.text.trim() || 'equipo'}.png`;
+                    link.href = canvas.toDataURL('image/png', 1.0);
                     link.click();
 
                 } catch (error) {
-                    console.error('Error generating image:', error);
-                    alert('Hubo un error al generar la imagen. Por favor intenta de nuevo.');
+                    console.error('Error generando imagen:', error);
+                    alert('Error al generar la imagen.');
                 } finally {
                     downloadBtn.innerHTML = originalText;
                     downloadBtn.disabled = false;
+                    window.scrollTo(0, scrollPos);
                 }
             });
 
-            // Modal Controls
             const closeModal = () => playerModal.classList.add('hidden');
             closeModalBtn.addEventListener('click', closeModal);
             modalBackdrop.addEventListener('click', closeModal);
@@ -323,13 +311,16 @@
                 return `/lineup-builder/proxy?url=${encodeURIComponent(url)}`;
             }
 
+            // ------------------------------------------
+            // RENDERIZADO MODIFICADO (Sin números, sin fondo negro, más pequeño)
+            // ------------------------------------------
             function renderFormation(formationName) {
                 formationLayer.innerHTML = '';
                 const positions = formations[formationName];
 
                 positions.forEach((pos, index) => {
                     const slot = document.createElement('div');
-                    slot.className = 'absolute transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center cursor-pointer transition hover:scale-110';
+                    slot.className = 'absolute transform -translate-x-1/2 -translate-y-1/2 cursor-pointer z-20 hover:scale-105 transition-transform duration-200';
                     slot.style.top = pos.top;
                     slot.style.left = pos.left;
                     slot.dataset.index = index;
@@ -339,33 +330,30 @@
                     if (player) {
                         const imageUrl = player.foto_url ? getProxyUrl(player.foto_url) : null;
 
-                        // Filled Slot
-                        // Used spacer div for robust spacing in html2canvas
+                        // ESTRUCTURA MINIMALISTA Y MÁS PEQUEÑA
                         slot.innerHTML = `
-                                                        <div class="w-32 flex flex-col items-center justify-center text-center">
-                                                    <div class="w-12 h-12 md:w-16 md:h-16 rounded-full border-2 border-white overflow-hidden bg-gray-800 shadow-lg relative mx-auto z-10">
-                                                        ${imageUrl
-                                ? `<img src="${imageUrl}" class="w-full h-full object-cover" crossorigin="anonymous">`
-                                : `<div class="w-full h-full flex items-center justify-center font-bold text-white text-xl">${player.nombre.charAt(0)}</div>`
-                            }
-                                                        <div class="absolute bottom-0 right-0 bg-yellow-500 text-black text-[10px] font-bold px-1 rounded-tl leading-none">
-                                                            ${player.numero ?? '-'}
-                                                        </div>
-                                                    </div>
-                                                    <!-- Spacer for html2canvas -->
-                                                    <div style="height: 8px;"></div>
-                                                        <div class="bg-black/80 px-2 py-0.5 rounded-full mx-auto inline-block z-20">
-                                                            <span class="text-white text-[8px] md:text-[10px] font-bold whitespace-nowrap block">${player.nombre}</span>
-                                                    </div>
-                                                </div>
-                                            `;
+                            <div class="flex flex-col items-center justify-center">
+                                <div class="w-12 h-12 md:w-16 md:h-16 rounded-full border-[2px] md:border-[3px] border-white overflow-hidden bg-gray-800 shadow-xl z-10 block">
+                                    ${imageUrl
+                                        ? `<img src="${imageUrl}" class="w-full h-full object-cover" crossorigin="anonymous">`
+                                        : `<div class="w-full h-full flex items-center justify-center font-bold text-white text-lg md:text-xl">${player.nombre.charAt(0)}</div>`
+                                    }
+                                </div>
+
+                                <div class="h-1"></div>
+
+                                <span class="text-white text-[10px] md:text-[12px] font-bold block leading-none tracking-wide text-center uppercase whitespace-nowrap drop-shadow-[0_2px_3px_rgba(0,0,0,0.9)]">
+                                    ${player.nombre}
+                                </span>
+                            </div>
+                        `;
                     } else {
-                        // Empty Slot
+                        // Slot Vacío (Ajustado al nuevo tamaño más pequeño)
                         slot.innerHTML = `
-                                                                                                    <div class="w-10 h-10 md:w-12 md:h-12 rounded-full border-2 border-dashed border-white/50 flex items-center justify-center bg-white/10 hover:bg-white/20 transition-colors mx-auto">
-                                                                                                        <span class="text-white font-bold text-xl">+</span>
-                                                                                                    </div>
-                                                                                                `;
+                            <div class="w-12 h-12 md:w-16 md:h-16 rounded-full border-2 border-dashed border-white/50 flex items-center justify-center bg-white/10 hover:bg-white/20 transition-colors shadow-sm">
+                                <span class="text-white font-bold text-xl opacity-80">+</span>
+                            </div>
+                        `;
                     }
 
                     slot.addEventListener('click', () => openPlayerSelection(index));
@@ -379,21 +367,17 @@
                     return;
                 }
                 activeSlotIndex = index;
-                playerSearch.value = ''; // Reset search
+                playerSearch.value = '';
                 renderPlayerList();
                 playerModal.classList.remove('hidden');
-                playerSearch.focus();
+                setTimeout(() => playerSearch.focus(), 100);
             }
 
             function renderPlayerList(searchTerm = '') {
                 playersList.innerHTML = '';
-
-                // Filter out already selected players
                 const selectedPlayerIds = Object.values(lineupState).map(p => p.id);
-
                 let availablePlayers = currentTeamPlayers.filter(p => !selectedPlayerIds.includes(p.id));
 
-                // Filter by search term
                 if (searchTerm) {
                     const term = searchTerm.toLowerCase();
                     availablePlayers = availablePlayers.filter(p =>
@@ -409,21 +393,19 @@
 
                 availablePlayers.forEach(player => {
                     const btn = document.createElement('button');
-                    btn.className = 'w-full text-left px-4 py-3 bg-gray-700 hover:bg-gray-600 rounded-lg flex items-center gap-3 transition-colors';
-                    // Use direct URL for list (no CORS needed for simple display usually, but consistent is better)
-                    // Actually list doesn't need crossOrigin, so direct URL is fine and faster.
+                    btn.className = 'w-full text-left px-4 py-3 bg-gray-700 hover:bg-gray-600 rounded-lg flex items-center gap-3 transition-colors border-b border-gray-600 last:border-0';
                     btn.innerHTML = `
-                                                                                                    <div class="w-8 h-8 rounded-full bg-gray-500 overflow-hidden flex-shrink-0">
-                                                                                                        ${player.foto_url
-                            ? `<img src="${player.foto_url}" class="w-full h-full object-cover">`
-                            : `<div class="w-full h-full flex items-center justify-center text-white font-bold">${player.nombre.charAt(0)}</div>`
-                        }
-                                                                                                    </div>
-                                                                                                    <div>
-                                                                                                        <div class="text-white font-bold text-sm">${player.nombre}</div>
-                                                                                                        <div class="text-gray-400 text-xs">${player.posicion_general} #${player.numero ?? '?'}</div>
-                                                                                                    </div>
-                                                                                                `;
+                        <div class="w-10 h-10 rounded-full bg-gray-500 overflow-hidden flex-shrink-0 border border-gray-400">
+                            ${player.foto_url
+                                ? `<img src="${player.foto_url}" class="w-full h-full object-cover">`
+                                : `<div class="w-full h-full flex items-center justify-center text-white font-bold">${player.nombre.charAt(0)}</div>`
+                            }
+                        </div>
+                        <div>
+                            <div class="text-white font-bold text-sm">${player.nombre}</div>
+                            <div class="text-gray-400 text-xs font-mono text-green-400">#${player.numero ?? '?'} - ${player.posicion_general ?? 'Jugador'}</div>
+                        </div>
+                    `;
                     btn.addEventListener('click', () => selectPlayer(player));
                     playersList.appendChild(btn);
                 });
