@@ -123,13 +123,24 @@
             {{-- Panel de Administración --}}
             @if (session('is_admin'))
                 <a href="{{ route('admin.panel') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200
-                                                               @if (isset($activeView) && $activeView === 'admin') 
-                                                                   bg-gradient-to-r from-primary to-emerald-600 text-white shadow-lg shadow-primary/30 
-                                                               @else 
-                                                                   text-gray-300 hover:text-white hover:bg-white/10 
-                                                               @endif">
+                                                                   @if (isset($activeView) && $activeView === 'admin') 
+                                                                       bg-gradient-to-r from-primary to-emerald-600 text-white shadow-lg shadow-primary/30 
+                                                                   @else 
+                                                                       text-gray-300 hover:text-white hover:bg-white/10 
+                                                                   @endif">
                     <span class="material-symbols-outlined">admin_panel_settings</span>
                     <span class="font-medium">Panel Admin</span>
+                </a>
+
+                {{-- ANÁLISIS PROFUNDO (NUEVO) --}}
+                <a href="{{ route('admin.analysis.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200
+                                                                   @if (request()->routeIs('admin.analysis.*')) 
+                                                                       bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg shadow-purple-500/30 
+                                                                   @else 
+                                                                       text-gray-300 hover:text-white hover:bg-white/10 
+                                                                   @endif">
+                    <span class="material-symbols-outlined">psychology</span>
+                    <span class="font-medium">Análisis Profundo</span>
                 </a>
             @endif
 

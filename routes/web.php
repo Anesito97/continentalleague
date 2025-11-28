@@ -114,5 +114,9 @@ Route::middleware(\App\Http\Middleware\AdminCheck::class)
         // RUTA PUT PARA ACTUALIZAR (Debe existir)
         Route::put('news/{noticia}', [NewsAdminController::class, 'update'])->name('news.update');
 
+        // --- DEEP ANALYSIS (NUEVO) ---
+        Route::get('deep-analysis', [\App\Http\Controllers\DeepAnalysisController::class, 'index'])->name('admin.analysis.index');
+        Route::post('deep-analysis', [\App\Http\Controllers\DeepAnalysisController::class, 'analyze'])->name('admin.analysis.analyze');
+
         // RUTAS PENDIENTES (Ej: teams/delete/{id}, players/edit/{id}, etc.)
     });
