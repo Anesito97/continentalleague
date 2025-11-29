@@ -316,8 +316,8 @@ class DeepAnalysisController extends Controller
             ->where('estado', 'finalizado')->count();
 
         // Home/Away Splits
-        $homeMatches = Partido::where('equipo_local_id', $team->id)->where('estado', 'finalizado')->get();
-        $awayMatches = Partido::where('equipo_visitante_id', $team->id)->where('estado', 'finalizado')->get();
+        $homeMatches = Partido::with('eventos')->where('equipo_local_id', $team->id)->where('estado', 'finalizado')->get();
+        $awayMatches = Partido::with('eventos')->where('equipo_visitante_id', $team->id)->where('estado', 'finalizado')->get();
 
         $homeGF = $homeMatches->sum('goles_local');
         $homeGA = $homeMatches->sum('goles_visitante');
@@ -378,6 +378,68 @@ class DeepAnalysisController extends Controller
             $personalityIcon = "fa-triangle-exclamation";
         }
 
+        // GK Efficiency (The Wall)
+        $totalSaves = $team->jugadores->sum('paradas');
+        $totalConceded = $team->goles_en_contra;
+        $shotsFaced = $totalSaves + $totalConceded;
+        $gkSavePct = $shotsFaced > 0 ? ($totalSaves / $shotsFaced) * 100 : 0;
+
+        $gkLabel = "Promedio";
+        $gkColor = "text-yellow-400";
+        if ($gkSavePct > 75) {
+            $gkLabel = "Muro Impenetrable";
+            $gkColor = "text-green-400";
+        } elseif ($gkSavePct < 60) {
+            $gkLabel = "Vulnerable";
+            $gkColor = "text-red-400";
+        }
+
+        // Resilience Score (Points recovered from losing positions)
+        $resiliencePoints = 0;
+        $allMatches = $homeMatches->merge($awayMatches);
+
+        foreach ($allMatches as $match) {
+            // Check if we need to load events (if not eager loaded)
+            $events = $match->eventos->sortBy('minuto');
+
+            $myScore = 0;
+            $opScore = 0;
+            $wasLosing = false;
+            $isLocal = $match->equipo_local_id == $team->id;
+
+            foreach ($events as $event) {
+                if ($event->tipo_evento === 'gol') {
+                    if ($event->equipo_id == $team->id) {
+                        $myScore++;
+                    } else {
+                        $opScore++;
+                    }
+
+                    if ($opScore > $myScore) {
+                        $wasLosing = true;
+                    }
+                }
+            }
+
+            // Final check
+            if ($wasLosing) {
+                if ($myScore > $opScore)
+                    $resiliencePoints += 3; // Won
+                elseif ($myScore == $opScore)
+                    $resiliencePoints += 1; // Drew
+            }
+        }
+
+        $resilienceLabel = "Frágil";
+        $resilienceColor = "text-red-400";
+        if ($resiliencePoints >= 6) {
+            $resilienceLabel = "Espíritu Indomable";
+            $resilienceColor = "text-green-400";
+        } elseif ($resiliencePoints >= 3) {
+            $resilienceLabel = "Luchador";
+            $resilienceColor = "text-yellow-400";
+        }
+
         return [
             'ppg' => number_format($team->puntos / $matches, 2),
             'gf_pg' => number_format($team->goles_a_favor / $matches, 2),
@@ -398,6 +460,16 @@ class DeepAnalysisController extends Controller
                 'label' => $personality,
                 'color' => $personalityColor,
                 'icon' => $personalityIcon
+            ],
+            'gk_efficiency' => [
+                'pct' => number_format($gkSavePct, 1),
+                'label' => $gkLabel,
+                'color' => $gkColor
+            ],
+            'resilience' => [
+                'points' => $resiliencePoints,
+                'label' => $resilienceLabel,
+                'color' => $resilienceColor
             ],
             'yellows' => $yellows,
             'reds' => $reds,

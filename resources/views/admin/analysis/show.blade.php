@@ -213,6 +213,73 @@
                     @endforeach
                 </div>
 
+                {{-- ADVANCED METRICS (GK & RESILIENCE) --}}
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {{-- GK EFFICIENCY --}}
+                    <div class="bg-card-bg/80 border border-white/10 rounded-xl p-4 relative overflow-hidden">
+                        <h4 class="text-sm font-bold text-white mb-6 flex items-center gap-2">
+                            <i class="fa-solid fa-hands-holding-circle text-yellow-400"></i>
+                            Eficiencia en Portería
+                        </h4>
+                        
+                        <div class="space-y-6">
+                            @foreach(['my' => $myTeam, 'op' => $opponent] as $key => $team)
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-3">
+                                        <img src="{{ $team->escudo_url ?? 'https://placehold.co/40x40' }}" class="w-8 h-8 object-contain">
+                                        <div>
+                                            <p class="text-xs text-gray-400 uppercase">{{ $team->nombre }}</p>
+                                            <p class="text-[10px] font-bold {{ $metrics[$key]['gk_efficiency']['color'] }}">
+                                                {{ $metrics[$key]['gk_efficiency']['label'] }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="text-right">
+                                        <span class="text-xl font-black text-white">{{ $metrics[$key]['gk_efficiency']['pct'] }}%</span>
+                                        <p class="text-[10px] text-gray-500">Paradas</p>
+                                    </div>
+                                </div>
+                                {{-- Bar --}}
+                                <div class="w-full bg-gray-800 rounded-full h-2">
+                                    <div class="bg-yellow-500 h-2 rounded-full" style="width: {{ $metrics[$key]['gk_efficiency']['pct'] }}%"></div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+
+                    {{-- RESILIENCE --}}
+                    <div class="bg-card-bg/80 border border-white/10 rounded-xl p-4 relative overflow-hidden">
+                        <h4 class="text-sm font-bold text-white mb-6 flex items-center gap-2">
+                            <i class="fa-solid fa-brain text-purple-400"></i>
+                            Resiliencia (Puntos Recuperados)
+                        </h4>
+                        
+                        <div class="space-y-6">
+                            @foreach(['my' => $myTeam, 'op' => $opponent] as $key => $team)
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-3">
+                                        <img src="{{ $team->escudo_url ?? 'https://placehold.co/40x40' }}" class="w-8 h-8 object-contain">
+                                        <div>
+                                            <p class="text-xs text-gray-400 uppercase">{{ $team->nombre }}</p>
+                                            <p class="text-[10px] font-bold {{ $metrics[$key]['resilience']['color'] }}">
+                                                {{ $metrics[$key]['resilience']['label'] }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="text-right">
+                                        <span class="text-xl font-black text-white">+{{ $metrics[$key]['resilience']['points'] }}</span>
+                                        <p class="text-[10px] text-gray-500">Pts tras ir perdiendo</p>
+                                    </div>
+                                </div>
+                                {{-- Bar --}}
+                                <div class="w-full bg-gray-800 rounded-full h-2">
+                                    <div class="bg-purple-500 h-2 rounded-full" style="width: {{ min($metrics[$key]['resilience']['points'] * 10, 100) }}%"></div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+
                 {{-- ANÁLISIS DE MOMENTO DE GOL (Gráficos) --}}
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {{-- MI EQUIPO --}}
@@ -779,4 +846,3 @@
         </div>
     </div>
 @endsection
-```
