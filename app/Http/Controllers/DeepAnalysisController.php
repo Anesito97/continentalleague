@@ -333,6 +333,51 @@ class DeepAnalysisController extends Controller
         $biggestLoss = 'N/A';
         // (Logic for records could be added here if needed, keeping it simple for now to avoid query overload)
 
+        // Home/Away PPG & Personality
+        $homeMatchesCount = $homeMatches->count();
+        $awayMatchesCount = $awayMatches->count();
+
+        $homePoints = 0;
+        foreach ($homeMatches as $m) {
+            if ($m->goles_local > $m->goles_visitante)
+                $homePoints += 3;
+            elseif ($m->goles_local == $m->goles_visitante)
+                $homePoints += 1;
+        }
+
+        $awayPoints = 0;
+        foreach ($awayMatches as $m) {
+            if ($m->goles_visitante > $m->goles_local)
+                $awayPoints += 3;
+            elseif ($m->goles_visitante == $m->goles_local)
+                $awayPoints += 1;
+        }
+
+        $homePPG = $homeMatchesCount > 0 ? $homePoints / $homeMatchesCount : 0;
+        $awayPPG = $awayMatchesCount > 0 ? $awayPoints / $awayMatchesCount : 0;
+
+        $personality = "Equilibrado";
+        $personalityColor = "text-gray-400";
+        $personalityIcon = "fa-scale-balanced";
+
+        if ($homePPG > 2.0 && $awayPPG < 1.0) {
+            $personality = "Fortín Local";
+            $personalityColor = "text-green-400";
+            $personalityIcon = "fa-dungeon";
+        } elseif ($awayPPG > 2.0 && $homePPG < 1.0) {
+            $personality = "Visitante Peligroso";
+            $personalityColor = "text-red-400";
+            $personalityIcon = "fa-road";
+        } elseif ($homePPG > 2.0 && $awayPPG > 2.0) {
+            $personality = "Aplanadora Total";
+            $personalityColor = "text-yellow-400";
+            $personalityIcon = "fa-crown";
+        } elseif ($homePPG < 0.5 && $awayPPG < 0.5) {
+            $personality = "En Crisis";
+            $personalityColor = "text-red-600";
+            $personalityIcon = "fa-triangle-exclamation";
+        }
+
         return [
             'ppg' => number_format($team->puntos / $matches, 2),
             'gf_pg' => number_format($team->goles_a_favor / $matches, 2),
@@ -343,10 +388,17 @@ class DeepAnalysisController extends Controller
             'failed_to_score_pct' => number_format(($failedToScore / $matches) * 100, 0) . '%',
             'btts_pct' => number_format(($btts / $matches) * 100, 0) . '%',
             'over25_pct' => number_format(($over25 / $matches) * 100, 0) . '%',
-            'home_gf' => number_format($homeMatches->count() > 0 ? $homeGF / $homeMatches->count() : 0, 2),
-            'home_ga' => number_format($homeMatches->count() > 0 ? $homeGA / $homeMatches->count() : 0, 2),
-            'away_gf' => number_format($awayMatches->count() > 0 ? $awayGF / $awayMatches->count() : 0, 2),
-            'away_ga' => number_format($awayMatches->count() > 0 ? $awayGA / $awayMatches->count() : 0, 2),
+            'home_gf' => number_format($homeMatchesCount > 0 ? $homeGF / $homeMatchesCount : 0, 2),
+            'home_ga' => number_format($homeMatchesCount > 0 ? $homeGA / $homeMatchesCount : 0, 2),
+            'away_gf' => number_format($awayMatchesCount > 0 ? $awayGF / $awayMatchesCount : 0, 2),
+            'away_ga' => number_format($awayMatchesCount > 0 ? $awayGA / $awayMatchesCount : 0, 2),
+            'home_ppg' => number_format($homePPG, 2),
+            'away_ppg' => number_format($awayPPG, 2),
+            'personality' => [
+                'label' => $personality,
+                'color' => $personalityColor,
+                'icon' => $personalityIcon
+            ],
             'yellows' => $yellows,
             'reds' => $reds,
             'form_score' => $this->calculateFormScore($team->form_guide)

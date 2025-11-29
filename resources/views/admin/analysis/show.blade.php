@@ -58,7 +58,7 @@
                             Comparativa Directa
                         </h3>
                     </div>
-                    
+
                     <div class="p-6 space-y-8">
                         @php
                             $groups = [
@@ -84,20 +84,22 @@
 
                         @foreach($groups as $groupName => $items)
                             <div>
-                                <h4 class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4 border-b border-white/5 pb-1">{{ $groupName }}</h4>
+                                <h4
+                                    class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4 border-b border-white/5 pb-1">
+                                    {{ $groupName }}</h4>
                                 <div class="space-y-4">
                                     @foreach($items as $item)
                                         @php
                                             $myValRaw = $metrics['my'][$item['key']];
                                             $opValRaw = $metrics['op'][$item['key']];
-                                            
+
                                             // Clean values for calculation
                                             $myVal = (float) str_replace('%', '', $myValRaw);
                                             $opVal = (float) str_replace('%', '', $opValRaw);
-                                            
+
                                             $max = max($myVal, $opVal);
                                             $max = $max == 0 ? 1 : $max; // Avoid division by zero
-                                            
+
                                             $myWidth = ($myVal / $max) * 100;
                                             $opWidth = ($opVal / $max) * 100;
 
@@ -122,18 +124,22 @@
                                         <div class="relative grid grid-cols-7 items-center gap-2 group">
                                             {{-- My Value --}}
                                             <div class="col-span-1 text-right text-sm {{ $myText }}">{{ $myValRaw }}</div>
-                                            
+
                                             {{-- My Bar (Right aligned) --}}
                                             <div class="col-span-2 flex justify-end">
-                                                <div class="h-2 rounded-l-full {{ $myColor }} transition-all duration-1000" style="width: {{ $myWidth }}%"></div>
+                                                <div class="h-2 rounded-l-full {{ $myColor }} transition-all duration-1000"
+                                                    style="width: {{ $myWidth }}%"></div>
                                             </div>
 
                                             {{-- Label (Center) --}}
-                                            <div class="col-span-1 text-center text-[10px] text-gray-500 uppercase font-bold leading-tight">{{ $item['label'] }}</div>
+                                            <div
+                                                class="col-span-1 text-center text-[10px] text-gray-500 uppercase font-bold leading-tight">
+                                                {{ $item['label'] }}</div>
 
                                             {{-- Op Bar (Left aligned) --}}
                                             <div class="col-span-2 flex justify-start">
-                                                <div class="h-2 rounded-r-full {{ $opColor }} transition-all duration-1000" style="width: {{ $opWidth }}%"></div>
+                                                <div class="h-2 rounded-r-full {{ $opColor }} transition-all duration-1000"
+                                                    style="width: {{ $opWidth }}%"></div>
                                             </div>
 
                                             {{-- Op Value --}}
@@ -146,43 +152,65 @@
                     </div>
                 </div>
 
-                {{-- HOME / AWAY SPLITS --}}
+                {{-- HOME / AWAY SPLITS (ENHANCED) --}}
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {{-- MI EQUIPO (HOME/AWAY) --}}
-                    <div class="bg-card-bg/80 border border-white/10 rounded-xl p-4">
-                        <h4 class="text-sm font-bold text-gray-300 mb-4 text-center border-b border-white/5 pb-2">
-                            {{ $myTeam->nombre }} - Rendimiento</h4>
-                        <div class="grid grid-cols-2 gap-4 text-center">
-                            <div>
-                                <p class="text-[10px] text-gray-500 uppercase">Local (GF/GC)</p>
-                                <p class="text-lg font-bold text-white">{{ $metrics['my']['home_gf'] }} /
-                                    {{ $metrics['my']['home_ga'] }}</p>
+                    @foreach(['my' => $myTeam, 'op' => $opponent] as $key => $team)
+                        <div
+                            class="bg-card-bg/80 border border-white/10 rounded-xl p-4 relative overflow-hidden group hover:border-white/20 transition">
+                            {{-- Personality Badge --}}
+                            <div
+                                class="absolute top-0 right-0 bg-white/5 px-3 py-1 rounded-bl-xl border-b border-l border-white/5">
+                                <div class="flex items-center gap-2">
+                                    <i
+                                        class="fa-solid {{ $metrics[$key]['personality']['icon'] }} {{ $metrics[$key]['personality']['color'] }} text-xs"></i>
+                                    <span
+                                        class="text-[10px] font-bold text-gray-300 uppercase tracking-wider">{{ $metrics[$key]['personality']['label'] }}</span>
+                                </div>
                             </div>
-                            <div>
-                                <p class="text-[10px] text-gray-500 uppercase">Visitante (GF/GC)</p>
-                                <p class="text-lg font-bold text-white">{{ $metrics['my']['away_gf'] }} /
-                                    {{ $metrics['my']['away_ga'] }}</p>
-                            </div>
-                        </div>
-                    </div>
 
-                    {{-- RIVAL (HOME/AWAY) --}}
-                    <div class="bg-card-bg/80 border border-white/10 rounded-xl p-4">
-                        <h4 class="text-sm font-bold text-gray-300 mb-4 text-center border-b border-white/5 pb-2">
-                            {{ $opponent->nombre }} - Rendimiento</h4>
-                        <div class="grid grid-cols-2 gap-4 text-center">
-                            <div>
-                                <p class="text-[10px] text-gray-500 uppercase">Local (GF/GC)</p>
-                                <p class="text-lg font-bold text-white">{{ $metrics['op']['home_gf'] }} /
-                                    {{ $metrics['op']['home_ga'] }}</p>
-                            </div>
-                            <div>
-                                <p class="text-[10px] text-gray-500 uppercase">Visitante (GF/GC)</p>
-                                <p class="text-lg font-bold text-white">{{ $metrics['op']['away_gf'] }} /
-                                    {{ $metrics['op']['away_ga'] }}</p>
+                            <h4 class="text-sm font-bold text-white mb-6 flex items-center gap-2">
+                                <img src="{{ $team->escudo_url ?? 'https://placehold.co/40x40' }}"
+                                    class="w-6 h-6 object-contain">
+                                {{ $team->nombre }}
+                            </h4>
+
+                            <div class="space-y-4">
+                                {{-- Home Stats --}}
+                                <div>
+                                    <div class="flex justify-between text-xs mb-1">
+                                        <span class="text-gray-400 flex items-center gap-2"><i class="fa-solid fa-house"></i>
+                                            Local</span>
+                                        <span class="text-white font-bold">{{ $metrics[$key]['home_ppg'] }} PPG</span>
+                                    </div>
+                                    <div class="w-full bg-gray-800 rounded-full h-1.5 mb-1">
+                                        <div class="bg-emerald-500 h-1.5 rounded-full"
+                                            style="width: {{ min(($metrics[$key]['home_ppg'] / 3) * 100, 100) }}%"></div>
+                                    </div>
+                                    <div class="flex justify-between text-[10px] text-gray-500">
+                                        <span>GF: {{ $metrics[$key]['home_gf'] }}</span>
+                                        <span>GC: {{ $metrics[$key]['home_ga'] }}</span>
+                                    </div>
+                                </div>
+
+                                {{-- Away Stats --}}
+                                <div>
+                                    <div class="flex justify-between text-xs mb-1">
+                                        <span class="text-gray-400 flex items-center gap-2"><i class="fa-solid fa-plane"></i>
+                                            Visitante</span>
+                                        <span class="text-white font-bold">{{ $metrics[$key]['away_ppg'] }} PPG</span>
+                                    </div>
+                                    <div class="w-full bg-gray-800 rounded-full h-1.5 mb-1">
+                                        <div class="bg-blue-500 h-1.5 rounded-full"
+                                            style="width: {{ min(($metrics[$key]['away_ppg'] / 3) * 100, 100) }}%"></div>
+                                    </div>
+                                    <div class="flex justify-between text-[10px] text-gray-500">
+                                        <span>GF: {{ $metrics[$key]['away_gf'] }}</span>
+                                        <span>GC: {{ $metrics[$key]['away_ga'] }}</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    @endforeach
                 </div>
 
                 {{-- ANÁLISIS DE MOMENTO DE GOL (Gráficos) --}}
@@ -212,7 +240,8 @@
                     {{-- RIVAL --}}
                     <div class="bg-card-bg/80 border border-white/10 rounded-xl p-4">
                         <h4 class="text-sm font-bold text-emerald-400 mb-4 text-center">¿Cuándo marca
-                            {{ $opponent->nombre }}?</h4>
+                            {{ $opponent->nombre }}?
+                        </h4>
                         @if($goalTiming['op_scored']['total'] > 0)
                             <div class="flex items-end justify-between h-32 gap-1">
                                 @foreach($goalTiming['op_scored']['percentages'] as $period => $pct)
@@ -237,7 +266,8 @@
                     {{-- MI EQUIPO (CONCEDED) --}}
                     <div class="bg-card-bg/80 border border-white/10 rounded-xl p-4">
                         <h4 class="text-sm font-bold text-rose-400 mb-4 text-center">¿Cuándo recibe gol
-                            {{ $myTeam->nombre }}?</h4>
+                            {{ $myTeam->nombre }}?
+                        </h4>
                         @if($goalTiming['my_conceded']['total'] > 0)
                             <div class="flex items-end justify-between h-32 gap-1">
                                 @foreach($goalTiming['my_conceded']['percentages'] as $period => $pct)
@@ -259,7 +289,8 @@
                     {{-- RIVAL (CONCEDED) --}}
                     <div class="bg-card-bg/80 border border-white/10 rounded-xl p-4">
                         <h4 class="text-sm font-bold text-rose-400 mb-4 text-center">¿Cuándo recibe gol
-                            {{ $opponent->nombre }}?</h4>
+                            {{ $opponent->nombre }}?
+                        </h4>
                         @if($goalTiming['op_conceded']['total'] > 0)
                             <div class="flex items-end justify-between h-32 gap-1">
                                 @foreach($goalTiming['op_conceded']['percentages'] as $period => $pct)
@@ -332,16 +363,18 @@
                         <i class="fa-solid fa-clipboard-list text-cyan-400"></i>
                         Plan de Partido (IA)
                     </h3>
-                    
+
                     <div class="space-y-6">
                         {{-- ATAQUE --}}
                         <div>
-                            <h4 class="text-xs font-bold text-green-400 uppercase tracking-widest mb-2 flex items-center gap-2">
+                            <h4
+                                class="text-xs font-bold text-green-400 uppercase tracking-widest mb-2 flex items-center gap-2">
                                 <i class="fa-solid fa-bullseye"></i> Fase Ofensiva
                             </h4>
                             <ul class="space-y-2">
                                 @foreach($strategy['attack'] as $tip)
-                                    <li class="flex gap-2 text-sm text-gray-300 bg-green-500/5 p-2 rounded border-l-2 border-green-500">
+                                    <li
+                                        class="flex gap-2 text-sm text-gray-300 bg-green-500/5 p-2 rounded border-l-2 border-green-500">
                                         <i class="fa-solid fa-check text-green-400 mt-1 text-xs"></i>
                                         <span>{{ $tip }}</span>
                                     </li>
@@ -351,12 +384,14 @@
 
                         {{-- DEFENSA --}}
                         <div>
-                            <h4 class="text-xs font-bold text-blue-400 uppercase tracking-widest mb-2 flex items-center gap-2">
+                            <h4
+                                class="text-xs font-bold text-blue-400 uppercase tracking-widest mb-2 flex items-center gap-2">
                                 <i class="fa-solid fa-shield-halved"></i> Fase Defensiva
                             </h4>
                             <ul class="space-y-2">
                                 @foreach($strategy['defense'] as $tip)
-                                    <li class="flex gap-2 text-sm text-gray-300 bg-blue-500/5 p-2 rounded border-l-2 border-blue-500">
+                                    <li
+                                        class="flex gap-2 text-sm text-gray-300 bg-blue-500/5 p-2 rounded border-l-2 border-blue-500">
                                         <i class="fa-solid fa-shield text-blue-400 mt-1 text-xs"></i>
                                         <span>{{ $tip }}</span>
                                     </li>
@@ -366,122 +401,181 @@
 
                         {{-- ALERTAS --}}
                         @if(!empty($strategy['alerts']) && $strategy['alerts'][0] != "Partido estándar. Sin anomalías estadísticas graves.")
-                        <div>
-                            <h4 class="text-xs font-bold text-red-400 uppercase tracking-widest mb-2 flex items-center gap-2">
-                                <i class="fa-solid fa-triangle-exclamation"></i> Alertas Clave
-                            </h4>
-                            <ul class="space-y-2">
-                                @foreach($strategy['alerts'] as $tip)
-                                    <li class="flex gap-2 text-sm text-white bg-red-500/10 p-2 rounded border-l-2 border-red-500 animate-pulse">
-                                        <i class="fa-solid fa-circle-exclamation text-red-500 mt-1 text-xs"></i>
-                                        <span>{{ $tip }}</span>
-                                    </li>
-                                @endforeach
-                            </ul>
-                        </div>
+                            <div>
+                                <h4
+                                    class="text-xs font-bold text-red-400 uppercase tracking-widest mb-2 flex items-center gap-2">
+                                    <i class="fa-solid fa-triangle-exclamation"></i> Alertas Clave
+                                </h4>
+                                <ul class="space-y-2">
+                                    @foreach($strategy['alerts'] as $tip)
+                                        <li
+                                            class="flex gap-2 text-sm text-white bg-red-500/10 p-2 rounded border-l-2 border-red-500 animate-pulse">
+                                            <i class="fa-solid fa-circle-exclamation text-red-500 mt-1 text-xs"></i>
+                                            <span>{{ $tip }}</span>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            </div>
                         @endif
                     </div>
                 </div>
 
                 {{-- VISUAL PITCH CAROUSEL (VARIANTES) --}}
-            <div class="bg-card-bg/80 border border-white/10 rounded-xl p-4 relative" x-data="{ activeSlide: 0, variants: {{ count($variants) }} }">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-lg font-bold text-white flex items-center gap-2">
-                        <i class="fa-solid fa-chess-board text-green-400"></i>
-                        Pizarra Táctica
-                    </h3>
-                    {{-- Carousel Controls --}}
-                    <div class="flex gap-2">
-                        <button @click="activeSlide = activeSlide === 0 ? variants - 1 : activeSlide - 1" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition">
-                            <i class="fa-solid fa-chevron-left"></i>
-                        </button>
-                        <button @click="activeSlide = activeSlide === variants - 1 ? 0 : activeSlide + 1" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition">
-                            <i class="fa-solid fa-chevron-right"></i>
-                        </button>
+                <div class="bg-card-bg/80 border border-white/10 rounded-xl p-4 relative"
+                    x-data="{ activeSlide: 0, variants: {{ count($variants) }} }">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-chess-board text-green-400"></i>
+                            Pizarra Táctica
+                        </h3>
+                        {{-- Carousel Controls --}}
+                        <div class="flex gap-2">
+                            <button @click="activeSlide = activeSlide === 0 ? variants - 1 : activeSlide - 1"
+                                class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition">
+                                <i class="fa-solid fa-chevron-left"></i>
+                            </button>
+                            <button @click="activeSlide = activeSlide === variants - 1 ? 0 : activeSlide + 1"
+                                class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition">
+                                <i class="fa-solid fa-chevron-right"></i>
+                            </button>
+                        </div>
                     </div>
-                </div>
 
-                @foreach($variants as $index => $variant)
-                    <div x-show="activeSlide === {{ $index }}" class="transition-opacity duration-300" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 transform scale-95" x-transition:enter-end="opacity-100 transform scale-100">
-                        
-                        {{-- Header del Variante --}}
-                        <div class="flex justify-between items-center mb-2">
-                            <span class="text-sm font-bold text-cyan-400 uppercase tracking-widest">{{ $variant['type'] }}</span>
-                            <span class="text-xs font-bold text-white bg-white/10 px-2 py-1 rounded">{{ $variant['formation'] }}</span>
-                        </div>
+                    @foreach($variants as $index => $variant)
+                        <div x-show="activeSlide === {{ $index }}" class="transition-opacity duration-300"
+                            x-transition:enter="transition ease-out duration-300"
+                            x-transition:enter-start="opacity-0 transform scale-95"
+                            x-transition:enter-end="opacity-100 transform scale-100">
 
-                        {{-- Razonamiento --}}
-                        <div class="bg-blue-500/10 border border-blue-500/20 p-3 rounded mb-4 min-h-[60px] flex items-center">
-                            <p class="text-xs text-blue-300 italic">
-                                <i class="fa-solid fa-circle-info mr-1"></i>
-                                {{ $variant['reasoning'] }}
-                            </p>
-                        </div>
+                            {{-- Header del Variante --}}
+                            <div class="flex justify-between items-center mb-2">
+                                <span
+                                    class="text-sm font-bold text-cyan-400 uppercase tracking-widest">{{ $variant['type'] }}</span>
+                                <span
+                                    class="text-xs font-bold text-white bg-white/10 px-2 py-1 rounded">{{ $variant['formation'] }}</span>
+                            </div>
 
-                        {{-- Pitch --}}
-                        <div class="relative w-full aspect-[2/3] bg-green-800 rounded-lg border-4 border-white shadow-2xl overflow-hidden select-none mx-auto max-w-[300px]">
-                            {{-- Pitch Lines --}}
-                            <div class="absolute inset-0 opacity-20" style="background-image: repeating-linear-gradient(0deg, transparent, transparent 20px, #000 20px, #000 40px);"></div>
-                            <div class="absolute inset-4 border-2 border-white/50"></div>
-                            <div class="absolute top-1/2 left-4 right-4 h-0.5 bg-white/50 -translate-y-1/2"></div>
-                            <div class="absolute top-1/2 left-1/2 w-24 h-24 border-2 border-white/50 rounded-full -translate-x-1/2 -translate-y-1/2"></div>
-                            <div class="absolute top-4 left-1/2 w-48 h-24 border-2 border-t-0 border-white/50 -translate-x-1/2 bg-white/5"></div>
-                            <div class="absolute bottom-4 left-1/2 w-48 h-24 border-2 border-b-0 border-white/50 -translate-x-1/2 bg-white/5"></div>
+                            {{-- Razonamiento --}}
+                            <div
+                                class="bg-blue-500/10 border border-blue-500/20 p-3 rounded mb-4 min-h-[60px] flex items-center">
+                                <p class="text-xs text-blue-300 italic">
+                                    <i class="fa-solid fa-circle-info mr-1"></i>
+                                    {{ $variant['reasoning'] }}
+                                </p>
+                            </div>
 
-                            {{-- Players Positioning --}}
-                            @php
-                                $formations = [
-                                    '4-4-2' => [
-                                        ['top' => '88%', 'left' => '50%'], // GK
-                                        ['top' => '68%', 'left' => '15%'], ['top' => '72%', 'left' => '38%'], ['top' => '72%', 'left' => '62%'], ['top' => '68%', 'left' => '85%'], // DEF
-                                        ['top' => '45%', 'left' => '15%'], ['top' => '50%', 'left' => '38%'], ['top' => '50%', 'left' => '62%'], ['top' => '45%', 'left' => '85%'], // MID
-                                        ['top' => '18%', 'left' => '35%'], ['top' => '18%', 'left' => '65%'] // FWD
-                                    ],
-                                    '4-3-3' => [
-                                        ['top' => '88%', 'left' => '50%'], // GK
-                                        ['top' => '68%', 'left' => '15%'], ['top' => '72%', 'left' => '38%'], ['top' => '72%', 'left' => '62%'], ['top' => '68%', 'left' => '85%'], // DEF
-                                        ['top' => '48%', 'left' => '30%'], ['top' => '52%', 'left' => '50%'], ['top' => '48%', 'left' => '70%'], // MID
-                                        ['top' => '20%', 'left' => '20%'], ['top' => '15%', 'left' => '50%'], ['top' => '20%', 'left' => '80%'] // FWD
-                                    ],
-                                    '5-4-1' => [
-                                        ['top' => '88%', 'left' => '50%'], // GK
-                                        ['top' => '60%', 'left' => '10%'], ['top' => '70%', 'left' => '30%'], ['top' => '72%', 'left' => '50%'], ['top' => '70%', 'left' => '70%'], ['top' => '60%', 'left' => '90%'], // DEF
-                                        ['top' => '45%', 'left' => '25%'], ['top' => '48%', 'left' => '42%'], ['top' => '48%', 'left' => '58%'], ['top' => '45%', 'left' => '75%'], // MID
-                                        ['top' => '15%', 'left' => '50%'] // ST
-                                    ],
-                                    '3-4-3' => [
-                                        ['top' => '88%', 'left' => '50%'], // GK
-                                        ['top' => '70%', 'left' => '25%'], ['top' => '72%', 'left' => '50%'], ['top' => '70%', 'left' => '75%'], // DEF
-                                        ['top' => '45%', 'left' => '15%'], ['top' => '50%', 'left' => '38%'], ['top' => '50%', 'left' => '62%'], ['top' => '45%', 'left' => '85%'], // MID
-                                        ['top' => '20%', 'left' => '20%'], ['top' => '15%', 'left' => '50%'], ['top' => '20%', 'left' => '80%'] // FWD
-                                    ],
-                                    '5-3-2' => [
-                                        ['top' => '88%', 'left' => '50%'], // GK
-                                        ['top' => '60%', 'left' => '10%'], ['top' => '70%', 'left' => '30%'], ['top' => '72%', 'left' => '50%'], ['top' => '70%', 'left' => '70%'], ['top' => '60%', 'left' => '90%'], // DEF
-                                        ['top' => '48%', 'left' => '30%'], ['top' => '52%', 'left' => '50%'], ['top' => '48%', 'left' => '70%'], // MID
-                                        ['top' => '18%', 'left' => '35%'], ['top' => '18%', 'left' => '65%'] // FWD
-                                    ]
-                                ];
-                                
-                                $currentPositions = $formations[$variant['formation']] ?? $formations['4-4-2'];
-                                $pIndex = 0;
-                            @endphp
+                            {{-- Pitch --}}
+                            <div
+                                class="relative w-full aspect-[2/3] bg-green-800 rounded-lg border-4 border-white shadow-2xl overflow-hidden select-none mx-auto max-w-[300px]">
+                                {{-- Pitch Lines --}}
+                                <div class="absolute inset-0 opacity-20"
+                                    style="background-image: repeating-linear-gradient(0deg, transparent, transparent 20px, #000 20px, #000 40px);">
+                                </div>
+                                <div class="absolute inset-4 border-2 border-white/50"></div>
+                                <div class="absolute top-1/2 left-4 right-4 h-0.5 bg-white/50 -translate-y-1/2"></div>
+                                <div
+                                    class="absolute top-1/2 left-1/2 w-24 h-24 border-2 border-white/50 rounded-full -translate-x-1/2 -translate-y-1/2">
+                                </div>
+                                <div
+                                    class="absolute top-4 left-1/2 w-48 h-24 border-2 border-t-0 border-white/50 -translate-x-1/2 bg-white/5">
+                                </div>
+                                <div
+                                    class="absolute bottom-4 left-1/2 w-48 h-24 border-2 border-b-0 border-white/50 -translate-x-1/2 bg-white/5">
+                                </div>
 
-                            @foreach($variant['lineup'] as $player)
-                                @if($pIndex < count($currentPositions))
-                                    @php $pos = $currentPositions[$pIndex]; $pIndex++; @endphp
-                                    <div class="absolute transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center" style="top: {{ $pos['top'] }}; left: {{ $pos['left'] }};">
-                                        <div class="w-8 h-8 rounded-full border border-white overflow-hidden bg-gray-800 shadow-md">
-                                            <img src="{{ $player->foto_url ?? 'https://placehold.co/40x40' }}" class="w-full h-full object-cover">
+                                {{-- Players Positioning --}}
+                                @php
+                                    $formations = [
+                                        '4-4-2' => [
+                                            ['top' => '88%', 'left' => '50%'], // GK
+                                            ['top' => '68%', 'left' => '15%'],
+                                            ['top' => '72%', 'left' => '38%'],
+                                            ['top' => '72%', 'left' => '62%'],
+                                            ['top' => '68%', 'left' => '85%'], // DEF
+                                            ['top' => '45%', 'left' => '15%'],
+                                            ['top' => '50%', 'left' => '38%'],
+                                            ['top' => '50%', 'left' => '62%'],
+                                            ['top' => '45%', 'left' => '85%'], // MID
+                                            ['top' => '18%', 'left' => '35%'],
+                                            ['top' => '18%', 'left' => '65%'] // FWD
+                                        ],
+                                        '4-3-3' => [
+                                            ['top' => '88%', 'left' => '50%'], // GK
+                                            ['top' => '68%', 'left' => '15%'],
+                                            ['top' => '72%', 'left' => '38%'],
+                                            ['top' => '72%', 'left' => '62%'],
+                                            ['top' => '68%', 'left' => '85%'], // DEF
+                                            ['top' => '48%', 'left' => '30%'],
+                                            ['top' => '52%', 'left' => '50%'],
+                                            ['top' => '48%', 'left' => '70%'], // MID
+                                            ['top' => '20%', 'left' => '20%'],
+                                            ['top' => '15%', 'left' => '50%'],
+                                            ['top' => '20%', 'left' => '80%'] // FWD
+                                        ],
+                                        '5-4-1' => [
+                                            ['top' => '88%', 'left' => '50%'], // GK
+                                            ['top' => '60%', 'left' => '10%'],
+                                            ['top' => '70%', 'left' => '30%'],
+                                            ['top' => '72%', 'left' => '50%'],
+                                            ['top' => '70%', 'left' => '70%'],
+                                            ['top' => '60%', 'left' => '90%'], // DEF
+                                            ['top' => '45%', 'left' => '25%'],
+                                            ['top' => '48%', 'left' => '42%'],
+                                            ['top' => '48%', 'left' => '58%'],
+                                            ['top' => '45%', 'left' => '75%'], // MID
+                                            ['top' => '15%', 'left' => '50%'] // ST
+                                        ],
+                                        '3-4-3' => [
+                                            ['top' => '88%', 'left' => '50%'], // GK
+                                            ['top' => '70%', 'left' => '25%'],
+                                            ['top' => '72%', 'left' => '50%'],
+                                            ['top' => '70%', 'left' => '75%'], // DEF
+                                            ['top' => '45%', 'left' => '15%'],
+                                            ['top' => '50%', 'left' => '38%'],
+                                            ['top' => '50%', 'left' => '62%'],
+                                            ['top' => '45%', 'left' => '85%'], // MID
+                                            ['top' => '20%', 'left' => '20%'],
+                                            ['top' => '15%', 'left' => '50%'],
+                                            ['top' => '20%', 'left' => '80%'] // FWD
+                                        ],
+                                        '5-3-2' => [
+                                            ['top' => '88%', 'left' => '50%'], // GK
+                                            ['top' => '60%', 'left' => '10%'],
+                                            ['top' => '70%', 'left' => '30%'],
+                                            ['top' => '72%', 'left' => '50%'],
+                                            ['top' => '70%', 'left' => '70%'],
+                                            ['top' => '60%', 'left' => '90%'], // DEF
+                                            ['top' => '48%', 'left' => '30%'],
+                                            ['top' => '52%', 'left' => '50%'],
+                                            ['top' => '48%', 'left' => '70%'], // MID
+                                            ['top' => '18%', 'left' => '35%'],
+                                            ['top' => '18%', 'left' => '65%'] // FWD
+                                        ]
+                                    ];
+
+                                    $currentPositions = $formations[$variant['formation']] ?? $formations['4-4-2'];
+                                    $pIndex = 0;
+                                @endphp
+
+                                @foreach($variant['lineup'] as $player)
+                                    @if($pIndex < count($currentPositions))
+                                        @php $pos = $currentPositions[$pIndex];
+                                        $pIndex++; @endphp
+                                        <div class="absolute transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center"
+                                            style="top: {{ $pos['top'] }}; left: {{ $pos['left'] }};">
+                                            <div class="w-8 h-8 rounded-full border border-white overflow-hidden bg-gray-800 shadow-md">
+                                                <img src="{{ $player->foto_url ?? 'https://placehold.co/40x40' }}"
+                                                    class="w-full h-full object-cover">
+                                            </div>
+                                            <span
+                                                class="text-[8px] font-bold text-white bg-black/50 px-1 rounded mt-0.5 whitespace-nowrap">{{ explode(' ', $player->nombre)[0] }}</span>
                                         </div>
-                                        <span class="text-[8px] font-bold text-white bg-black/50 px-1 rounded mt-0.5 whitespace-nowrap">{{ explode(' ', $player->nombre)[0] }}</span>
-                                    </div>
-                                @endif
-                            @endforeach
+                                    @endif
+                                @endforeach
+                            </div>
                         </div>
-                    </div>
-                @endforeach
-            </div>
+                    @endforeach
+                </div>
 
                 {{-- SUBSTITUCIONES (NUEVO) --}}
                 @if(count($substitutions) > 0)
@@ -542,11 +636,12 @@
                             <span class="text-xs text-gray-400 uppercase">Jugadores</span>
                         </div>
                         <div class="bg-white/5 rounded-lg p-3 text-center">
-                            <span class="block text-2xl font-bold text-green-400">{{ $squadStats['op']['total_goals'] }}</span>
+                            <span
+                                class="block text-2xl font-bold text-green-400">{{ $squadStats['op']['total_goals'] }}</span>
                             <span class="text-xs text-gray-400 uppercase">Goles Totales</span>
                         </div>
                     </div>
-                    
+
                     {{-- DNA Insight --}}
                     <div class="space-y-2 mb-4">
                         <div class="bg-blue-500/10 border border-blue-500/20 p-2 rounded flex items-start gap-2">
@@ -581,7 +676,7 @@
                         </div>
                     </div>
 
-                {{-- THE WALL --}}
+                    {{-- THE WALL --}}
                     @if($squadStats['op']['goalkeeper'])
                         <h4 class="text-xs font-bold text-gray-400 uppercase mb-2">The Wall (Portero)</h4>
                         <div class="flex items-center gap-3 bg-white/5 p-2 rounded">
@@ -589,7 +684,8 @@
                                 class="w-10 h-10 rounded-full border border-gray-600">
                             <div>
                                 <p class="text-sm font-bold text-white leading-none">
-                                    {{ $squadStats['op']['goalkeeper']->nombre }}</p>
+                                    {{ $squadStats['op']['goalkeeper']->nombre }}
+                                </p>
                                 <p class="text-xs text-gray-500">{{ $squadStats['op']['goalkeeper']->paradas }} Paradas</p>
                             </div>
                         </div>
@@ -598,71 +694,85 @@
 
                 {{-- DUEL OF THE DAY --}}
                 @if(isset($keyMatchup))
-                <div class="bg-card-bg/80 border border-white/10 rounded-xl p-4 relative overflow-hidden">
-                    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary to-red-500"></div>
-                    <h3 class="text-sm font-bold text-gray-400 mb-6 uppercase tracking-wider text-center">
-                        <i class="fa-solid fa-fire text-orange-500 mr-2"></i>Duel of the Day
-                    </h3>
-                    
-                    <div class="flex items-center justify-between relative">
-                        {{-- My Player --}}
-                        <div class="flex flex-col items-center w-1/3 relative z-10">
-                            <div class="w-16 h-16 rounded-full p-1 bg-gradient-to-br from-primary to-emerald-600 shadow-lg shadow-primary/30 mb-2">
-                                <img src="{{ $keyMatchup['my']->foto_url ?? 'https://placehold.co/64x64' }}" class="w-full h-full rounded-full object-cover border-2 border-gray-900">
-                            </div>
-                            <span class="text-white font-bold text-sm text-center leading-tight">{{ $keyMatchup['my']->nombre }}</span>
-                            <span class="text-[10px] text-primary font-bold uppercase">{{ $myTeam->nombre }}</span>
-                        </div>
+                    <div class="bg-card-bg/80 border border-white/10 rounded-xl p-4 relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary to-red-500"></div>
+                        <h3 class="text-sm font-bold text-gray-400 mb-6 uppercase tracking-wider text-center">
+                            <i class="fa-solid fa-fire text-orange-500 mr-2"></i>Duel of the Day
+                        </h3>
 
-                        {{-- VS Badge --}}
-                        <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-0 opacity-20 text-6xl font-black text-white italic">VS</div>
+                        <div class="flex items-center justify-between relative">
+                            {{-- My Player --}}
+                            <div class="flex flex-col items-center w-1/3 relative z-10">
+                                <div
+                                    class="w-16 h-16 rounded-full p-1 bg-gradient-to-br from-primary to-emerald-600 shadow-lg shadow-primary/30 mb-2">
+                                    <img src="{{ $keyMatchup['my']->foto_url ?? 'https://placehold.co/64x64' }}"
+                                        class="w-full h-full rounded-full object-cover border-2 border-gray-900">
+                                </div>
+                                <span
+                                    class="text-white font-bold text-sm text-center leading-tight">{{ $keyMatchup['my']->nombre }}</span>
+                                <span class="text-[10px] text-primary font-bold uppercase">{{ $myTeam->nombre }}</span>
+                            </div>
 
-                        {{-- Stats Table --}}
-                        <div class="w-1/3 z-10">
-                            <div class="space-y-2">
-                                {{-- Goals --}}
-                                <div class="flex items-center justify-between text-xs">
-                                    <span class="font-bold {{ $keyMatchup['comparison']['goals']['my'] >= $keyMatchup['comparison']['goals']['op'] ? 'text-primary' : 'text-gray-500' }}">
-                                        {{ $keyMatchup['comparison']['goals']['my'] }}
-                                    </span>
-                                    <span class="text-gray-400 uppercase text-[10px]">Goles</span>
-                                    <span class="font-bold {{ $keyMatchup['comparison']['goals']['op'] >= $keyMatchup['comparison']['goals']['my'] ? 'text-red-500' : 'text-gray-500' }}">
-                                        {{ $keyMatchup['comparison']['goals']['op'] }}
-                                    </span>
-                                </div>
-                                {{-- Assists --}}
-                                <div class="flex items-center justify-between text-xs">
-                                    <span class="font-bold {{ $keyMatchup['comparison']['assists']['my'] >= $keyMatchup['comparison']['assists']['op'] ? 'text-primary' : 'text-gray-500' }}">
-                                        {{ $keyMatchup['comparison']['assists']['my'] }}
-                                    </span>
-                                    <span class="text-gray-400 uppercase text-[10px]">Asist</span>
-                                    <span class="font-bold {{ $keyMatchup['comparison']['assists']['op'] >= $keyMatchup['comparison']['assists']['my'] ? 'text-red-500' : 'text-gray-500' }}">
-                                        {{ $keyMatchup['comparison']['assists']['op'] }}
-                                    </span>
-                                </div>
-                                {{-- G/Match --}}
-                                <div class="flex items-center justify-between text-xs">
-                                    <span class="font-bold {{ $keyMatchup['comparison']['gpg']['my'] >= $keyMatchup['comparison']['gpg']['op'] ? 'text-primary' : 'text-gray-500' }}">
-                                        {{ $keyMatchup['comparison']['gpg']['my'] }}
-                                    </span>
-                                    <span class="text-gray-400 uppercase text-[10px]">G/P</span>
-                                    <span class="font-bold {{ $keyMatchup['comparison']['gpg']['op'] >= $keyMatchup['comparison']['gpg']['my'] ? 'text-red-500' : 'text-gray-500' }}">
-                                        {{ $keyMatchup['comparison']['gpg']['op'] }}
-                                    </span>
+                            {{-- VS Badge --}}
+                            <div
+                                class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-0 opacity-20 text-6xl font-black text-white italic">
+                                VS</div>
+
+                            {{-- Stats Table --}}
+                            <div class="w-1/3 z-10">
+                                <div class="space-y-2">
+                                    {{-- Goals --}}
+                                    <div class="flex items-center justify-between text-xs">
+                                        <span
+                                            class="font-bold {{ $keyMatchup['comparison']['goals']['my'] >= $keyMatchup['comparison']['goals']['op'] ? 'text-primary' : 'text-gray-500' }}">
+                                            {{ $keyMatchup['comparison']['goals']['my'] }}
+                                        </span>
+                                        <span class="text-gray-400 uppercase text-[10px]">Goles</span>
+                                        <span
+                                            class="font-bold {{ $keyMatchup['comparison']['goals']['op'] >= $keyMatchup['comparison']['goals']['my'] ? 'text-red-500' : 'text-gray-500' }}">
+                                            {{ $keyMatchup['comparison']['goals']['op'] }}
+                                        </span>
+                                    </div>
+                                    {{-- Assists --}}
+                                    <div class="flex items-center justify-between text-xs">
+                                        <span
+                                            class="font-bold {{ $keyMatchup['comparison']['assists']['my'] >= $keyMatchup['comparison']['assists']['op'] ? 'text-primary' : 'text-gray-500' }}">
+                                            {{ $keyMatchup['comparison']['assists']['my'] }}
+                                        </span>
+                                        <span class="text-gray-400 uppercase text-[10px]">Asist</span>
+                                        <span
+                                            class="font-bold {{ $keyMatchup['comparison']['assists']['op'] >= $keyMatchup['comparison']['assists']['my'] ? 'text-red-500' : 'text-gray-500' }}">
+                                            {{ $keyMatchup['comparison']['assists']['op'] }}
+                                        </span>
+                                    </div>
+                                    {{-- G/Match --}}
+                                    <div class="flex items-center justify-between text-xs">
+                                        <span
+                                            class="font-bold {{ $keyMatchup['comparison']['gpg']['my'] >= $keyMatchup['comparison']['gpg']['op'] ? 'text-primary' : 'text-gray-500' }}">
+                                            {{ $keyMatchup['comparison']['gpg']['my'] }}
+                                        </span>
+                                        <span class="text-gray-400 uppercase text-[10px]">G/P</span>
+                                        <span
+                                            class="font-bold {{ $keyMatchup['comparison']['gpg']['op'] >= $keyMatchup['comparison']['gpg']['my'] ? 'text-red-500' : 'text-gray-500' }}">
+                                            {{ $keyMatchup['comparison']['gpg']['op'] }}
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
-                        {{-- Opponent Player --}}
-                        <div class="flex flex-col items-center w-1/3 relative z-10">
-                            <div class="w-16 h-16 rounded-full p-1 bg-gradient-to-br from-red-500 to-orange-600 shadow-lg shadow-red-500/30 mb-2">
-                                <img src="{{ $keyMatchup['op']->foto_url ?? 'https://placehold.co/64x64' }}" class="w-full h-full rounded-full object-cover border-2 border-gray-900">
+                            {{-- Opponent Player --}}
+                            <div class="flex flex-col items-center w-1/3 relative z-10">
+                                <div
+                                    class="w-16 h-16 rounded-full p-1 bg-gradient-to-br from-red-500 to-orange-600 shadow-lg shadow-red-500/30 mb-2">
+                                    <img src="{{ $keyMatchup['op']->foto_url ?? 'https://placehold.co/64x64' }}"
+                                        class="w-full h-full rounded-full object-cover border-2 border-gray-900">
+                                </div>
+                                <span
+                                    class="text-white font-bold text-sm text-center leading-tight">{{ $keyMatchup['op']->nombre }}</span>
+                                <span class="text-[10px] text-red-400 font-bold uppercase">{{ $opponent->nombre }}</span>
                             </div>
-                            <span class="text-white font-bold text-sm text-center leading-tight">{{ $keyMatchup['op']->nombre }}</span>
-                            <span class="text-[10px] text-red-400 font-bold uppercase">{{ $opponent->nombre }}</span>
                         </div>
                     </div>
-                </div>
                 @endif
 
             </div>
