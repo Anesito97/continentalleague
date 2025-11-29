@@ -345,117 +345,105 @@
                     </div>
                 </div>
 
-                {{-- VISUAL PITCH (DINÁMICO) --}}
-                <div class="bg-card-bg/80 border border-white/10 rounded-xl p-4">
-                    <h3 class="text-lg font-bold text-white mb-2 flex items-center gap-2">
-                        <i class="fa-solid fa-people-group text-green-400"></i>
-                        Pizarra Táctica ({{ $formation }})
+                {{-- VISUAL PITCH CAROUSEL (VARIANTES) --}}
+            <div class="bg-card-bg/80 border border-white/10 rounded-xl p-4 relative" x-data="{ activeSlide: 0, variants: {{ count($variants) }} }">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-chess-board text-green-400"></i>
+                        Pizarra Táctica
                     </h3>
-
-                    {{-- RAZONAMIENTO DE LA FORMACIÓN --}}
-                    <div class="bg-blue-500/10 border border-blue-500/20 p-3 rounded mb-4">
-                        <p class="text-xs text-blue-300 italic">
-                            <i class="fa-solid fa-circle-info mr-1"></i>
-                            {{ $formationReasoning }}
-                        </p>
-                    </div>
-
-                    <div
-                        class="relative w-full aspect-[2/3] bg-green-800 rounded-lg border-4 border-white shadow-2xl overflow-hidden select-none mx-auto max-w-[300px]">
-                        {{-- Pitch Lines --}}
-                        <div class="absolute inset-0 opacity-20"
-                            style="background-image: repeating-linear-gradient(0deg, transparent, transparent 20px, #000 20px, #000 40px);">
-                        </div>
-                        <div class="absolute inset-4 border-2 border-white/50"></div>
-                        <div class="absolute top-1/2 left-4 right-4 h-0.5 bg-white/50 -translate-y-1/2"></div>
-                        <div
-                            class="absolute top-1/2 left-1/2 w-24 h-24 border-2 border-white/50 rounded-full -translate-x-1/2 -translate-y-1/2">
-                        </div>
-                        <div
-                            class="absolute top-4 left-1/2 w-48 h-24 border-2 border-t-0 border-white/50 -translate-x-1/2 bg-white/5">
-                        </div>
-                        <div
-                            class="absolute bottom-4 left-1/2 w-48 h-24 border-2 border-b-0 border-white/50 -translate-x-1/2 bg-white/5">
-                        </div>
-
-                        {{-- Players Positioning Logic --}}
-                        @php
-                            $formations = [
-                                '4-4-2' => [
-                                    ['top' => '88%', 'left' => '50%'], // GK
-                                    ['top' => '68%', 'left' => '15%'],
-                                    ['top' => '72%', 'left' => '38%'],
-                                    ['top' => '72%', 'left' => '62%'],
-                                    ['top' => '68%', 'left' => '85%'], // DEF
-                                    ['top' => '45%', 'left' => '15%'],
-                                    ['top' => '50%', 'left' => '38%'],
-                                    ['top' => '50%', 'left' => '62%'],
-                                    ['top' => '45%', 'left' => '85%'], // MID
-                                    ['top' => '18%', 'left' => '35%'],
-                                    ['top' => '18%', 'left' => '65%'] // FWD
-                                ],
-                                '4-3-3' => [
-                                    ['top' => '88%', 'left' => '50%'], // GK
-                                    ['top' => '68%', 'left' => '15%'],
-                                    ['top' => '72%', 'left' => '38%'],
-                                    ['top' => '72%', 'left' => '62%'],
-                                    ['top' => '68%', 'left' => '85%'], // DEF
-                                    ['top' => '48%', 'left' => '30%'],
-                                    ['top' => '52%', 'left' => '50%'],
-                                    ['top' => '48%', 'left' => '70%'], // MID
-                                    ['top' => '20%', 'left' => '20%'],
-                                    ['top' => '15%', 'left' => '50%'],
-                                    ['top' => '20%', 'left' => '80%'] // FWD
-                                ],
-                                '5-4-1' => [
-                                    ['top' => '88%', 'left' => '50%'], // GK
-                                    ['top' => '60%', 'left' => '10%'],
-                                    ['top' => '70%', 'left' => '30%'],
-                                    ['top' => '72%', 'left' => '50%'],
-                                    ['top' => '70%', 'left' => '70%'],
-                                    ['top' => '60%', 'left' => '90%'], // DEF
-                                    ['top' => '45%', 'left' => '25%'],
-                                    ['top' => '48%', 'left' => '42%'],
-                                    ['top' => '48%', 'left' => '58%'],
-                                    ['top' => '45%', 'left' => '75%'], // MID
-                                    ['top' => '15%', 'left' => '50%'] // ST
-                                ],
-                                '3-4-3' => [
-                                    ['top' => '88%', 'left' => '50%'], // GK
-                                    ['top' => '70%', 'left' => '25%'],
-                                    ['top' => '72%', 'left' => '50%'],
-                                    ['top' => '70%', 'left' => '75%'], // DEF
-                                    ['top' => '45%', 'left' => '15%'],
-                                    ['top' => '50%', 'left' => '38%'],
-                                    ['top' => '50%', 'left' => '62%'],
-                                    ['top' => '45%', 'left' => '85%'], // MID
-                                    ['top' => '20%', 'left' => '20%'],
-                                    ['top' => '15%', 'left' => '50%'],
-                                    ['top' => '20%', 'left' => '80%'] // FWD
-                                ]
-                            ];
-
-                            $currentPositions = $formations[$formation] ?? $formations['4-4-2'];
-                            $pIndex = 0;
-                        @endphp
-
-                        @foreach($suggestedLineup as $player)
-                            @if($pIndex < count($currentPositions))
-                                @php $pos = $currentPositions[$pIndex];
-                                $pIndex++; @endphp
-                                <div class="absolute transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center"
-                                    style="top: {{ $pos['top'] }}; left: {{ $pos['left'] }};">
-                                    <div class="w-8 h-8 rounded-full border border-white overflow-hidden bg-gray-800 shadow-md">
-                                        <img src="{{ $player->foto_url ?? 'https://placehold.co/40x40' }}"
-                                            class="w-full h-full object-cover">
-                                    </div>
-                                    <span
-                                        class="text-[8px] font-bold text-white bg-black/50 px-1 rounded mt-0.5 whitespace-nowrap">{{ explode(' ', $player->nombre)[0] }}</span>
-                                </div>
-                            @endif
-                        @endforeach
+                    {{-- Carousel Controls --}}
+                    <div class="flex gap-2">
+                        <button @click="activeSlide = activeSlide === 0 ? variants - 1 : activeSlide - 1" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition">
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </button>
+                        <button @click="activeSlide = activeSlide === variants - 1 ? 0 : activeSlide + 1" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </button>
                     </div>
                 </div>
+
+                @foreach($variants as $index => $variant)
+                    <div x-show="activeSlide === {{ $index }}" class="transition-opacity duration-300" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 transform scale-95" x-transition:enter-end="opacity-100 transform scale-100">
+                        
+                        {{-- Header del Variante --}}
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-sm font-bold text-cyan-400 uppercase tracking-widest">{{ $variant['type'] }}</span>
+                            <span class="text-xs font-bold text-white bg-white/10 px-2 py-1 rounded">{{ $variant['formation'] }}</span>
+                        </div>
+
+                        {{-- Razonamiento --}}
+                        <div class="bg-blue-500/10 border border-blue-500/20 p-3 rounded mb-4 min-h-[60px] flex items-center">
+                            <p class="text-xs text-blue-300 italic">
+                                <i class="fa-solid fa-circle-info mr-1"></i>
+                                {{ $variant['reasoning'] }}
+                            </p>
+                        </div>
+
+                        {{-- Pitch --}}
+                        <div class="relative w-full aspect-[2/3] bg-green-800 rounded-lg border-4 border-white shadow-2xl overflow-hidden select-none mx-auto max-w-[300px]">
+                            {{-- Pitch Lines --}}
+                            <div class="absolute inset-0 opacity-20" style="background-image: repeating-linear-gradient(0deg, transparent, transparent 20px, #000 20px, #000 40px);"></div>
+                            <div class="absolute inset-4 border-2 border-white/50"></div>
+                            <div class="absolute top-1/2 left-4 right-4 h-0.5 bg-white/50 -translate-y-1/2"></div>
+                            <div class="absolute top-1/2 left-1/2 w-24 h-24 border-2 border-white/50 rounded-full -translate-x-1/2 -translate-y-1/2"></div>
+                            <div class="absolute top-4 left-1/2 w-48 h-24 border-2 border-t-0 border-white/50 -translate-x-1/2 bg-white/5"></div>
+                            <div class="absolute bottom-4 left-1/2 w-48 h-24 border-2 border-b-0 border-white/50 -translate-x-1/2 bg-white/5"></div>
+
+                            {{-- Players Positioning --}}
+                            @php
+                                $formations = [
+                                    '4-4-2' => [
+                                        ['top' => '88%', 'left' => '50%'], // GK
+                                        ['top' => '68%', 'left' => '15%'], ['top' => '72%', 'left' => '38%'], ['top' => '72%', 'left' => '62%'], ['top' => '68%', 'left' => '85%'], // DEF
+                                        ['top' => '45%', 'left' => '15%'], ['top' => '50%', 'left' => '38%'], ['top' => '50%', 'left' => '62%'], ['top' => '45%', 'left' => '85%'], // MID
+                                        ['top' => '18%', 'left' => '35%'], ['top' => '18%', 'left' => '65%'] // FWD
+                                    ],
+                                    '4-3-3' => [
+                                        ['top' => '88%', 'left' => '50%'], // GK
+                                        ['top' => '68%', 'left' => '15%'], ['top' => '72%', 'left' => '38%'], ['top' => '72%', 'left' => '62%'], ['top' => '68%', 'left' => '85%'], // DEF
+                                        ['top' => '48%', 'left' => '30%'], ['top' => '52%', 'left' => '50%'], ['top' => '48%', 'left' => '70%'], // MID
+                                        ['top' => '20%', 'left' => '20%'], ['top' => '15%', 'left' => '50%'], ['top' => '20%', 'left' => '80%'] // FWD
+                                    ],
+                                    '5-4-1' => [
+                                        ['top' => '88%', 'left' => '50%'], // GK
+                                        ['top' => '60%', 'left' => '10%'], ['top' => '70%', 'left' => '30%'], ['top' => '72%', 'left' => '50%'], ['top' => '70%', 'left' => '70%'], ['top' => '60%', 'left' => '90%'], // DEF
+                                        ['top' => '45%', 'left' => '25%'], ['top' => '48%', 'left' => '42%'], ['top' => '48%', 'left' => '58%'], ['top' => '45%', 'left' => '75%'], // MID
+                                        ['top' => '15%', 'left' => '50%'] // ST
+                                    ],
+                                    '3-4-3' => [
+                                        ['top' => '88%', 'left' => '50%'], // GK
+                                        ['top' => '70%', 'left' => '25%'], ['top' => '72%', 'left' => '50%'], ['top' => '70%', 'left' => '75%'], // DEF
+                                        ['top' => '45%', 'left' => '15%'], ['top' => '50%', 'left' => '38%'], ['top' => '50%', 'left' => '62%'], ['top' => '45%', 'left' => '85%'], // MID
+                                        ['top' => '20%', 'left' => '20%'], ['top' => '15%', 'left' => '50%'], ['top' => '20%', 'left' => '80%'] // FWD
+                                    ],
+                                    '5-3-2' => [
+                                        ['top' => '88%', 'left' => '50%'], // GK
+                                        ['top' => '60%', 'left' => '10%'], ['top' => '70%', 'left' => '30%'], ['top' => '72%', 'left' => '50%'], ['top' => '70%', 'left' => '70%'], ['top' => '60%', 'left' => '90%'], // DEF
+                                        ['top' => '48%', 'left' => '30%'], ['top' => '52%', 'left' => '50%'], ['top' => '48%', 'left' => '70%'], // MID
+                                        ['top' => '18%', 'left' => '35%'], ['top' => '18%', 'left' => '65%'] // FWD
+                                    ]
+                                ];
+                                
+                                $currentPositions = $formations[$variant['formation']] ?? $formations['4-4-2'];
+                                $pIndex = 0;
+                            @endphp
+
+                            @foreach($variant['lineup'] as $player)
+                                @if($pIndex < count($currentPositions))
+                                    @php $pos = $currentPositions[$pIndex]; $pIndex++; @endphp
+                                    <div class="absolute transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center" style="top: {{ $pos['top'] }}; left: {{ $pos['left'] }};">
+                                        <div class="w-8 h-8 rounded-full border border-white overflow-hidden bg-gray-800 shadow-md">
+                                            <img src="{{ $player->foto_url ?? 'https://placehold.co/40x40' }}" class="w-full h-full object-cover">
+                                        </div>
+                                        <span class="text-[8px] font-bold text-white bg-black/50 px-1 rounded mt-0.5 whitespace-nowrap">{{ explode(' ', $player->nombre)[0] }}</span>
+                                    </div>
+                                @endif
+                            @endforeach
+                        </div>
+                    </div>
+                @endforeach
+            </div>
 
                 {{-- SUBSTITUCIONES (NUEVO) --}}
                 @if(count($substitutions) > 0)

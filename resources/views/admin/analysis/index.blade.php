@@ -60,13 +60,71 @@
                         </div>
                     </div>
 
-                    <button type="submit"
-                        class="w-full bg-gradient-to-r from-primary to-emerald-600 hover:from-primary/90 hover:to-emerald-600/90 text-white font-bold py-4 rounded-lg shadow-lg hover:shadow-primary/50 transition transform hover:scale-[1.02] flex items-center justify-center gap-2 mt-4">
-                        <span class="material-symbols-outlined">analytics</span>
-                        Generar Informe Táctico
-                    </button>
+                    {{-- SELECCIÓN DE JUGADORES (NUEVO) --}}
+                    <div id="players-section" class="hidden mt-8">
+                        <h3 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                            <i class="fa-solid fa-users-gear text-primary"></i>
+                            Disponibilidad de Plantilla
+                        </h3>
+                        <div class="bg-card-bg/50 border border-white/10 rounded-xl p-4">
+                            <p class="text-sm text-gray-400 mb-4">Desmarca los jugadores que no estarán disponibles para
+                                este partido.</p>
+                            <div id="players-grid"
+                                class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 max-h-60 overflow-y-auto custom-scrollbar">
+                                {{-- Players will be injected here via JS --}}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-8 flex justify-end">
+                        <button type="submit"
+                            class="bg-gradient-to-r from-primary to-emerald-600 text-white font-bold py-3 px-8 rounded-xl shadow-lg hover:shadow-primary/50 transition-all transform hover:scale-105 flex items-center gap-2">
+                            <i class="fa-solid fa-microchip"></i>
+                            Ejecutar Análisis Profundo
+                        </button>
+                    </div>
                 </form>
             </div>
         </div>
     </div>
+
+    <script>
+        document.getElementById('my_team_id').addEventListener('change', function () {
+            const teamId = this.value;
+            const playersSection = document.getElementById('players-section');
+            const playersGrid = document.getElementById('players-grid');
+
+            if (teamId) {
+                // Fetch players (Assuming we have an API endpoint or using a raw route)
+                // For now, we'll use a simple fetch to a new route we need to create or reuse an existing one.
+                // Let's assume we create a simple route /api/teams/{id}/players
+
+                fetch(`/api/teams/${teamId}/players`)
+                    .then(response => response.json())
+                    .then(data => {
+                        playersGrid.innerHTML = '';
+                        data.forEach(player => {
+                            const div = document.createElement('div');
+                            div.className = 'flex items-center gap-2 bg-white/5 p-2 rounded hover:bg-white/10 transition cursor-pointer';
+                            div.innerHTML = `
+                                <input type="checkbox" name="available_players[]" value="${player.id}" checked class="form-checkbox h-4 w-4 text-primary rounded border-gray-600 bg-gray-700 focus:ring-primary">
+                                <span class="text-sm text-gray-300 truncate">${player.nombre}</span>
+                            `;
+                            // Toggle checkbox on div click
+                            div.addEventListener('click', (e) => {
+                                if (e.target.type !== 'checkbox') {
+                                    const checkbox = div.querySelector('input');
+                                    checkbox.checked = !checkbox.checked;
+                                }
+                            });
+                            playersGrid.appendChild(div);
+                        });
+                        playersSection.classList.remove('hidden');
+                    })
+                    .catch(error => console.error('Error fetching players:', error));
+            } else {
+                playersSection.classList.add('hidden');
+            }
+        });
+    </script>
 @endsection

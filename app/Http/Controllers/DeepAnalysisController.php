@@ -95,23 +95,15 @@ class DeepAnalysisController extends Controller
             'op' => $this->getRecentMatches($opponent)
         ];
 
-        // 7. Alineación Sugerida (Dinámica)
-        $formationInfo = $this->determineFormation($myTeam, $opponent, $metrics);
-        $formation = $formationInfo['formation'];
-        $formationReasoning = $formationInfo['reasoning'];
-        $formationConfig = $formationInfo['config'];
+        // 7. Alineación Sugerida (Variantes)
+        $availablePlayers = $request->input('available_players'); // Array of IDs or null
+        $variants = $this->getLineupVariants($myTeam, $opponent, $metrics, $availablePlayers);
 
-        $suggestedLineupRaw = $this->idealElevenService->getBestEleven($myTeam->id, $formationConfig, true);
-
-        // Aplanar la estructura para la vista
-        $suggestedLineup = collect([$suggestedLineupRaw['goalkeeper']])
-            ->merge($suggestedLineupRaw['defenders'])
-            ->merge($suggestedLineupRaw['midfielders'])
-            ->merge($suggestedLineupRaw['forwards'])
-            ->filter();
+        // Use the first variant (Balanced/AI Best) for substitutions and marking
+        $mainVariant = $variants[0]['lineup'];
 
         // 8. Substituciones Sugeridas (NUEVO)
-        $substitutions = $this->getSubstitutions($myTeam, $suggestedLineup);
+        $substitutions = $this->getSubstitutions($myTeam, $mainVariant);
 
         // 9. Marcas Personales (NUEVO)
         $manMarking = $this->getManMarking($myTeam, $opponent);
@@ -129,13 +121,52 @@ class DeepAnalysisController extends Controller
             'winProb',
             'squadStats',
             'recentHistory',
-            'suggestedLineup',
-            'formation',
-            'formationReasoning',
+            'variants',
             'substitutions',
             'manMarking',
             'strategy'
         ));
+    }
+
+    private function getLineupVariants($myTeam, $opponent, $metrics, $availablePlayers)
+    {
+        $variants = [];
+
+        // Variant 1: AI Best (Dynamic based on opponent)
+        $aiFormation = $this->determineFormation($myTeam, $opponent, $metrics);
+        $variants[] = [
+            'type' => 'IA Recomendada (Equilibrada)',
+            'formation' => $aiFormation['formation'],
+            'reasoning' => $aiFormation['reasoning'],
+            'lineup' => $this->flattenLineup($this->idealElevenService->getBestEleven($myTeam->id, $aiFormation['config'], true, $availablePlayers))
+        ];
+
+        // Variant 2: Offensive (Aggressive)
+        $variants[] = [
+            'type' => 'Ofensiva Total',
+            'formation' => '3-4-3',
+            'reasoning' => 'Arriesga atrás para saturar el ataque. Ideal si necesitas remontar o el rival se encierra.',
+            'lineup' => $this->flattenLineup($this->idealElevenService->getBestEleven($myTeam->id, ['def' => 3, 'mid' => 4, 'fwd' => 3], true, $availablePlayers))
+        ];
+
+        // Variant 3: Defensive (Bus Parking)
+        $variants[] = [
+            'type' => 'Muralla Defensiva',
+            'formation' => '5-4-1',
+            'reasoning' => 'Prioriza mantener el cero. Bloque bajo y contragolpes con un solo punta.',
+            'lineup' => $this->flattenLineup($this->idealElevenService->getBestEleven($myTeam->id, ['def' => 5, 'mid' => 4, 'fwd' => 1], true, $availablePlayers))
+        ];
+
+        return $variants;
+    }
+
+    private function flattenLineup($lineupRaw)
+    {
+        return collect([$lineupRaw['goalkeeper']])
+            ->merge($lineupRaw['defenders'])
+            ->merge($lineupRaw['midfielders'])
+            ->merge($lineupRaw['forwards'])
+            ->filter();
     }
 
     private function determineFormation($myTeam, $opponent, $metrics)

@@ -16,18 +16,18 @@ class IdealElevenService
         $this->ratingService = $ratingService;
     }
 
-    public function getBestEleven(?int $teamId = null, array $formationConfig = ['def' => 4, 'mid' => 3, 'fwd' => 3], bool $ignoreCards = false): array
+    public function getBestEleven(?int $teamId = null, array $formationConfig = ['def' => 4, 'mid' => 3, 'fwd' => 3], bool $ignoreCards = false, ?array $availablePlayerIds = null): array
     {
         // Use lowercase position names as found in the database
         return [
-            'forwards' => $this->getBestPlayers('delantero', $formationConfig['fwd'], $teamId, $ignoreCards),
-            'midfielders' => $this->getBestPlayers('medio', $formationConfig['mid'], $teamId, $ignoreCards),
-            'defenders' => $this->getBestPlayers('defensa', $formationConfig['def'], $teamId, $ignoreCards),
-            'goalkeeper' => $this->getBestPlayers('portero', 1, $teamId, $ignoreCards)->first(),
+            'forwards' => $this->getBestPlayers('delantero', $formationConfig['fwd'], $teamId, $ignoreCards, $availablePlayerIds),
+            'midfielders' => $this->getBestPlayers('medio', $formationConfig['mid'], $teamId, $ignoreCards, $availablePlayerIds),
+            'defenders' => $this->getBestPlayers('defensa', $formationConfig['def'], $teamId, $ignoreCards, $availablePlayerIds),
+            'goalkeeper' => $this->getBestPlayers('portero', 1, $teamId, $ignoreCards, $availablePlayerIds)->first(),
         ];
     }
 
-    private function getBestPlayers(string $position, int $limit, ?int $teamId = null, bool $ignoreCards = false): Collection
+    private function getBestPlayers(string $position, int $limit, ?int $teamId = null, bool $ignoreCards = false, ?array $availablePlayerIds = null): Collection
     {
         // Get all players of the position, optionally filtered by team
         $query = Jugador::where('posicion_general', $position)
@@ -35,6 +35,10 @@ class IdealElevenService
 
         if ($teamId) {
             $query->where('equipo_id', $teamId);
+        }
+
+        if ($availablePlayerIds !== null) {
+            $query->whereIn('id', $availablePlayerIds);
         }
 
         $players = $query->get();
