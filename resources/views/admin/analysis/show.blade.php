@@ -50,7 +50,7 @@
             {{-- COLUMNA IZQUIERDA: DATOS DUROS --}}
             <div class="lg:col-span-8 space-y-6">
 
-                {{-- TALE OF THE TAPE --}}
+                {{-- TALE OF THE TAPE (VISUAL METRICS) --}}
                 <div class="bg-card-bg/90 backdrop-blur-md border border-white/10 rounded-xl overflow-hidden">
                     <div class="bg-black/20 p-4 border-b border-white/5 flex justify-between items-center">
                         <h3 class="text-lg font-bold text-white flex items-center gap-2">
@@ -58,89 +58,91 @@
                             Comparativa Directa
                         </h3>
                     </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-sm">
-                            <thead class="bg-white/5 text-gray-400 text-xs uppercase">
-                                <tr>
-                                    <th class="py-3 px-4 text-left w-1/3">{{ $myTeam->nombre }}</th>
-                                    <th class="py-3 px-4 text-center w-1/3">Métrica</th>
-                                    <th class="py-3 px-4 text-right w-1/3">{{ $opponent->nombre }}</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-white/5">
-                                {{-- Puntos por Partido --}}
-                                <tr class="hover:bg-white/5 transition">
-                                    <td
-                                        class="py-3 px-4 font-bold {{ $metrics['my']['ppg'] > $metrics['op']['ppg'] ? 'text-green-400' : '' }}">
-                                        {{ $metrics['my']['ppg'] }}</td>
-                                    <td class="py-3 px-4 text-center text-gray-500">Puntos x Partido</td>
-                                    <td
-                                        class="py-3 px-4 text-right font-bold {{ $metrics['op']['ppg'] > $metrics['my']['ppg'] ? 'text-green-400' : '' }}">
-                                        {{ $metrics['op']['ppg'] }}</td>
-                                </tr>
-                                {{-- Goles a Favor --}}
-                                <tr class="hover:bg-white/5 transition">
-                                    <td
-                                        class="py-3 px-4 font-bold {{ $metrics['my']['gf_pg'] > $metrics['op']['gf_pg'] ? 'text-green-400' : '' }}">
-                                        {{ $metrics['my']['gf_pg'] }}</td>
-                                    <td class="py-3 px-4 text-center text-gray-500">Goles Marcados (Prom)</td>
-                                    <td
-                                        class="py-3 px-4 text-right font-bold {{ $metrics['op']['gf_pg'] > $metrics['my']['gf_pg'] ? 'text-green-400' : '' }}">
-                                        {{ $metrics['op']['gf_pg'] }}</td>
-                                </tr>
-                                {{-- Goles en Contra --}}
-                                <tr class="hover:bg-white/5 transition">
-                                    <td
-                                        class="py-3 px-4 font-bold {{ $metrics['my']['ga_pg'] < $metrics['op']['ga_pg'] ? 'text-green-400' : 'text-red-400' }}">
-                                        {{ $metrics['my']['ga_pg'] }}</td>
-                                    <td class="py-3 px-4 text-center text-gray-500">Goles Recibidos (Prom)</td>
-                                    <td
-                                        class="py-3 px-4 text-right font-bold {{ $metrics['op']['ga_pg'] < $metrics['my']['ga_pg'] ? 'text-green-400' : 'text-red-400' }}">
-                                        {{ $metrics['op']['ga_pg'] }}</td>
-                                </tr>
-                                {{-- Porterías a Cero --}}
-                                <tr class="hover:bg-white/5 transition">
-                                    <td class="py-3 px-4 font-bold">{{ $metrics['my']['clean_sheets'] }}
-                                        ({{ $metrics['my']['clean_sheets_pct'] }})</td>
-                                    <td class="py-3 px-4 text-center text-gray-500">Porterías a Cero</td>
-                                    <td class="py-3 px-4 text-right font-bold">{{ $metrics['op']['clean_sheets'] }}
-                                        ({{ $metrics['op']['clean_sheets_pct'] }})</td>
-                                </tr>
-                                {{-- Partidos sin Marcar --}}
-                                <tr class="hover:bg-white/5 transition">
-                                    <td
-                                        class="py-3 px-4 font-bold {{ $metrics['my']['failed_to_score'] < $metrics['op']['failed_to_score'] ? 'text-green-400' : 'text-red-400' }}">
-                                        {{ $metrics['my']['failed_to_score'] }}
-                                        ({{ $metrics['my']['failed_to_score_pct'] }})</td>
-                                    <td class="py-3 px-4 text-center text-gray-500">Partidos sin Marcar</td>
-                                    <td
-                                        class="py-3 px-4 text-right font-bold {{ $metrics['op']['failed_to_score'] < $metrics['my']['failed_to_score'] ? 'text-green-400' : 'text-red-400' }}">
-                                        {{ $metrics['op']['failed_to_score'] }}
-                                        ({{ $metrics['op']['failed_to_score_pct'] }})</td>
-                                </tr>
-                                {{-- BTTS --}}
-                                <tr class="hover:bg-white/5 transition">
-                                    <td class="py-3 px-4 font-bold">{{ $metrics['my']['btts_pct'] }}</td>
-                                    <td class="py-3 px-4 text-center text-gray-500">Ambos Marcan %</td>
-                                    <td class="py-3 px-4 text-right font-bold">{{ $metrics['op']['btts_pct'] }}</td>
-                                </tr>
-                                {{-- Over 2.5 --}}
-                                <tr class="hover:bg-white/5 transition">
-                                    <td class="py-3 px-4 font-bold">{{ $metrics['my']['over25_pct'] }}</td>
-                                    <td class="py-3 px-4 text-center text-gray-500">+2.5 Goles %</td>
-                                    <td class="py-3 px-4 text-right font-bold">{{ $metrics['op']['over25_pct'] }}</td>
-                                </tr>
-                                {{-- Tarjetas --}}
-                                <tr class="hover:bg-white/5 transition">
-                                    <td class="py-3 px-4 font-bold text-yellow-400">{{ $metrics['my']['yellows'] }} <span
-                                            class="text-red-500 ml-1">{{ $metrics['my']['reds'] }}</span></td>
-                                    <td class="py-3 px-4 text-center text-gray-500">Tarjetas (A/R)</td>
-                                    <td class="py-3 px-4 text-right font-bold text-yellow-400">
-                                        {{ $metrics['op']['yellows'] }} <span
-                                            class="text-red-500 ml-1">{{ $metrics['op']['reds'] }}</span></td>
-                                </tr>
-                            </tbody>
-                        </table>
+                    
+                    <div class="p-6 space-y-8">
+                        @php
+                            $groups = [
+                                'GENERAL' => [
+                                    ['label' => 'Puntos x Partido', 'key' => 'ppg', 'format' => 'number'],
+                                ],
+                                'ATAQUE' => [
+                                    ['label' => 'Goles a Favor (Prom)', 'key' => 'gf_pg', 'format' => 'number'],
+                                    ['label' => 'Partidos sin Marcar', 'key' => 'failed_to_score_pct', 'format' => 'percent', 'inverse' => true], // Inverse: Lower is better
+                                    ['label' => '+2.5 Goles', 'key' => 'over25_pct', 'format' => 'percent'],
+                                ],
+                                'DEFENSA' => [
+                                    ['label' => 'Goles en Contra (Prom)', 'key' => 'ga_pg', 'format' => 'number', 'inverse' => true],
+                                    ['label' => 'Porterías a Cero', 'key' => 'clean_sheets_pct', 'format' => 'percent'],
+                                    ['label' => 'Ambos Marcan', 'key' => 'btts_pct', 'format' => 'percent'],
+                                ],
+                                'DISCIPLINA' => [
+                                    ['label' => 'Tarjetas Amarillas', 'key' => 'yellows', 'format' => 'number', 'inverse' => true],
+                                    ['label' => 'Tarjetas Rojas', 'key' => 'reds', 'format' => 'number', 'inverse' => true],
+                                ]
+                            ];
+                        @endphp
+
+                        @foreach($groups as $groupName => $items)
+                            <div>
+                                <h4 class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4 border-b border-white/5 pb-1">{{ $groupName }}</h4>
+                                <div class="space-y-4">
+                                    @foreach($items as $item)
+                                        @php
+                                            $myValRaw = $metrics['my'][$item['key']];
+                                            $opValRaw = $metrics['op'][$item['key']];
+                                            
+                                            // Clean values for calculation
+                                            $myVal = (float) str_replace('%', '', $myValRaw);
+                                            $opVal = (float) str_replace('%', '', $opValRaw);
+                                            
+                                            $max = max($myVal, $opVal);
+                                            $max = $max == 0 ? 1 : $max; // Avoid division by zero
+                                            
+                                            $myWidth = ($myVal / $max) * 100;
+                                            $opWidth = ($opVal / $max) * 100;
+
+                                            // Determine winner color
+                                            $inverse = $item['inverse'] ?? false;
+                                            $myColor = 'bg-gray-600';
+                                            $opColor = 'bg-gray-600';
+                                            $myText = 'text-gray-400';
+                                            $opText = 'text-gray-400';
+
+                                            if ($myVal != $opVal) {
+                                                if (($myVal > $opVal && !$inverse) || ($myVal < $opVal && $inverse)) {
+                                                    $myColor = 'bg-primary';
+                                                    $myText = 'text-primary font-bold';
+                                                } else {
+                                                    $opColor = 'bg-red-500';
+                                                    $opText = 'text-red-500 font-bold';
+                                                }
+                                            }
+                                        @endphp
+
+                                        <div class="relative grid grid-cols-7 items-center gap-2 group">
+                                            {{-- My Value --}}
+                                            <div class="col-span-1 text-right text-sm {{ $myText }}">{{ $myValRaw }}</div>
+                                            
+                                            {{-- My Bar (Right aligned) --}}
+                                            <div class="col-span-2 flex justify-end">
+                                                <div class="h-2 rounded-l-full {{ $myColor }} transition-all duration-1000" style="width: {{ $myWidth }}%"></div>
+                                            </div>
+
+                                            {{-- Label (Center) --}}
+                                            <div class="col-span-1 text-center text-[10px] text-gray-500 uppercase font-bold leading-tight">{{ $item['label'] }}</div>
+
+                                            {{-- Op Bar (Left aligned) --}}
+                                            <div class="col-span-2 flex justify-start">
+                                                <div class="h-2 rounded-r-full {{ $opColor }} transition-all duration-1000" style="width: {{ $opWidth }}%"></div>
+                                            </div>
+
+                                            {{-- Op Value --}}
+                                            <div class="col-span-1 text-left text-sm {{ $opText }}">{{ $opValRaw }}</div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endforeach
                     </div>
                 </div>
 
