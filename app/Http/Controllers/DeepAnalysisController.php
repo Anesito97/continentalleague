@@ -325,8 +325,8 @@ class DeepAnalysisController extends Controller
         $awayGA = $awayMatches->sum('goles_local');
 
         // Discipline
-        $yellows = EventoPartido::where('equipo_id', $team->id)->where('tipo_evento', 'tarjeta_amarilla')->count();
-        $reds = EventoPartido::where('equipo_id', $team->id)->where('tipo_evento', 'tarjeta_roja')->count();
+        $yellows = EventoPartido::where('equipo_id', $team->id)->where('tipo_evento', 'amarilla')->count();
+        $reds = EventoPartido::where('equipo_id', $team->id)->where('tipo_evento', 'roja')->count();
 
         // Records
         $biggestWin = 'N/A';
