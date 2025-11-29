@@ -16,19 +16,18 @@ class IdealElevenService
         $this->ratingService = $ratingService;
     }
 
-    public function getBestEleven(?int $teamId = null): array
+    public function getBestEleven(?int $teamId = null, array $formationConfig = ['def' => 4, 'mid' => 3, 'fwd' => 3], bool $ignoreCards = false): array
     {
-        // 4-3-3 Formation
         // Use lowercase position names as found in the database
         return [
-            'forwards' => $this->getBestPlayers('delantero', 3, $teamId),
-            'midfielders' => $this->getBestPlayers('medio', 3, $teamId),
-            'defenders' => $this->getBestPlayers('defensa', 4, $teamId),
-            'goalkeeper' => $this->getBestPlayers('portero', 1, $teamId)->first(),
+            'forwards' => $this->getBestPlayers('delantero', $formationConfig['fwd'], $teamId, $ignoreCards),
+            'midfielders' => $this->getBestPlayers('medio', $formationConfig['mid'], $teamId, $ignoreCards),
+            'defenders' => $this->getBestPlayers('defensa', $formationConfig['def'], $teamId, $ignoreCards),
+            'goalkeeper' => $this->getBestPlayers('portero', 1, $teamId, $ignoreCards)->first(),
         ];
     }
 
-    private function getBestPlayers(string $position, int $limit, ?int $teamId = null): Collection
+    private function getBestPlayers(string $position, int $limit, ?int $teamId = null, bool $ignoreCards = false): Collection
     {
         // Get all players of the position, optionally filtered by team
         $query = Jugador::where('posicion_general', $position)
@@ -41,8 +40,8 @@ class IdealElevenService
         $players = $query->get();
 
         // Calculate score for each player
-        $players->each(function ($player) {
-            $player->rating = $this->calculateRating($player);
+        $players->each(function ($player) use ($ignoreCards) {
+            $player->rating = $this->calculateRating($player, $ignoreCards);
         });
 
         // Sort by rating desc, then by goals desc, then by name asc for stability
@@ -57,7 +56,7 @@ class IdealElevenService
         })->take($limit);
     }
 
-    private function calculateRating(Jugador $player): float
+    private function calculateRating(Jugador $player, bool $ignoreCards = false): float
     {
         $stats = [
             'goals' => $player->goles ?? 0,
@@ -76,7 +75,7 @@ class IdealElevenService
             $stats['matches_lost'] = $this->calculateMatchesLost($player->equipo_id);
         }
 
-        return $this->ratingService->calculate($player->posicion_general, $stats);
+        return $this->ratingService->calculate($player->posicion_general, $stats, $ignoreCards);
     }
 
     private function calculateGoalsConceded(?int $teamId): int

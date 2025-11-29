@@ -36,7 +36,7 @@ class PlayerRatingService
         'own_goal' => -10,
     ];
 
-    public function calculate(string $position, array $stats): float
+    public function calculate(string $position, array $stats, bool $ignoreCards = false): float
     {
         $position = strtolower($position);
         $weights = self::WEIGHTS[$position] ?? self::WEIGHTS['delantero']; // Default to forward if unknown
@@ -54,8 +54,10 @@ class PlayerRatingService
         $score += ($stats['matches_lost'] ?? 0) * ($weights['match_lost'] ?? 0);
 
         // General Penalties
-        $score += ($stats['yellow_cards'] ?? 0) * self::PENALTIES['yellow_card'];
-        $score += ($stats['red_cards'] ?? 0) * self::PENALTIES['red_card'];
+        if (!$ignoreCards) {
+            $score += ($stats['yellow_cards'] ?? 0) * self::PENALTIES['yellow_card'];
+            $score += ($stats['red_cards'] ?? 0) * self::PENALTIES['red_card'];
+        }
         $score += ($stats['own_goals'] ?? 0) * self::PENALTIES['own_goal'];
 
         return $score;

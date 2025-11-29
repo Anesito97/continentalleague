@@ -95,19 +95,28 @@ class DeepAnalysisController extends Controller
             'op' => $this->getRecentMatches($opponent)
         ];
 
-        // 7. Alineación Sugerida (Flattened)
-        $bestEleven = $this->idealElevenService->getBestEleven($myTeam->id);
-        $suggestedLineup = collect();
-        if ($bestEleven['goalkeeper'])
-            $suggestedLineup->push($bestEleven['goalkeeper']);
-        foreach (['defenders', 'midfielders', 'forwards'] as $group) {
-            if (isset($bestEleven[$group])) {
-                foreach ($bestEleven[$group] as $p)
-                    $suggestedLineup->push($p);
-            }
-        }
+        // 7. Alineación Sugerida (Dinámica)
+        $formationInfo = $this->determineFormation($myTeam, $opponent, $metrics);
+        $formation = $formationInfo['formation'];
+        $formationReasoning = $formationInfo['reasoning'];
+        $formationConfig = $formationInfo['config'];
 
-        // 8. Generación de Estrategia "AI" (Expanded)
+        $suggestedLineupRaw = $this->idealElevenService->getBestEleven($myTeam->id, $formationConfig, true);
+
+        // Aplanar la estructura para la vista
+        $suggestedLineup = collect([$suggestedLineupRaw['goalkeeper']])
+            ->merge($suggestedLineupRaw['defenders'])
+            ->merge($suggestedLineupRaw['midfielders'])
+            ->merge($suggestedLineupRaw['forwards'])
+            ->filter();
+
+        // 8. Substituciones Sugeridas (NUEVO)
+        $substitutions = $this->getSubstitutions($myTeam, $suggestedLineup);
+
+        // 9. Marcas Personales (NUEVO)
+        $manMarking = $this->getManMarking($myTeam, $opponent);
+
+        // 10. Generación de Estrategia "AI" (Expanded)
         $strategy = $this->generateStrategy($myTeam, $opponent, $h2hStats, $metrics, $goalTiming);
 
         return view('admin.analysis.show', compact(
@@ -121,8 +130,94 @@ class DeepAnalysisController extends Controller
             'squadStats',
             'recentHistory',
             'suggestedLineup',
+            'formation',
+            'formationReasoning',
+            'substitutions',
+            'manMarking',
             'strategy'
         ));
+    }
+
+    private function determineFormation($myTeam, $opponent, $metrics)
+    {
+        // Simple heuristic for formation selection
+        $opStrength = $metrics['op']['ppg'];
+        $myStrength = $metrics['my']['ppg'];
+        $opGoals = $metrics['op']['gf_pg'];
+
+        // Default: Balanced
+        $formation = '4-4-2';
+        $config = ['def' => 4, 'mid' => 4, 'fwd' => 2];
+        $reasoning = "El rival presenta un nivel similar. Un 4-4-2 clásico ofrece equilibrio para controlar el medio campo sin renunciar al ataque.";
+
+        // Scenario 1: Opponent is much stronger (Defensive)
+        if ($opStrength > $myStrength + 0.5 || $opGoals > 2.0) {
+            $formation = '5-4-1';
+            $config = ['def' => 5, 'mid' => 4, 'fwd' => 1];
+            $reasoning = "El rival es muy ofensivo (promedia {$opGoals} goles). Recomendamos un 5-4-1 para saturar la defensa y buscar contragolpes rápidos.";
+        }
+        // Scenario 2: Opponent is weaker (Offensive)
+        elseif ($opStrength < $myStrength - 0.5) {
+            $formation = '3-4-3';
+            $config = ['def' => 3, 'mid' => 4, 'fwd' => 3];
+            $reasoning = "El rival es accesible. Un 3-4-3 agresivo permitirá dominar la posesión y crear múltiples ocasiones de gol.";
+        }
+        // Scenario 3: Balanced but we want more control (4-3-3)
+        elseif ($metrics['my']['gf_pg'] > 1.5) {
+            $formation = '4-3-3';
+            $config = ['def' => 4, 'mid' => 3, 'fwd' => 3];
+            $reasoning = "Tu equipo tiene buen poder ofensivo. El 4-3-3 potenciará a tus extremos y mantendrá presión alta.";
+        }
+
+        return ['formation' => $formation, 'config' => $config, 'reasoning' => $reasoning];
+    }
+
+    private function getSubstitutions($team, $starters)
+    {
+        // Find players NOT in the starters list
+        $starterIds = $starters->pluck('id')->toArray();
+        $bench = $team->jugadores->whereNotIn('id', $starterIds);
+
+        $subs = [];
+
+        // 1. Offensive Sub (If losing)
+        $bestAttacker = $bench->whereIn('posicion_general', ['DEL', 'MED'])->sortByDesc('goles')->first();
+        if ($bestAttacker) {
+            $subs[] = [
+                'scenario' => 'Si vas perdiendo (Min 60-70)',
+                'in' => $bestAttacker,
+                'out_position' => 'DEF/MED',
+                'reason' => "Aporta frescura y gol ({$bestAttacker->goles} goles)."
+            ];
+        }
+
+        // 2. Defensive Sub (If winning)
+        $bestDefender = $bench->whereIn('posicion_general', ['DEF', 'MED'])->sortByDesc('partidos_jugados')->first();
+        if ($bestDefender) {
+            $subs[] = [
+                'scenario' => 'Si vas ganando (Min 75+)',
+                'in' => $bestDefender,
+                'out_position' => 'DEL',
+                'reason' => 'Cierra el partido y asegura el resultado.'
+            ];
+        }
+
+        return $subs;
+    }
+
+    private function getManMarking($myTeam, $opponent)
+    {
+        $opThreat = $opponent->jugadores->sortByDesc('goles')->first();
+        $myStopper = $myTeam->jugadores->where('posicion_general', 'DEF')->sortByDesc('partidos_jugados')->first();
+
+        if ($opThreat && $myStopper) {
+            return [
+                'target' => $opThreat,
+                'marker' => $myStopper,
+                'instruction' => "Asigna a {$myStopper->nombre} para marcar de cerca a {$opThreat->nombre}. Evita que reciba cómodo."
+            ];
+        }
+        return null;
     }
 
     private function calculateTeamMetrics($team)
