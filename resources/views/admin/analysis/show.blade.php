@@ -494,31 +494,56 @@
 
                 {{-- SQUAD DNA --}}
                 <div class="bg-card-bg/80 border border-white/10 rounded-xl p-4">
-                    <h3 class="text-sm font-bold text-white mb-3 uppercase tracking-widest border-b border-white/5 pb-2">
-                        Squad DNA: {{ $opponent->nombre }}</h3>
+                    <h3 class="text-sm font-bold text-gray-400 mb-4 uppercase tracking-wider flex items-center gap-2">
+                        <i class="fa-solid fa-dna text-blue-400"></i>
+                        Squad DNA: {{ $opponent->nombre }}
+                    </h3>
                     <div class="grid grid-cols-2 gap-4 mb-4">
-                        <div class="text-center bg-white/5 p-2 rounded">
-                            <p class="text-2xl font-black text-white">{{ $squadStats['op']['size'] }}</p>
-                            <p class="text-[10px] text-gray-500 uppercase">Jugadores</p>
+                        <div class="bg-white/5 rounded-lg p-3 text-center">
+                            <span class="block text-2xl font-bold text-white">{{ $squadStats['op']['size'] }}</span>
+                            <span class="text-xs text-gray-400 uppercase">Jugadores</span>
                         </div>
-                        <div class="text-center bg-white/5 p-2 rounded">
-                            <p class="text-2xl font-black text-green-400">{{ $squadStats['op']['total_goals'] }}</p>
-                            <p class="text-[10px] text-gray-500 uppercase">Goles Totales</p>
+                        <div class="bg-white/5 rounded-lg p-3 text-center">
+                            <span class="block text-2xl font-bold text-green-400">{{ $squadStats['op']['total_goals'] }}</span>
+                            <span class="text-xs text-gray-400 uppercase">Goles Totales</span>
+                        </div>
+                    </div>
+                    
+                    {{-- DNA Insight --}}
+                    <div class="space-y-2 mb-4">
+                        <div class="bg-blue-500/10 border border-blue-500/20 p-2 rounded flex items-start gap-2">
+                            <i class="fa-solid fa-magnifying-glass text-blue-400 mt-1 text-xs"></i>
+                            <p class="text-xs text-blue-200">{{ $squadStats['op']['dna_insight']['reason'] }}</p>
+                        </div>
+                        <div class="bg-red-500/10 border border-red-500/20 p-2 rounded flex items-start gap-2">
+                            <i class="fa-solid fa-shield-halved text-red-400 mt-1 text-xs"></i>
+                            <p class="text-xs text-red-200">{{ $squadStats['op']['dna_insight']['strategy'] }}</p>
                         </div>
                     </div>
 
-                    {{-- CREATIVE HUB --}}
-                    <h4 class="text-xs font-bold text-gray-400 uppercase mb-2">Creative Hub (Asistencias)</h4>
+                    <h4 class="text-xs font-bold text-gray-500 mb-2 uppercase">Creative Hub (Asistencias)</h4>
                     <div class="space-y-2 mb-4">
                         @foreach($squadStats['op']['top_assisters'] as $player)
                             <div class="flex justify-between items-center text-sm">
                                 <span class="text-white">{{ $player->nombre }}</span>
-                                <span class="text-cyan-400 font-bold">{{ $player->asistencias }}</span>
+                                <span class="font-bold text-cyan-400">{{ $player->asistencias }}</span>
                             </div>
                         @endforeach
                     </div>
 
-                    {{-- THE WALL --}}
+                    {{-- Creative Insight --}}
+                    <div class="space-y-2">
+                        <div class="bg-cyan-500/10 border border-cyan-500/20 p-2 rounded flex items-start gap-2">
+                            <i class="fa-solid fa-brain text-cyan-400 mt-1 text-xs"></i>
+                            <p class="text-xs text-cyan-200">{{ $squadStats['op']['creative_insight']['reason'] }}</p>
+                        </div>
+                        <div class="bg-orange-500/10 border border-orange-500/20 p-2 rounded flex items-start gap-2">
+                            <i class="fa-solid fa-hand-paper text-orange-400 mt-1 text-xs"></i>
+                            <p class="text-xs text-orange-200">{{ $squadStats['op']['creative_insight']['strategy'] }}</p>
+                        </div>
+                    </div>
+
+                {{-- THE WALL --}}
                     @if($squadStats['op']['goalkeeper'])
                         <h4 class="text-xs font-bold text-gray-400 uppercase mb-2">The Wall (Portero)</h4>
                         <div class="flex items-center gap-3 bg-white/5 p-2 rounded">
@@ -533,37 +558,77 @@
                     @endif
                 </div>
 
-                {{-- DUELO DE ESTRELLAS --}}
-                <div class="bg-card-bg/80 border border-white/10 rounded-xl p-4">
-                    <h4 class="text-xs font-bold text-gray-400 uppercase mb-3 text-center">Jugadores a Seguir (Goleadores)
-                    </h4>
-                    <div class="flex justify-between items-center">
-                        @php
-                            $myTopScorer = $squadStats['my']['top_scorers']->first();
-                            $opTopScorer = $squadStats['op']['top_scorers']->first();
-                        @endphp
+                {{-- DUEL OF THE DAY --}}
+                @if(isset($keyMatchup))
+                <div class="bg-card-bg/80 border border-white/10 rounded-xl p-4 relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary to-red-500"></div>
+                    <h3 class="text-sm font-bold text-gray-400 mb-6 uppercase tracking-wider text-center">
+                        <i class="fa-solid fa-fire text-orange-500 mr-2"></i>Duel of the Day
+                    </h3>
+                    
+                    <div class="flex items-center justify-between relative">
+                        {{-- My Player --}}
+                        <div class="flex flex-col items-center w-1/3 relative z-10">
+                            <div class="w-16 h-16 rounded-full p-1 bg-gradient-to-br from-primary to-emerald-600 shadow-lg shadow-primary/30 mb-2">
+                                <img src="{{ $keyMatchup['my']->foto_url ?? 'https://placehold.co/64x64' }}" class="w-full h-full rounded-full object-cover border-2 border-gray-900">
+                            </div>
+                            <span class="text-white font-bold text-sm text-center leading-tight">{{ $keyMatchup['my']->nombre }}</span>
+                            <span class="text-[10px] text-primary font-bold uppercase">{{ $myTeam->nombre }}</span>
+                        </div>
 
-                        @if($myTopScorer)
-                            <div class="text-center">
-                                <img src="{{ $myTopScorer->foto_url ?? 'https://placehold.co/50x50' }}"
-                                    class="w-12 h-12 rounded-full border border-primary mx-auto mb-1">
-                                <p class="text-xs text-white font-bold">{{ explode(' ', $myTopScorer->nombre)[0] }}</p>
-                                <p class="text-[10px] text-primary">{{ $myTopScorer->goles }} Goles</p>
+                        {{-- VS Badge --}}
+                        <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-0 opacity-20 text-6xl font-black text-white italic">VS</div>
+
+                        {{-- Stats Table --}}
+                        <div class="w-1/3 z-10">
+                            <div class="space-y-2">
+                                {{-- Goals --}}
+                                <div class="flex items-center justify-between text-xs">
+                                    <span class="font-bold {{ $keyMatchup['comparison']['goals']['my'] >= $keyMatchup['comparison']['goals']['op'] ? 'text-primary' : 'text-gray-500' }}">
+                                        {{ $keyMatchup['comparison']['goals']['my'] }}
+                                    </span>
+                                    <span class="text-gray-400 uppercase text-[10px]">Goles</span>
+                                    <span class="font-bold {{ $keyMatchup['comparison']['goals']['op'] >= $keyMatchup['comparison']['goals']['my'] ? 'text-red-500' : 'text-gray-500' }}">
+                                        {{ $keyMatchup['comparison']['goals']['op'] }}
+                                    </span>
+                                </div>
+                                {{-- Assists --}}
+                                <div class="flex items-center justify-between text-xs">
+                                    <span class="font-bold {{ $keyMatchup['comparison']['assists']['my'] >= $keyMatchup['comparison']['assists']['op'] ? 'text-primary' : 'text-gray-500' }}">
+                                        {{ $keyMatchup['comparison']['assists']['my'] }}
+                                    </span>
+                                    <span class="text-gray-400 uppercase text-[10px]">Asist</span>
+                                    <span class="font-bold {{ $keyMatchup['comparison']['assists']['op'] >= $keyMatchup['comparison']['assists']['my'] ? 'text-red-500' : 'text-gray-500' }}">
+                                        {{ $keyMatchup['comparison']['assists']['op'] }}
+                                    </span>
+                                </div>
+                                {{-- G/Match --}}
+                                <div class="flex items-center justify-between text-xs">
+                                    <span class="font-bold {{ $keyMatchup['comparison']['gpg']['my'] >= $keyMatchup['comparison']['gpg']['op'] ? 'text-primary' : 'text-gray-500' }}">
+                                        {{ $keyMatchup['comparison']['gpg']['my'] }}
+                                    </span>
+                                    <span class="text-gray-400 uppercase text-[10px]">G/P</span>
+                                    <span class="font-bold {{ $keyMatchup['comparison']['gpg']['op'] >= $keyMatchup['comparison']['gpg']['my'] ? 'text-red-500' : 'text-gray-500' }}">
+                                        {{ $keyMatchup['comparison']['gpg']['op'] }}
+                                    </span>
+                                </div>
                             </div>
-                        @endif
-                        <span class="text-gray-600 font-black text-xl">VS</span>
-                        @if($opTopScorer)
-                            <div class="text-center">
-                                <img src="{{ $opTopScorer->foto_url ?? 'https://placehold.co/50x50' }}"
-                                    class="w-12 h-12 rounded-full border border-red-500 mx-auto mb-1">
-                                <p class="text-xs text-white font-bold">{{ explode(' ', $opTopScorer->nombre)[0] }}</p>
-                                <p class="text-[10px] text-red-500">{{ $opTopScorer->goles }} Goles</p>
+                        </div>
+
+                        {{-- Opponent Player --}}
+                        <div class="flex flex-col items-center w-1/3 relative z-10">
+                            <div class="w-16 h-16 rounded-full p-1 bg-gradient-to-br from-red-500 to-orange-600 shadow-lg shadow-red-500/30 mb-2">
+                                <img src="{{ $keyMatchup['op']->foto_url ?? 'https://placehold.co/64x64' }}" class="w-full h-full rounded-full object-cover border-2 border-gray-900">
                             </div>
-                        @endif
+                            <span class="text-white font-bold text-sm text-center leading-tight">{{ $keyMatchup['op']->nombre }}</span>
+                            <span class="text-[10px] text-red-400 font-bold uppercase">{{ $opponent->nombre }}</span>
+                        </div>
                     </div>
                 </div>
+                @endif
 
             </div>
         </div>
     </div>
 @endsection
+```

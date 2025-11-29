@@ -23,6 +23,19 @@ class DeepAnalysisController extends Controller
         return view('admin.analysis.index', compact('teams'));
     }
 
+    public function selection(Request $request)
+    {
+        $request->validate([
+            'my_team_id' => 'required|exists:equipos,id',
+            'opponent_id' => 'required|exists:equipos,id',
+        ]);
+
+        $myTeam = Equipo::with('jugadores')->findOrFail($request->my_team_id);
+        $opponent = Equipo::findOrFail($request->opponent_id);
+
+        return view('admin.analysis.selection', compact('myTeam', 'opponent'));
+    }
+
     public function analyze(Request $request)
     {
         $request->validate([
@@ -111,6 +124,27 @@ class DeepAnalysisController extends Controller
         // 10. Generación de Estrategia "AI" (Expanded)
         $strategy = $this->generateStrategy($myTeam, $opponent, $h2hStats, $metrics, $goalTiming);
 
+        // 11. Key Matchup (Duel of the Day)
+        $myTopScorer = $myTeam->jugadores->sortByDesc('goles')->first();
+        $opTopScorer = $opponent->jugadores->sortByDesc('goles')->first();
+
+        $keyMatchup = null;
+        if ($myTopScorer && $opTopScorer) {
+            $keyMatchup = [
+                'my' => $myTopScorer,
+                'op' => $opTopScorer,
+                'comparison' => [
+                    'goals' => ['my' => $myTopScorer->goles, 'op' => $opTopScorer->goles],
+                    'assists' => ['my' => $myTopScorer->asistencias, 'op' => $opTopScorer->asistencias],
+                    'matches' => ['my' => $myTopScorer->partidos_jugados, 'op' => $opTopScorer->partidos_jugados],
+                    'gpg' => [
+                        'my' => $myTopScorer->partidos_jugados > 0 ? number_format($myTopScorer->goles / $myTopScorer->partidos_jugados, 2) : 0,
+                        'op' => $opTopScorer->partidos_jugados > 0 ? number_format($opTopScorer->goles / $opTopScorer->partidos_jugados, 2) : 0
+                    ]
+                ]
+            ];
+        }
+
         return view('admin.analysis.show', compact(
             'myTeam',
             'opponent',
@@ -124,7 +158,8 @@ class DeepAnalysisController extends Controller
             'variants',
             'substitutions',
             'manMarking',
-            'strategy'
+            'strategy',
+            'keyMatchup'
         ));
     }
 
@@ -385,13 +420,53 @@ class DeepAnalysisController extends Controller
 
     private function getSquadStats($team)
     {
+        $totalGoals = $team->jugadores->sum('goles');
+        $totalAssists = $team->jugadores->sum('asistencias');
+        $topScorer = $team->jugadores->sortByDesc('goles')->first();
+        $topAssister = $team->jugadores->sortByDesc('asistencias')->first();
+
+        // --- DNA INSIGHT (GOALS) ---
+        $dnaReasoning = "Plantilla equilibrada.";
+        $dnaStrategy = "Mantener orden defensivo estándar.";
+
+        if ($totalGoals > 0 && $topScorer) {
+            $scorerPct = ($topScorer->goles / $totalGoals) * 100;
+            if ($scorerPct > 40) {
+                $dnaReasoning = "Dependencia extrema de {$topScorer->nombre} ({$topScorer->goles} goles).";
+                $dnaStrategy = "Doble marca sobre él. Si lo anulas, el equipo se apaga.";
+            } elseif ($scorerPct > 20) {
+                $dnaReasoning = "Ataque concentrado en sus puntas.";
+                $dnaStrategy = "Vigilar desmarques de ruptura de los delanteros.";
+            } else {
+                $dnaReasoning = "Amenaza distribuida. Cualquiera puede marcar.";
+                $dnaStrategy = "Defensa zonal estricta. No perder referencias individuales.";
+            }
+        }
+
+        // --- CREATIVE INSIGHT (ASSISTS) ---
+        $creativeReasoning = "Juego directo o individual.";
+        $creativeStrategy = "Ganar duelos 1vs1.";
+
+        if ($totalAssists > 0 && $topAssister) {
+            $assisterPct = ($topAssister->asistencias / $totalAssists) * 100;
+            if ($assisterPct > 40) {
+                $creativeReasoning = "Motor único: {$topAssister->nombre} genera todo el juego.";
+                $creativeStrategy = "Presión asfixiante sobre el '10'. No dejarle girar.";
+            } else {
+                $creativeReasoning = "Juego asociativo y coral.";
+                $creativeStrategy = "Cortar líneas de pase y saturar el medio campo.";
+            }
+        }
+
         return [
             'size' => $team->jugadores->count(),
             'top_scorers' => $team->jugadores->sortByDesc('goles')->take(3),
             'top_assisters' => $team->jugadores->sortByDesc('asistencias')->take(3),
             'goalkeeper' => $team->jugadores->where('posicion_general', 'POR')->sortByDesc('paradas')->first(),
-            'total_goals' => $team->jugadores->sum('goles'),
-            'total_assists' => $team->jugadores->sum('asistencias'),
+            'total_goals' => $totalGoals,
+            'total_assists' => $totalAssists,
+            'dna_insight' => ['reason' => $dnaReasoning, 'strategy' => $dnaStrategy],
+            'creative_insight' => ['reason' => $creativeReasoning, 'strategy' => $creativeStrategy],
         ];
     }
 

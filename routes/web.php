@@ -116,6 +116,7 @@ Route::middleware(\App\Http\Middleware\AdminCheck::class)
 
         // --- DEEP ANALYSIS (NUEVO) ---
         Route::get('deep-analysis', [\App\Http\Controllers\DeepAnalysisController::class, 'index'])->name('admin.analysis.index');
+        Route::post('deep-analysis/selection', [\App\Http\Controllers\DeepAnalysisController::class, 'selection'])->name('admin.analysis.selection');
         Route::post('deep-analysis', [\App\Http\Controllers\DeepAnalysisController::class, 'analyze'])->name('admin.analysis.analyze');
         Route::get('/api/teams/{id}/players', function ($id) {
             return \App\Models\Jugador::where('equipo_id', $id)->orderBy('nombre')->get(['id', 'nombre']);
