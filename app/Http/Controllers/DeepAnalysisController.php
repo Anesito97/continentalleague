@@ -527,46 +527,72 @@ class DeepAnalysisController extends Controller
 
     private function generateStrategy($myTeam, $opponent, $h2hStats, $metrics, $goalTiming)
     {
-        $tips = [];
-        $mainFocus = "";
+        $attack = [];
+        $defense = [];
+        $alerts = [];
 
-        // --- ANÁLISIS DEFENSIVO DEL RIVAL ---
+        // --- 1. ATTACK PHASE (How to score) ---
         $opGA = $metrics['op']['ga_pg'];
+        $opCleanSheets = $metrics['op']['clean_sheets'];
+
         if ($opGA > 1.8) {
-            $mainFocus = "Ataque Agresivo";
-            $tips[] = "La defensa rival es muy frágil (recibe {$opGA} goles/partido). Presiona la salida.";
+            $attack[] = "La defensa rival es frágil (recibe {$opGA} goles/partido). Presiona alto y busca el error.";
         } elseif ($opGA < 0.8) {
-            $mainFocus = "Paciencia";
-            $tips[] = "Rival muy sólido atrás. Evita centros frontales, busca filtrar pases.";
-        } else {
-            $mainFocus = "Control";
+            $attack[] = "Rival muy sólido. Paciencia, evita centros frontales y busca filtrar pases entre líneas.";
         }
 
-        // --- ANÁLISIS DE MOMENTO DE GOL ---
-        // ¿Cuándo son vulnerables? (Usando lógica inversa simple o datos reales si tuviéramos 'conceded timing')
-        // Por ahora usamos su momento de gol para advertir
-        if (isset($goalTiming['op_scored']['percentages']) && !empty($goalTiming['op_scored']['percentages'])) {
-            $percentages = $goalTiming['op_scored']['percentages'];
-            $maxVal = max($percentages);
-            if ($maxVal > 0) {
-                $opStrongestPeriod = array_keys($percentages, $maxVal)[0];
-                $tips[] = "¡Cuidado! El rival es letal entre los minutos {$opStrongestPeriod}. Mantén la concentración máxima.";
-            }
+        if ($opCleanSheets == 0) {
+            $attack[] = "No saben mantener el cero. Dispara desde fuera del área ante cualquier espacio.";
         }
 
-        // --- ANÁLISIS DE EFICIENCIA ---
-        if ($metrics['op']['failed_to_score'] > 2) {
-            $tips[] = "Al rival le cuesta marcar. Si anotas primero, probablemente ganaremos.";
+        // Check for late goals conceded
+        if (isset($goalTiming['op_conceded']['percentages']['76-90+']) && $goalTiming['op_conceded']['percentages']['76-90+'] > 25) {
+            $attack[] = "Sufren físicamente al final. Guarda cambios ofensivos para los últimos 15 minutos.";
         }
 
-        // --- ANÁLISIS H2H ---
+        // --- 2. DEFENSE PHASE (How to stop them) ---
+        $opGF = $metrics['op']['gf_pg'];
+        $opFailedScore = $metrics['op']['failed_to_score'];
+
+        if ($opGF > 2.0) {
+            $defense[] = "Poder ofensivo letal. Prioriza el orden defensivo y no arriesgues en la salida.";
+        } elseif ($opGF < 0.8) {
+            $defense[] = "Les cuesta marcar. Si anotas primero, el partido es tuyo.";
+        }
+
+        if ($opFailedScore > 2) {
+            $defense[] = "Son inconsistentes arriba. Si los frustras los primeros 20 min, se desesperan.";
+        }
+
+        // Check for early goals scored
+        if (isset($goalTiming['op_scored']['percentages']['0-15']) && $goalTiming['op_scored']['percentages']['0-15'] > 20) {
+            $defense[] = "Entran muy enchufados. Máxima concentración en el arranque.";
+        }
+
+        // --- 3. ALERTS (Discipline, H2H, etc) ---
+        $opYellows = $metrics['op']['yellows'];
+        $opReds = $metrics['op']['reds'];
+
+        if ($opYellows > 10 || $opReds > 1) {
+            $alerts[] = "Juegan al límite (Alto riesgo de tarjetas). Provoca faltas cerca del área.";
+        }
+
         if ($h2hStats['losses'] >= 2 && $h2hStats['wins'] == 0) {
-            $tips[] = "Es tu 'Bestia Negra'. Juega sin miedo pero con doble cobertura en defensa.";
+            $alerts[] = "Rival histórico difícil ('Bestia Negra'). Juega con cabeza fría.";
         }
+
+        // Fillers if empty
+        if (empty($attack))
+            $attack[] = "Juega tu fútbol habitual. Busca imponer tu ritmo.";
+        if (empty($defense))
+            $defense[] = "Mantén las líneas juntas y comunícate constantemente.";
+        if (empty($alerts))
+            $alerts[] = "Partido estándar. Sin anomalías estadísticas graves.";
 
         return [
-            'focus' => $mainFocus,
-            'tips' => $tips
+            'attack' => $attack,
+            'defense' => $defense,
+            'alerts' => $alerts
         ];
     }
 }

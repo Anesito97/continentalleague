@@ -324,24 +324,60 @@
             {{-- COLUMNA DERECHA: COACH'S CORNER & ALINEACIÓN & SQUAD DNA --}}
             <div class="lg:col-span-4 space-y-6">
 
-                {{-- ESTRATEGIA SUGERIDA --}}
-                <div class="bg-[#1a1f2e] border border-l-4 border-l-cyan-500 border-white/10 rounded-r-xl p-6 shadow-lg">
-                    <h3 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                {{-- ESTRATEGIA SUGERIDA (MATCH PLAN) --}}
+                <div class="bg-[#1a1f2e] border border-white/10 rounded-xl p-6 shadow-lg">
+                    <h3 class="text-lg font-bold text-white mb-6 flex items-center gap-2">
                         <i class="fa-solid fa-clipboard-list text-cyan-400"></i>
-                        Informe de Scouting IA
+                        Plan de Partido (IA)
                     </h3>
-                    <div class="mb-6">
-                        <p class="text-[10px] text-cyan-500 uppercase tracking-widest font-bold mb-1">Enfoque Táctico</p>
-                        <p class="text-2xl font-black text-white leading-tight">{{ $strategy['focus'] }}</p>
-                    </div>
-                    <div class="space-y-4">
-                        @foreach($strategy['tips'] as $index => $tip)
-                            <div class="flex gap-3">
-                                <span
-                                    class="flex-shrink-0 w-6 h-6 rounded-full bg-cyan-900/50 text-cyan-400 flex items-center justify-center text-xs font-bold border border-cyan-500/30">{{ $index + 1 }}</span>
-                                <p class="text-sm text-gray-300 leading-snug">{{ $tip }}</p>
-                            </div>
-                        @endforeach
+                    
+                    <div class="space-y-6">
+                        {{-- ATAQUE --}}
+                        <div>
+                            <h4 class="text-xs font-bold text-green-400 uppercase tracking-widest mb-2 flex items-center gap-2">
+                                <i class="fa-solid fa-bullseye"></i> Fase Ofensiva
+                            </h4>
+                            <ul class="space-y-2">
+                                @foreach($strategy['attack'] as $tip)
+                                    <li class="flex gap-2 text-sm text-gray-300 bg-green-500/5 p-2 rounded border-l-2 border-green-500">
+                                        <i class="fa-solid fa-check text-green-400 mt-1 text-xs"></i>
+                                        <span>{{ $tip }}</span>
+                                    </li>
+                                @endforeach
+                            </ul>
+                        </div>
+
+                        {{-- DEFENSA --}}
+                        <div>
+                            <h4 class="text-xs font-bold text-blue-400 uppercase tracking-widest mb-2 flex items-center gap-2">
+                                <i class="fa-solid fa-shield-halved"></i> Fase Defensiva
+                            </h4>
+                            <ul class="space-y-2">
+                                @foreach($strategy['defense'] as $tip)
+                                    <li class="flex gap-2 text-sm text-gray-300 bg-blue-500/5 p-2 rounded border-l-2 border-blue-500">
+                                        <i class="fa-solid fa-shield text-blue-400 mt-1 text-xs"></i>
+                                        <span>{{ $tip }}</span>
+                                    </li>
+                                @endforeach
+                            </ul>
+                        </div>
+
+                        {{-- ALERTAS --}}
+                        @if(!empty($strategy['alerts']) && $strategy['alerts'][0] != "Partido estándar. Sin anomalías estadísticas graves.")
+                        <div>
+                            <h4 class="text-xs font-bold text-red-400 uppercase tracking-widest mb-2 flex items-center gap-2">
+                                <i class="fa-solid fa-triangle-exclamation"></i> Alertas Clave
+                            </h4>
+                            <ul class="space-y-2">
+                                @foreach($strategy['alerts'] as $tip)
+                                    <li class="flex gap-2 text-sm text-white bg-red-500/10 p-2 rounded border-l-2 border-red-500 animate-pulse">
+                                        <i class="fa-solid fa-circle-exclamation text-red-500 mt-1 text-xs"></i>
+                                        <span>{{ $tip }}</span>
+                                    </li>
+                                @endforeach
+                            </ul>
+                        </div>
+                        @endif
                     </div>
                 </div>
 
