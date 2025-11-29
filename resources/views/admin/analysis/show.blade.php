@@ -844,5 +844,121 @@
 
             </div>
         </div>
+
+        {{-- 13. MATCH INTELLIGENCE REPORT (ENHANCED) --}}
+        @if(isset($finalSummary))
+            <div class="mt-8 relative overflow-hidden rounded-2xl border border-white/10 bg-[#0f172a] shadow-2xl">
+                {{-- Header Bar --}}
+                <div class="bg-gradient-to-r from-blue-900/50 to-purple-900/50 p-4 border-b border-white/10 flex justify-between items-center">
+                    <div class="flex items-center gap-3">
+                        <div class="bg-blue-500/20 p-2 rounded-lg border border-blue-500/30">
+                            <i class="fa-solid fa-brain text-blue-400 text-xl"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-xl font-black text-white uppercase tracking-widest leading-none">CORTEX INTELLIGENCE</h2>
+                            <span class="text-[10px] text-blue-300 font-mono tracking-widest">MATCH REPORT v2.0 // AUTHOR: {{ $finalSummary['author'] }}</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="animate-pulse w-2 h-2 rounded-full bg-green-500"></span>
+                        <span class="text-xs font-mono text-green-400">LIVE ANALYSIS</span>
+                    </div>
+                </div>
+
+                <div class="p-6 sm:p-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
+                    
+                    {{-- COL 1: THE STORYLINE (Narrative) --}}
+                    <div class="lg:col-span-7 space-y-6">
+                        <h3 class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4 flex items-center gap-2">
+                            <i class="fa-solid fa-book-open text-gray-600"></i> The Storyline
+                        </h3>
+                        
+                        <div class="relative pl-6 border-l-2 border-white/10 space-y-8">
+                            {{-- Act 1 --}}
+                            <div class="relative group">
+                                <span class="absolute -left-[31px] top-0 w-4 h-4 rounded-full bg-gray-800 border-2 border-gray-600 group-hover:border-blue-500 group-hover:bg-blue-500 transition-colors"></span>
+                                <h4 class="text-sm font-bold text-white mb-1">El Contexto</h4>
+                                <p class="text-gray-400 text-sm leading-relaxed">"{{ $finalSummary['storyline']['context'] }}"</p>
+                            </div>
+                            {{-- Act 2 --}}
+                            <div class="relative group">
+                                <span class="absolute -left-[31px] top-0 w-4 h-4 rounded-full bg-gray-800 border-2 border-gray-600 group-hover:border-purple-500 group-hover:bg-purple-500 transition-colors"></span>
+                                <h4 class="text-sm font-bold text-white mb-1">El Conflicto</h4>
+                                <p class="text-gray-400 text-sm leading-relaxed">"{{ $finalSummary['storyline']['conflict'] }}"</p>
+                            </div>
+                            {{-- Act 3 --}}
+                            <div class="relative group">
+                                <span class="absolute -left-[31px] top-0 w-4 h-4 rounded-full bg-gray-800 border-2 border-gray-600 group-hover:border-green-500 group-hover:bg-green-500 transition-colors"></span>
+                                <h4 class="text-sm font-bold text-white mb-1">La Resolución</h4>
+                                <p class="text-gray-400 text-sm leading-relaxed">"{{ $finalSummary['storyline']['resolution'] }}"</p>
+                            </div>
+                        </div>
+
+                        {{-- Scenarios Grid --}}
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6">
+                            @foreach($finalSummary['scenarios'] as $scenario)
+                                <div class="bg-white/5 border border-white/5 rounded-lg p-3 hover:bg-white/10 transition-colors">
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <i class="fa-solid {{ $scenario['icon'] }} {{ $scenario['color'] }} text-xs"></i>
+                                        <span class="text-[10px] font-bold text-gray-300 uppercase">{{ $scenario['condition'] }}</span>
+                                    </div>
+                                    <p class="text-xs text-gray-400 leading-tight">{{ $scenario['outcome'] }}</p>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+
+                    {{-- COL 2: X-FACTOR & VERDICT --}}
+                    <div class="lg:col-span-5 space-y-6">
+                        
+                        {{-- X-Factor Card --}}
+                        @if($finalSummary['x_factor']['player'])
+                            <div class="relative overflow-hidden rounded-xl bg-gradient-to-br from-indigo-900/40 to-blue-900/40 border border-indigo-500/30 p-1">
+                                <div class="absolute top-0 right-0 bg-indigo-500 text-white text-[10px] font-bold px-2 py-1 rounded-bl-lg uppercase tracking-wider">
+                                    The X-Factor
+                                </div>
+                                <div class="bg-gray-900/80 rounded-lg p-4 flex items-center gap-4 backdrop-blur-sm h-full">
+                                    <img src="{{ $finalSummary['x_factor']['player']->foto_url ?? 'https://placehold.co/80x80' }}" 
+                                         class="w-16 h-16 rounded-full border-2 border-indigo-500 shadow-[0_0_15px_rgba(99,102,241,0.5)] object-cover">
+                                    <div>
+                                        <h4 class="text-lg font-black text-white leading-none mb-1">{{ $finalSummary['x_factor']['player']->nombre }}</h4>
+                                        <p class="text-xs text-indigo-300 font-mono mb-2 uppercase">{{ $myTeam->nombre }}</p>
+                                        <p class="text-xs text-gray-400 italic leading-tight">"{{ $finalSummary['x_factor']['reason'] }}"</p>
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
+
+                        {{-- Verdict Box --}}
+                        <div class="bg-black/40 border border-white/10 rounded-xl p-6 text-center relative overflow-hidden group">
+                            <div class="absolute inset-0 bg-gradient-to-t from-{{ $finalSummary['prediction']['verdict'] == 'VICTORIA' ? 'green' : ($finalSummary['prediction']['verdict'] == 'DERROTA' ? 'red' : 'yellow') }}-500/10 to-transparent opacity-50 group-hover:opacity-100 transition-opacity"></div>
+                            
+                            <h3 class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4 relative z-10">Veredicto Final</h3>
+                            
+                            <div class="flex justify-center items-baseline gap-1 mb-2 relative z-10">
+                                <span class="text-4xl font-black text-white">{{ $finalSummary['prediction']['score'] }}</span>
+                            </div>
+                            
+                            <div class="inline-block px-4 py-1 rounded-full bg-white/10 border border-white/20 text-sm font-bold text-white mb-4 relative z-10">
+                                {{ $finalSummary['prediction']['verdict'] }}
+                            </div>
+
+                            {{-- Confidence Bar --}}
+                            <div class="relative z-10">
+                                <div class="flex justify-between text-[10px] text-gray-500 mb-1 uppercase font-bold">
+                                    <span>Confianza IA</span>
+                                    <span>{{ $finalSummary['prediction']['confidence'] }}%</span>
+                                </div>
+                                <div class="w-full bg-gray-800 rounded-full h-1.5 overflow-hidden">
+                                    <div class="h-full bg-gradient-to-r from-gray-600 to-white transition-all duration-1000" 
+                                         style="width: {{ $finalSummary['prediction']['confidence'] }}%"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        @endif
     </div>
 @endsection

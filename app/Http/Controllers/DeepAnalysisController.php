@@ -145,6 +145,9 @@ class DeepAnalysisController extends Controller
             ];
         }
 
+        // 12. Final Summary (Analyst's Report)
+        $finalSummary = $this->generateFinalSummary($myTeam, $opponent, $metrics, $winProb, $h2hStats);
+
         return view('admin.analysis.show', compact(
             'myTeam',
             'opponent',
@@ -159,8 +162,120 @@ class DeepAnalysisController extends Controller
             'substitutions',
             'manMarking',
             'strategy',
-            'keyMatchup'
+            'keyMatchup',
+            'finalSummary'
         ));
+    }
+
+    private function generateFinalSummary($myTeam, $opponent, $metrics, $winProb, $h2hStats)
+    {
+        // --- 1. THE STORYLINE (3 Acts) ---
+        $storyline = [];
+
+        // Act 1: The Context
+        if ($winProb > 65) {
+            $storyline['context'] = "El escenario está servido para una victoria de {$myTeam->nombre}. Las métricas indican una superioridad estructural, pero el fútbol castiga la confianza excesiva.";
+        } elseif ($winProb < 35) {
+            $storyline['context'] = "Desafío mayúsculo. {$opponent->nombre} llega como claro favorito, imponiendo respeto con sus números. Será una prueba de carácter y resistencia.";
+        } else {
+            $storyline['context'] = "Choque de trenes. Dos fuerzas equilibradas colisionan en lo que promete ser un duelo táctico decidido por el mínimo error.";
+        }
+
+        // Act 2: The Conflict (Style Clash)
+        $myStyle = $metrics['my']['gf_pg'] > 1.5 ? 'Ofensivo' : 'Conservador';
+        $opStyle = $metrics['op']['gf_pg'] > 1.5 ? 'Ofensivo' : 'Conservador';
+
+        if ($myStyle == 'Ofensivo' && $opStyle == 'Ofensivo') {
+            $storyline['conflict'] = "Se espera un intercambio de golpes constante. Ambos equipos priorizan el arco rival, lo que augura espacios y verticalidad.";
+        } elseif ($myStyle == 'Conservador' && $opStyle == 'Conservador') {
+            $storyline['conflict'] = "La batalla será en la medular. Con ambos equipos priorizando el orden, la paciencia para encontrar grietas será la virtud clave.";
+        } else {
+            $storyline['conflict'] = "Choque de estilos: Ataque vs Defensa. Quien logre imponer su ritmo (caos o control) tendrá la llave del partido.";
+        }
+
+        // Act 3: The Resolution (Key to Victory)
+        if ($metrics['my']['clean_sheets_pct'] > 40) {
+            $storyline['resolution'] = "Tu solidez defensiva es tu mejor arma. Si mantienes el cero, el gol llegará por decantación.";
+        } elseif ($metrics['op']['ga_pg'] > 2.0) {
+            $storyline['resolution'] = "Su defensa es de cristal. La presión alta y los remates constantes acabarán por romper su resistencia.";
+        } else {
+            $storyline['resolution'] = "La eficacia será determinante. En partidos tan cerrados, el balón parado o una genialidad individual definirán el marcador.";
+        }
+
+        // --- 2. TACTICAL SCENARIOS ---
+        $scenarios = [];
+
+        // Scenario A: Early Goal
+        $scenarios[] = [
+            'condition' => "Si marcas en los primeros 15'",
+            'outcome' => "Ellos se desordenarán. Su historial muestra fragilidad mental al ir abajo.",
+            'icon' => 'fa-stopwatch',
+            'color' => 'text-green-400'
+        ];
+
+        // Scenario B: Late Game
+        $scenarios[] = [
+            'condition' => "Si llegas empatado al 75'",
+            'outcome' => "Tienes ventaja física. Sus números caen drásticamente en el último cuarto de hora.",
+            'icon' => 'fa-heart-pulse',
+            'color' => 'text-yellow-400'
+        ];
+
+        // Scenario C: Conceding First
+        $scenarios[] = [
+            'condition' => "Si recibes el primer gol",
+            'outcome' => "No pierdas la cabeza. Tienden a replegarse demasiado pronto, regalando el campo.",
+            'icon' => 'fa-shield-virus',
+            'color' => 'text-red-400'
+        ];
+
+        // --- 3. THE X-FACTOR (Player Spotlight) ---
+        // Find a player with high impact but maybe not the top scorer (e.g. high assists or saves)
+        $xFactor = null;
+        $xReason = "";
+
+        // Look for top assister first
+        $topAssister = $myTeam->jugadores->sortByDesc('asistencias')->first();
+        if ($topAssister && $topAssister->asistencias > 2) {
+            $xFactor = $topAssister;
+            $xReason = "El Arquitecto. Su visión será vital para romper líneas.";
+        } else {
+            // Fallback to top scorer
+            $xFactor = $myTeam->jugadores->sortByDesc('goles')->first();
+            $xReason = "El Ejecutor. Cuando el partido se trabe, sus goles son la solución.";
+        }
+
+        // --- 4. PREDICTION & CONFIDENCE ---
+        $confidence = min(abs($winProb - 50) * 2 + 40, 95); // Higher confidence if win prob is extreme
+        $predictedScore = "";
+
+        $myExpGoals = $metrics['my']['gf_pg'];
+        $opExpGoals = $metrics['op']['gf_pg'];
+
+        // Simple logic for score
+        $myScore = round($myExpGoals);
+        $opScore = round($opExpGoals);
+
+        // Adjust based on H2H
+        if ($h2hStats['my_goals'] > $h2hStats['opponent_goals'])
+            $myScore++;
+
+        $predictedScore = "{$myScore} - {$opScore}";
+
+        return [
+            'storyline' => $storyline,
+            'scenarios' => $scenarios,
+            'x_factor' => [
+                'player' => $xFactor,
+                'reason' => $xReason
+            ],
+            'prediction' => [
+                'score' => $predictedScore,
+                'confidence' => $confidence,
+                'verdict' => $winProb > 50 ? 'VICTORIA' : ($winProb > 30 ? 'EMPATE' : 'DERROTA')
+            ],
+            'author' => 'CORTEX AI v2.0'
+        ];
     }
 
     private function getLineupVariants($myTeam, $opponent, $metrics, $availablePlayers)
