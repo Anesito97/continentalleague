@@ -30,7 +30,7 @@ class GalleryController extends Controller
      *
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function upload(Request $request)
+    public function upload(Request $request, \App\Services\WhatsAppService $whatsapp)
     {
         // 1. Validación de la solicitud (se mantiene igual)
         $request->validate([
@@ -60,11 +60,11 @@ class GalleryController extends Controller
             $directory = public_path('gallery');
 
             // Generamos un nombre de archivo único
-            $filename = uniqid('gallery_').'.'.$file->getClientOriginalExtension();
+            $filename = uniqid('gallery_') . '.' . $file->getClientOriginalExtension();
 
             try {
                 // 3. Comprobar y crear el directorio si no existe
-                if (! File::isDirectory($directory)) {
+                if (!File::isDirectory($directory)) {
                     File::makeDirectory($directory, 0777, true, true);
                 }
 
@@ -72,36 +72,53 @@ class GalleryController extends Controller
                 $file->move($directory, $filename);
 
                 // 5. Esta es la URL pública COMPLETA que guardaremos
-                $url = asset('gallery/'.$filename);
+                $url = asset('gallery/' . $filename);
 
                 // Guardamos la ruta física completa por si falla la BD
-                $physicalPath = $directory.'/'.$filename;
+                $physicalPath = $directory . '/' . $filename;
 
             } catch (\Exception $e) {
                 // Manejar error de movimiento de archivo
-                return back()->with('error', 'Error al guardar la imagen: '.$e->getMessage());
+                return back()->with('error', 'Error al guardar la imagen: ' . $e->getMessage());
             }
         }
 
-        if (! $url) {
+        if (!$url) {
             return back()->with('error', 'No se pudo generar la URL de la imagen.');
         }
 
         // 3. Crear el registro en la base de datos
         try {
-            GalleryItem::create([
+            $item = GalleryItem::create([
                 'titulo' => $request->input('titulo'),
                 'image_url' => $url, // <-- 6. Guardamos la URL completa (ej: http://localhost/gallery/...)
                 'partido_id' => $request->input('match_id'),
                 'uploaded_by_user_id' => auth()->id(),
             ]);
+
+            // --- NOTIFICACIÓN WHATSAPP ---
+            try {
+                $galleryUrl = route('gallery.index');
+                $title = $request->input('titulo') ? "*{$request->input('titulo')}*" : "";
+
+                $message = "📸 *NUEVA FOTO EN LA GALERÍA* 📸\n\n" .
+                    "{$title}\n" .
+                    "Se ha subido una nueva imagen a la galería.\n\n" .
+                    "🔗 Ver galería: {$galleryUrl}";
+
+                $whatsapp->sendMessage($message);
+
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::error("Error enviando WhatsApp (Galería): " . $e->getMessage());
+            }
+
         } catch (\Exception $e) {
             // En caso de error de BD, eliminamos el archivo subido
             if ($physicalPath && file_exists($physicalPath)) {
                 unlink($physicalPath);
             }
 
-            return back()->with('error', 'Error al guardar en la base de datos: '.$e->getMessage());
+            return back()->with('error', 'Error al guardar en la base de datos: ' . $e->getMessage());
         }
 
         // 4. Redirigir con éxito
@@ -127,7 +144,7 @@ class GalleryController extends Controller
             return back()->with('success', 'Imagen eliminada con éxito.');
 
         } catch (\Exception $e) {
-            return back()->with('error', 'Error al eliminar la imagen: '.$e->getMessage());
+            return back()->with('error', 'Error al eliminar la imagen: ' . $e->getMessage());
         }
     }
 }
