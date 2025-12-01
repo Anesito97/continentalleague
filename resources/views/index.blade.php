@@ -400,33 +400,23 @@
         class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
         {{-- MEJORA: Tarjeta con borde animado (ver CSS) --}}
         <div class="bg-gray-800 card p-6 w-11/12 max-w-sm shadow-2xl hover:transform-none modal-card-glow">
-            <h4 class="text-xl font-bold mb-4 text-green-400">Acceso de Administrador</h4>
-
-            <form method="POST" action="{{ route('login') }}">
-                @csrf
-                <div class="mb-4">
-                    <label for="login-username" class="block text-sm font-medium text-gray-400">Usuario</label>
-                    <input type="text" name="username" id="login-username" required
-                        class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:border-primary focus:ring-primary">
-                </div>
-                <div class="mb-6">
-                    <label for="login-password" class="block text-sm font-medium text-gray-400">Contraseña</label>
-                    <input type="password" name="password" id="login-password" required
-                        class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:border-primary focus:ring-primary">
-                </div>
-                {{-- MEJORA: Botón con gradiente, sombra y efecto hover --}}
-                <button type="submit"
-                    class="bg-gradient-to-r from-primary to-emerald-600 hover:from-primary/90 hover:to-emerald-600/90 text-white font-bold py-2 px-4 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-glow mb-3 w-full">
-                    Iniciar Sesión
-                </button>
-            </form>
+            <h4 class="text-xl font-bold mb-4 text-green-400 text-center">Iniciar Sesión</h4>
 
             {{-- BOTÓN GOOGLE --}}
             <a href="{{ route('auth.google') }}"
-                class="flex items-center justify-center gap-2 bg-white text-gray-700 font-bold py-2 px-4 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg mb-3 w-full hover:bg-gray-100">
+                class="flex items-center justify-center gap-2 bg-white text-gray-700 font-bold py-3 px-4 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg mb-6 w-full hover:bg-gray-100">
                 <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-5 h-5" alt="Google Logo">
                 Iniciar con Google
             </a>
+
+            <div class="border-t border-gray-700 my-4"></div>
+
+            <div class="text-center mb-4">
+                <a href="{{ route('login') }}" class="text-gray-400 hover:text-white text-sm transition-colors">
+                    ¿Eres administrador? Inicia sesión aquí
+                </a>
+            </div>
+
             {{-- MEJORA: Botón de cancelar más sutil --}}
             <button onclick="document.getElementById('login-modal').classList.add('hidden')"
                 class="bg-gray-700 hover:bg-gray-600 text-gray-300 font-bold py-2 px-4 rounded-lg transition w-full">Cancelar</button>

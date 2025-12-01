@@ -35,7 +35,7 @@ Route::get('imagess', [GalleryController::class, 'index'])->name('gallery.index'
 
 // --- AUTENTICACIÓN ---
 Route::get('login', function () {
-    return redirect()->route('home', ['login' => 'true']);
+    return view('auth.login');
 })->name('login');
 Route::post('login', [AuthController::class, 'login']);
 Route::get('logout', [AuthController::class, 'logout'])->name('logout');
