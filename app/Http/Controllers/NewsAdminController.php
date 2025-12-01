@@ -42,7 +42,7 @@ class NewsAdminController extends Controller
         return view('edit', $data);
     }
     // Creado para la acción POST del formulario de creación
-    public function store(Request $request)
+    public function store(Request $request, \App\Services\WhatsAppService $whatsapp)
     {
         $request->validate([
             'titulo' => 'required|string|max:255',
@@ -65,12 +65,30 @@ class NewsAdminController extends Controller
             $imageUrl = asset('uploads/news_banners/' . $filename);
         }
 
-        Noticia::create([
+        $news = Noticia::create([
             'titulo' => $request->titulo,
             'contenido' => $request->contenido,
             'imagen_url' => $imageUrl,
             'publicada_en' => now(),
         ]);
+
+        // --- NOTIFICACIÓN WHATSAPP ---
+        try {
+            $appUrl = env('APP_URL', url('/'));
+            // Asumimos que hay una ruta para ver la noticia, si no, usamos la home
+            // $newsUrl = route('news.show', $news->id); 
+            $newsUrl = $appUrl;
+
+            $message = "📰 *NUEVA NOTICIA* 📰\n\n" .
+                "*{$request->titulo}*\n\n" .
+                "Lee más en nuestra web:\n" .
+                "🔗 {$newsUrl}";
+
+            $whatsapp->sendMessage($message);
+
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error("Error enviando WhatsApp (Noticia): " . $e->getMessage());
+        }
 
         return redirect()->route('admin.news')->with('success', 'Noticia registrada con éxito.');
     }
