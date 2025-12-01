@@ -129,6 +129,9 @@ Route::middleware(\App\Http\Middleware\AdminCheck::class)
         Route::delete('notifications/{message}', [\App\Http\Controllers\NotificationController::class, 'destroy'])->name('admin.notifications.destroy');
         Route::post('notifications/{message}/send', [\App\Http\Controllers\NotificationController::class, 'send'])->name('admin.notifications.send');
 
+        // --- ANALÍTICAS ---
+        Route::get('analytics', [\App\Http\Controllers\AnalyticsController::class, 'index'])->name('admin.analytics');
+
         // RUTAS PENDIENTES (Ej: teams/delete/{id}, players/edit/{id}, etc.)
     });
 

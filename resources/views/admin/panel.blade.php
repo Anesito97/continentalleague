@@ -37,6 +37,12 @@
             <span class="material-symbols-outlined mr-2">campaign</span> Notificaciones
         </a>
 
+        {{-- ANALÍTICAS --}}
+        <a href="{{ route('admin.analytics') }}" class="admin-nav-item w-full text-left p-3 rounded-lg flex items-center text-sm font-medium transition duration-300
+                   @if ($activeAdminContent === 'analytics') bg-gray-700 @else hover:bg-gray-700 @endif">
+            <span class="material-symbols-outlined mr-2">query_stats</span> Analíticas
+        </a>
+
         {{-- FINALIZAR PARTIDO --}}
         <a href="{{ route('admin.finalize-match') }}"
             class="admin-nav-item w-full text-left p-3 rounded-lg flex items-center text-sm font-bold mt-4 transition duration-300
@@ -54,6 +60,7 @@
     'players' => 'Gestión de Jugadores',
     'matches' => 'Gestión de Partidos',
     'notifications' => 'Notificaciones Predefinidas',
+    'analytics' => 'Analíticas de Visitas',
     'finalize-match' => 'Finalizar Partido',
     default => 'Panel de Administración',
 } }}
@@ -72,6 +79,8 @@
             @include('admin.finalize', ['pendingMatches' => $pendingMatches, 'players' => $players])
         @elseif($activeAdminContent === 'notifications')
             @include('admin.notifications', ['messages' => $messages ?? collect()])
+        @elseif($activeAdminContent === 'analytics')
+            @include('admin.analytics', ['pageViews' => $pageViews ?? collect()])
         @endif
     </div>
 </div>
