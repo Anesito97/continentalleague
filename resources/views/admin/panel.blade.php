@@ -71,7 +71,7 @@
         @elseif($activeAdminContent === 'finalize-match')
             @include('admin.finalize', ['pendingMatches' => $pendingMatches, 'players' => $players])
         @elseif($activeAdminContent === 'notifications')
-            @include('admin.notifications', ['messages' => $messages])
+            @include('admin.notifications', ['messages' => $messages ?? collect()])
         @endif
     </div>
 </div>
