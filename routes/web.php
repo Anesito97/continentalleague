@@ -122,6 +122,13 @@ Route::middleware(\App\Http\Middleware\AdminCheck::class)
             return \App\Models\Jugador::where('equipo_id', $id)->orderBy('nombre')->get(['id', 'nombre']);
         });
 
+        // --- NOTIFICACIONES PREDEFINIDAS ---
+        Route::get('notifications', [\App\Http\Controllers\NotificationController::class, 'index'])->name('admin.notifications.index');
+        Route::post('notifications', [\App\Http\Controllers\NotificationController::class, 'store'])->name('admin.notifications.store');
+        Route::put('notifications/{message}', [\App\Http\Controllers\NotificationController::class, 'update'])->name('admin.notifications.update');
+        Route::delete('notifications/{message}', [\App\Http\Controllers\NotificationController::class, 'destroy'])->name('admin.notifications.destroy');
+        Route::post('notifications/{message}/send', [\App\Http\Controllers\NotificationController::class, 'send'])->name('admin.notifications.send');
+
         // RUTAS PENDIENTES (Ej: teams/delete/{id}, players/edit/{id}, etc.)
     });
 
