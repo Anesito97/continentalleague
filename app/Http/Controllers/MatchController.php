@@ -120,7 +120,7 @@ class MatchController extends Controller
     }
 
     // 2. Finalizar Partido (Ligeramente modificado para usar las nuevas funciones)
-    public function finalize(Request $request)
+    public function finalize(Request $request, \App\Services\WhatsAppService $whatsapp)
     {
         $request->validate([
             'match_id' => 'required|exists:partidos,id',
@@ -131,7 +131,7 @@ class MatchController extends Controller
 
         DB::beginTransaction();
         try {
-            $match = Partido::where('id', $request->match_id)
+            $match = Partido::with(['localTeam', 'visitorTeam'])->where('id', $request->match_id)
                 ->where('estado', 'pendiente')
                 ->firstOrFail();
 
@@ -147,6 +147,38 @@ class MatchController extends Controller
             $this->applyPlayerStats($request->events ?? [], $match->id);
 
             DB::commit();
+
+            // --- NOTIFICACIÓN WHATSAPP ---
+            try {
+                $local = $match->localTeam->nombre;
+                $visitor = $match->visitorTeam->nombre;
+                $score = "{$request->goles_local} - {$request->goles_visitor}";
+
+                $eventsList = "";
+                if (!empty($request->events)) {
+                    foreach ($request->events as $event) {
+                        if (!empty($event['player_id'])) {
+                            $player = Jugador::find($event['player_id']);
+                            $playerName = $player ? $player->nombre : 'Jugador';
+                            $type = ucfirst($event['event_type'] ?? 'Evento');
+                            $min = !empty($event['minuto']) ? "({$event['minuto']}')" : "";
+                            $eventsList .= "• {$min} {$type}: {$playerName}\n";
+                        }
+                    }
+                }
+
+                $appUrl = env('APP_URL', url('/'));
+                $message = "🏆 *PARTIDO FINALIZADO* 🏆\n\n" .
+                    "⚽ *{$local}* vs *{$visitor}*\n" .
+                    "🔢 Resultado: *{$score}*\n\n" .
+                    "📝 *Eventos:*\n{$eventsList}\n" .
+                    "🔗 Ver más: {$appUrl}";
+
+                $whatsapp->sendMessage($message);
+
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::error("Error enviando WhatsApp: " . $e->getMessage());
+            }
 
             return redirect()->route('admin.finalize-match')->with('success', 'Partido finalizado con éxito.');
         } catch (\Exception $e) {
