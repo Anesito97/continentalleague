@@ -124,3 +124,9 @@ Route::middleware(\App\Http\Middleware\AdminCheck::class)
 
         // RUTAS PENDIENTES (Ej: teams/delete/{id}, players/edit/{id}, etc.)
     });
+
+// --- RUTA DE PRUEBA WHATSAPP ---
+Route::get('/test-whatsapp', function (\App\Services\WhatsAppService $whatsapp) {
+    $success = $whatsapp->sendMessage('Notificación de prueba desde el BOT🚀');
+    return $success ? 'Mensaje enviado correctamente' : 'Error al enviar mensaje';
+});
