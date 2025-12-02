@@ -396,7 +396,7 @@
 
     {{-- MODAL DE LOGIN (AÑADIDO CONTENIDO FALTANTE para solucionar la opacidad) --}}
     {{-- MEJORA: Fondo del modal con efecto blur --}}
-    <div id="login-modal"
+    <div id="login-modal" style="display: none;"
         class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
         {{-- MEJORA: Tarjeta con borde animado (ver CSS) --}}
         <div class="bg-gray-800 card p-6 w-11/12 max-w-sm shadow-2xl hover:transform-none modal-card-glow">
@@ -418,7 +418,7 @@
             </div>
 
             {{-- MEJORA: Botón de cancelar más sutil --}}
-            <button onclick="document.getElementById('login-modal').classList.add('hidden')"
+            <button onclick="document.getElementById('login-modal').style.display = 'none'; document.getElementById('login-modal').classList.add('hidden')"
                 class="bg-gray-700 hover:bg-gray-600 text-gray-300 font-bold py-2 px-4 rounded-lg transition w-full">Cancelar</button>
         </div>
     </div>
@@ -477,6 +477,7 @@
             // Check for login query param to open modal
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.get('login') === 'true') {
+                document.getElementById('login-modal').style.display = 'flex';
                 document.getElementById('login-modal').classList.remove('hidden');
                 document.getElementById('login-modal').classList.add('flex'); // Ensure flex is added for centering
             }

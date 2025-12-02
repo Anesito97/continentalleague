@@ -80,7 +80,14 @@
         @elseif($activeAdminContent === 'notifications')
             @include('admin.notifications', ['messages' => $messages ?? collect()])
         @elseif($activeAdminContent === 'analytics')
-            @include('admin.analytics', ['pageViews' => $pageViews ?? collect()])
+            @include('admin.analytics', [
+                'pageViews' => $pageViews ?? collect(),
+                'totalVisits' => $totalVisits ?? 0,
+                'uniqueVisitors' => $uniqueVisitors ?? 0,
+                'chartData' => $chartData ?? ['labels' => [], 'data' => []],
+                'browserStats' => $browserStats ?? [],
+                'osStats' => $osStats ?? []
+            ])
         @endif
     </div>
 </div>
