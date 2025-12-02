@@ -259,6 +259,8 @@
 
     {{-- MODAL DE LOGIN (AÑADIDO CONTENIDO FALTANTE para solucionar la opacidad) --}}
     {{-- MEJORA: Fondo del modal con efecto blur --}}
+    <div id="login-modal" style="display: none;"
+        class="fixed inset-0 bg-black/70 backdrop-blur-sm z-[60] hidden items-center justify-center p-4">
         <div class="bg-gray-800 card p-6 w-11/12 max-w-sm shadow-2xl hover:transform-none modal-card-glow">
             <h4 class="text-xl font-bold mb-4 text-green-400 text-center">Iniciar Sesión</h4>
 
@@ -278,9 +280,10 @@
             </div>
 
             {{-- MEJORA: Botón de cancelar más sutil --}}
-            <button onclick="document.getElementById('login-modal').classList.add('hidden')"
+            <button onclick="document.getElementById('login-modal').style.display = 'none'; document.getElementById('login-modal').classList.add('hidden')"
                 class="bg-gray-700 hover:bg-gray-600 text-gray-300 font-bold py-2 px-4 rounded-lg transition w-full">Cancelar</button>
         </div>
+    </div>
 
     <script>
         // Lógica del Loader
@@ -336,6 +339,16 @@
 
                 // 5. Restaurar la posición del scroll
                 window.scrollTo(0, scrollPosition);
+            }
+        }
+
+        // ⬇️ FUNCIÓN GLOBAL PARA ABRIR EL MODAL DE LOGIN ⬇️
+        function openLoginModal() {
+            const modal = document.getElementById('login-modal');
+            if (modal) {
+                modal.style.display = 'flex';
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
             }
         }
     </script>

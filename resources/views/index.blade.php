@@ -394,11 +394,9 @@
     {{-- MODALES Y SCRIPTS FINALES --}}
     @include('partials.alerts')
 
-    {{-- MODAL DE LOGIN (AÑADIDO CONTENIDO FALTANTE para solucionar la opacidad) --}}
-    {{-- MEJORA: Fondo del modal con efecto blur --}}
+    {{-- MODAL DE LOGIN (RESTAURADO PARA HOME PAGE) --}}
     <div id="login-modal" style="display: none;"
-        class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
-        {{-- MEJORA: Tarjeta con borde animado (ver CSS) --}}
+        class="fixed inset-0 bg-black/70 backdrop-blur-sm z-[60] hidden items-center justify-center p-4">
         <div class="bg-gray-800 card p-6 w-11/12 max-w-sm shadow-2xl hover:transform-none modal-card-glow">
             <h4 class="text-xl font-bold mb-4 text-green-400 text-center">Iniciar Sesión</h4>
 
@@ -422,6 +420,20 @@
                 class="bg-gray-700 hover:bg-gray-600 text-gray-300 font-bold py-2 px-4 rounded-lg transition w-full">Cancelar</button>
         </div>
     </div>
+
+    <script>
+        // ⬇️ FUNCIÓN GLOBAL PARA ABRIR EL MODAL DE LOGIN (HOME PAGE) ⬇️
+        function openLoginModal() {
+            const modal = document.getElementById('login-modal');
+            if (modal) {
+                modal.style.display = 'flex';
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            }
+        }
+    </script>
+
+
 
     {{-- MODAL GENÉRICO DE EDICIÓN (Placeholder) --}}
     <div id="edit-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
@@ -477,9 +489,9 @@
             // Check for login query param to open modal
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.get('login') === 'true') {
-                document.getElementById('login-modal').style.display = 'flex';
-                document.getElementById('login-modal').classList.remove('hidden');
-                document.getElementById('login-modal').classList.add('flex'); // Ensure flex is added for centering
+                if (typeof openLoginModal === 'function') {
+                    openLoginModal();
+                }
             }
         });
 
