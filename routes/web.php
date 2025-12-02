@@ -133,6 +133,10 @@ Route::middleware(\App\Http\Middleware\AdminCheck::class)
         Route::get('analytics', [\App\Http\Controllers\AnalyticsController::class, 'index'])->name('admin.analytics');
 
         // RUTAS PENDIENTES (Ej: teams/delete/{id}, players/edit/{id}, etc.)
+    
+        // GESTIÓN DE USUARIOS (GOOGLE)
+        Route::get('users', [\App\Http\Controllers\AdminUserController::class, 'index'])->name('admin.users.index');
+        Route::post('users/{user}/toggle-block', [\App\Http\Controllers\AdminUserController::class, 'toggleBlock'])->name('admin.users.toggle-block');
     });
 
 // --- RUTA DE PRUEBA WHATSAPP ---

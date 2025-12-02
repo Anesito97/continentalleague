@@ -384,6 +384,7 @@
                             'players' => $players,
                             'pendingMatches' => $pendingMatches,
                             'activeAdminContent' => session('activeAdminContent', 'teams'),
+                            'users' => $users ?? new \Illuminate\Pagination\LengthAwarePaginator([], 0, 15),
                         ])
                     </section>
                 @endif

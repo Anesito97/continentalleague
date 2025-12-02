@@ -25,6 +25,12 @@
             <span class="material-symbols-outlined mr-2">sports_soccer</span> Gestión de Partidos
         </a>
 
+        {{-- GESTIÓN DE USUARIOS (GOOGLE) --}}
+        <a href="{{ route('admin.users.index') }}" class="admin-nav-item w-full text-left p-3 rounded-lg flex items-center text-sm font-medium transition duration-300
+                   @if ($activeAdminContent === 'users') bg-gray-700 @else hover:bg-gray-700 @endif">
+            <span class="material-symbols-outlined mr-2">manage_accounts</span> Gestión de Usuarios
+        </a>
+
         {{-- GESTIÓN DE NOTICIAS (NUEVO ENLACE) --}}
         <a href="{{ route('admin.news') }}" class="admin-nav-item w-full text-left p-3 rounded-lg flex items-center text-sm font-medium transition duration-300
                    @if ($activeAdminContent === 'news') bg-gray-700 @else hover:bg-gray-700 @endif">
@@ -55,6 +61,7 @@
     <div class="col-span-1 lg:col-span-3">
         <h2 class="text-4xl font-bold text-white mb-6 border-b border-green-700 pb-2" id="admin-title">
             {{ match ($activeAdminContent) {
+    'users' => 'Gestión de Usuarios (Google)',
     'news' => 'Gestión de Noticias',
     'teams' => 'Gestión de Equipos',
     'players' => 'Gestión de Jugadores',
@@ -67,7 +74,9 @@
         </h2>
 
         {{-- INCLUSIÓN DINÁMICA DE CONTENIDO --}}
-        @if ($activeAdminContent === 'news')
+        @if ($activeAdminContent === 'users')
+            @include('admin.users.index', ['users' => $users])
+        @elseif ($activeAdminContent === 'news')
             @include('admin.news', ['news' => $news])
         @elseif ($activeAdminContent === 'teams')
             @include('admin.teams', ['teams' => $teams])

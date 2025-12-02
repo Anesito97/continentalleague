@@ -45,12 +45,16 @@ class AuthController extends Controller
                 }
             }
 
+            if ($user->is_blocked) {
+                return redirect()->route('home')->with('error', 'Tu cuenta ha sido bloqueada. Contacta al administrador.');
+            }
+
             Auth::login($user);
 
             return redirect()->route('home');
 
         } catch (\Exception $e) {
-            return redirect()->route('login')->with('error', 'Error al iniciar sesión con Google.');
+            return redirect()->route('home')->with('error', 'Error al iniciar sesión con Google.');
         }
     }
     // Función de LOGIN, usada por el formulario POST
