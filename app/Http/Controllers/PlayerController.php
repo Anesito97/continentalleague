@@ -36,7 +36,7 @@ class PlayerController extends Controller
     public function store(Request $request)
     {
         // ... (validación)
-        $photoUrl = 'https://placehold.co/100x100/1f2937/FFFFFF?text=JUGADOR';
+        $photoUrl = asset('player.png');
 
         if ($request->hasFile('logo') && $request->file('logo')->isValid()) {
             $file = $request->file('logo');
